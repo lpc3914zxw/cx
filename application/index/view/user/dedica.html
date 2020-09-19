@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>用户管理</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="__STATIC__/img/favicon.png">
+    <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <style>
+           .description  img{
+                width:100% !important;
+           }
+    </style>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+    <div>
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$current_menu.name}</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="example-wrap">
+                            <div class="example">
+                                <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+                                    <form role="form" class="form-inline">
+                                        <div class="form-group">
+                                            <label>用户</label>
+                                            <input type="text" name="name" id="name" placeholder="用户名称/ID/手机号" class="form-control" value="">
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <label>来源&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="type" name="type">
+                                                <option value="" >-请选择来源-</option>
+                                                
+                                                   <option value="1">每日才学</option>
+                                                   <option value="2">文章阅读</option>
+                                                   <option value="3">文章点赞</option>
+                                                   <option value="4">文章分享</option>
+                                                   <option value="5">反馈意见</option>
+                                                   <option value="6">邀请</option>
+                                                   <option value="7">才学堂学习</option>
+                                                   <option value="8">金句分享</option>
+                                                   <option value="9">大社群新增一人</option>
+                                                   <option value="10">小社群新增一人</option>
+                                                   <option value="11">大社群新增一学习力</option>
+                                                   <option value="12">小社群新增一学习力</option>
+                                                   <option value="13">才学堂课程消费</option>
+                                                   <option value="14">课程阅读</option>
+                                                   <option value="15">课程点赞</option>
+                                                   <option value="16">课程分享</option>
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        
+                                         <div class="form-group">
+                                            <label>时间&nbsp;&nbsp;</label>
+                                            <input type="text" name="time" placeholder="请选择时间" class="form-control" value="" id="scoretime">
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-outline btn-primary" onclick="exportes()" style="margin-bottom: 0">
+                                                导出
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <table id="bootstrapTable" data-click-to-select="true">
+                                    <thead>
+                                    <tr>
+                                        <th data-checkbox="true"></th>
+                                        <th data-field="id" align="center">ID</th>
+                                        <th data-field="name" align="center">昵称</th>
+                                        <th data-field="tel" align="center">手机</th>
+                                        <th data-field="value" align="center">获得贡献值</th>
+                                        <th data-field="content" align="center">来源说明</th>
+                                        <th data-field="type" data-formatter="formatType" align="center">来源类别</th>
+                                        <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true">时间</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input  type="hidden"  id="uid"  value="{$uid}"/>
+<script src="/static/web/js/laydate.js"></script>
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="__STATIC__/js/plugins/layer/layer.js"></script>
+<script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+<script src="__STATIC__/js/contabs.min.js"></script>
+<script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+<script src="__STATIC__/js/content.min.js"></script>
+<script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="__STATIC__/js/common.js"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script>
+
+ $(function () {
+       $("#bootstrapTable").bootstrapTable({
+           url: "/index/user/dedica/uid/" + $('#uid').val(),
+           idField: 'id',
+           search: false,
+           cache: false,       //是否使用缓存
+           sortStable: true,
+           sortOrder: 'desc',
+           striped: true,      //是否显示行间隔色
+           pagination: true,
+           detailView: false,       //开启详细视图功能
+           detailFormatter: 'detailFormat',
+           sidePagination: 'server',
+           pageNumber: 1,
+           pageSize: 20,
+           pageList: '[20, 50, 100]',
+           showRefresh: true,
+           showToggle: false,
+           showColumns: true,
+           iconSize: "outline",
+           toolbar: "#bootstrapTableToolbar"
+       });
+    });
+
+     function exportes() {
+         var name = $("input[name='name']").val();
+         var type = $('#type').val();
+         var scoretime = $('#scoretime').val();
+         var uid = $('#uid').val();
+         window.location.href="/index/user/exportDedica/name/" + name + '/type/' + type +  '/scoretime/' + scoretime + '/uid/' + uid;
+     }
+
+
+    function search() {
+        var name = $("input[name='name']").val();
+        var type = $('#type').val();
+        var scoretime = $('#scoretime').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {name: name, type:type,scoretime:scoretime};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+    laydate.render({
+      elem: '#scoretime'
+      ,type: 'datetime'
+      ,range: true
+    });
+     function formatType(value) {
+         if(value == 1) {
+             return '每日才学';
+         }else if(value == 2) {
+             return '文章阅读';
+         }else if(value == 3) {
+             return '文章点赞';
+         }else if(value == 4) {
+             return '文章分享';
+         }else if(value == 5) {
+             return '反馈意见';
+         }else if(value == 6) {
+             return '邀请';
+         }else if(value == 7) {
+             return '才学堂课堂刚学习';
+         }else if(value == 8) {
+             return '金句分享';
+         }else if(value == 9) {
+             return '大社群新增一人';
+         }else if(value == 10) {
+             return '小社群新增一人';
+         }else if(value == 11) {
+             return '大社群新增一学习力';
+         }else if(value == 12) {
+             return '小社群新增一学习力';
+         }else if(value == 13) {
+             return '才学堂课程消费';
+         }else if(value == 14) {
+             return '课程阅读';
+         }else if(value == 15) {
+             return '课程点赞';
+         }else if(value == 16) {
+             return '课程分享';
+         }
+         
+         
+     }
+
+
+</script>
+</body>
+</html>

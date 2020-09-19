@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/login_v2.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:49 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>才学堂后台</title>
+     <link rel="shortcut icon" href="../../logo-28px.ico">
+    <meta name="keywords" content="才学堂">
+    <meta name="description" content="才学堂">
+    <link href="__STATIC__/css/bootstrap.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/login.min.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>
+        if(window.top!==window.self){window.top.location=window.location};
+    </script>
+
+</head>
+<style type="text/css">
+
+</style>
+<body class="signin">
+    <div class="signinpanel">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="signin-info">
+                    <div class="logopanel m-b">
+                        <h1>[导师后台]</h1>
+                    </div>
+                    <div class="m-b"></div>
+                    <h4><strong>欢迎来到导师管理后台</strong></h4>
+                   <!--<strong><a href="#">忘记密码&raquo;</a></strong>-->
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <!-- <form method="post" action=""> -->
+                <h4 class="no-margins">登录：</h4>
+                <p class="m-t-md">请输入账号密码</p>
+                <input type="text" class="form-control uname" name="name" id="username" placeholder="用户名" />
+                <input type="password" class="form-control pword m-b" name="password" id="password"placeholder="密码" />
+                <div class="input-group form-group">
+                    <input type="text" name="verify" id="verify" class="form-control" style="color:#333" placeholder="验证码" required="">
+                    <span class="input-group-btn" style="height:40px;margin-top:4px; width:auto;">
+                            <img style="cursor:pointer;margin-top:14px;width:94%;float:right;" class="mh5 verifyimg reloadverify" alt="点击刷新" src="{:url('Login/verify')}" >
+                        </span>
+                </div>
+                <!-- <a href="#">忘记密码了？</a> -->
+                <button class="btn btn-success btn-block" onclick="userLogin()" id="submit">登录</button>
+                <!-- </form> -->
+            </div>
+        </div>
+        <div class="signup-footer">
+            <div class="pull-left">
+                &copy; 2020 All Rights Reserved.
+            </div>
+        </div>
+    </div>
+    <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__STATIC__/js/demo/layer-demo.min.js"></script>
+    <script src="__STATIC__/js/layer/layer.js"></script>
+    <script src="__STATIC__/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <script type="text/javascript">
+        //刷新验证码
+        var verifyimg = $(".verifyimg").attr("src");
+        $(".reloadverify").click(function () {
+            if (verifyimg.indexOf('?') > 0) {
+                $(".verifyimg").attr("src", verifyimg + '&random=' + Math.random());
+            } else {
+                $(".verifyimg").attr("src", verifyimg.replace(/\?.*$/, '') + '?' + Math.random());
+            }
+        });
+        var SubmitOrHidden = function(event) {
+            e = event ? event : (window.event ? window.event : null);
+            if (e.keyCode == 13) {
+                userLogin();
+            }
+        }
+        window.document.onkeydown = SubmitOrHidden;
+        //用户登录
+        function userLogin(){
+            $('#submit').attr('disabled',true)
+            var name = $("#username").val();
+            var pwd = $("#password").val();
+            var code = $("#verify").val();
+            if(name == ""){
+               parent.layer.msg('账号不能为空！');
+                $('#submit').attr('disabled',false)
+               return;
+            }else if(pwd == ""){
+                parent.layer.msg('密码不能为空！');
+                $('#submit').attr('disabled',false)
+                return;
+            }else if(code == ""){
+                parent.layer.msg('验证码不能为空！');
+                $('#submit').attr('disabled',false)
+                return;
+            }
+            $.ajax({
+                url: "{:\\think\\Url::build('login/login')}",
+                data: {
+                    name:name,
+                    pwd:pwd,
+                    verify:code
+                },
+                dataType: "json",
+                type: "post",
+                success: function(data){
+                    if (data.code === 1) {
+                        parent.layer.msg(data.msg);
+                        window.location.href = "{:url('index/index')}"
+                    } else {
+                        parent.layer.msg(data.msg);
+                        setTimeout(function() {
+                             window.location.href = "{:url('login/index')}"
+                        },1500)
+
+                    }
+                },
+            });
+        }
+       </script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/login_v2.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:52 GMT -->
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>文章详情</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1809818_gfj9lnha0yc.css" />
+    <link rel="stylesheet" href="/static/wxapp/css/alayout.css" />
+    <link rel="stylesheet" href="/static/wxapp/css/detail.css" />
+    <script src="/static/wxapp/js/flexible.js"></script>
+    <style>
+        img { -ms-interpolation-mode: bicubic; }
+
+        img { width: 100%; }
+    </style>
+  </head>
+  <body onclick="register()">
+    <section class="padding-30">
+      <div class="app-box">
+        <div class="open-app flex justify-between align-center">
+          <div class="flex align-center">
+            <img class="logo" src="https://mrcx.caixue.co/Uploads/20200721/833966c32f04360ac7bf529b7f16f93a.png" />
+            <div class="font-28">学财商上每日财学 边学边赚</div>
+          </div>
+          <button class="open-btn font-26">立即打开</button>
+        </div>
+      </div>
+      <div class="font-36 font-weight-500">{$ainfo['title']}</div>
+      <div class="flex justify-between align-center margin-top-30">
+        <div class="flex align-center ">
+          <img src="{$ainfo['imgurl']}" class="user-header" />
+          <div class="margin-left-20">
+            <div class="flex align-center font-26 font-weight-500">{$ainfo['name']}</div>
+            <div class="flex align-center font-22 text-grey">
+              <div>发布于 {$ainfo['addtime']}</div>
+              <div class="margin-left-20">阅读 {$ainfo['readnum']}</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex align-center">
+          <button class="btn like">关注</button>
+          <!--button class="btn is-like">已关注</button-->
+        </div>
+      </div>
+      <div class="margin-top-30 font-28">{$ainfo['content']}</div>
+      <div class="flex flex-column center margin-top-30 bottom">
+        <button class="my-btn submit flex center">
+          <i class="iconfont iconicon font-32"></i>
+          <div class="margin-left-10 font-28">赞赏作者</div>
+        </button>
+        <div class="number-box text-black flex center font-26 margin-top-20"><p class="text-orange">{$ainfo['likeauth_num']}</p> 人赞赏</div>
+        <div class="flex flex-wrap margin-top-20">
+          <!--img src="https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=412796477,2371228780&fm=111&gp=0.jpg" class="user-header margin-left-10" />
+          <img src="https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=412796477,2371228780&fm=111&gp=0.jpg" class="user-header margin-left-10" />
+          <img src="https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=412796477,2371228780&fm=111&gp=0.jpg" class="user-header margin-left-10" />
+          <img src="https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=412796477,2371228780&fm=111&gp=0.jpg" class="user-header margin-left-10" />
+          <img src="https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=412796477,2371228780&fm=111&gp=0.jpg" class="user-header margin-left-10" /-->
+        </div>
+      </div>
+      <div style="height: 1.72rem;"></div>
+      <div class="footer flex center padding-bottom-20" style="
+    height: 69.6px;">
+        <button class="my-btn default font-28 text-gray" disabled="disabled">评论暂未开放</button>
+        <div class="flex center padding-20">
+          <i class="iconfont iconzan font-36"></i>
+          <div class="font-26 padding-left-10">{$ainfo['like_num']}</div>
+        </div>
+        <div class="flex center padding-20">
+          <i class="iconfont iconshoucangxingxing-xianxing font-36"></i>
+          <div class="font-26 padding-left-10">{$ainfo['collection_num']}</div>
+        </div>
+        <div class="flex center padding-20">
+          <i class="iconfont iconpinglun font-36"></i>
+          <div class="font-26 padding-left-10">{$ainfo['comment_num']}</div>
+        </div>
+      </div>
+    </section>
+    <script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/wxapp/js/device.js"></script>
+    <script src="/static/wxapp/js/main.js"></script>
+    <script>
+        function register(){
+           var url =  "<?php echo $url?>";
+           window.location.href = url;
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>{$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+
+<!--右侧部分开始-->
+<div id="page-wrapper" class="gray-bg dashbard-1" style="overflow: auto;">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <style>
+            .table th, .table td {
+                text-align: center;
+            }
+            #page-wrapper {
+                padding: 0 15px;
+                position: inherit;
+                margin: 0 0 0 60px;
+            }
+
+        </style>
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$current_menu.name|default=''}</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12  col-md-12">
+                        <div class="example-wrap">
+                            <div class="example">
+                                <div class="btn-group hidden-xs" role="group">
+                                    <button type="button" class="btn btn-outline btn-default" onclick="add()">
+                                        <i class="fa fa-plus-square-o" aria-hidden="true">&nbsp;&nbsp;添加</i>
+                                    </button>
+                                </div>
+                                <table id="bootstrapTable" data-click-to-select="true">
+                                    <thead>
+                                    <tr>
+                                        <th data-checkbox="true"></th>
+                                        <th data-field="id" data-sortable="true" >序号ID</th>
+                                        <th data-field="name" data-sortable="true"  >名称</th>
+                                        <th data-field="imgurl" data-sortable="true" data-formatter="formatImg" >轮播图片</th>
+                                        <th data-field="type" data-sortable="true" data-formatter="formatTrue">场景</th>
+                                        <th data-field="link" data-sortable="true"   >跳转地址</th>
+                                        <th data-field="idvalue" data-sortable="true"   >参数ID值</th>
+                                        <th data-field="addtime" data-formatter="formatTime" align="center" >添加时间</th>
+                                        <th data-field="" data-formatter="formatOperation" >操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--右侧部分结束-->
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/hplus/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/hplus/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/static/hplus/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+<script src="/static/hplus/js/hplus.min.js?v=4.1.0"></script>
+<script src="/static/hplus/js/contabs.min.js"></script>
+<script src="/static/hplus/js/plugins/pace/pace.min.js"></script>
+<script src="/static/hplus/js/content.min.js"></script>
+
+<script src="/static/hplus/js/plugins/toastr/toastr.min.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/bootstrap-table.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/static/hplus/js/common.js"></script>
+
+<script src="/static/hplus/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="/static/hplus/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script>
+
+    $(function () {
+        $("#bootstrapTable").bootstrapTable({
+            url: "{:\\think\\Url::build('Advertisement/index')}",
+            idField: 'id',
+            search: false,
+            cache: false,       //是否使用缓存
+            sortStable: true,
+            sortOrder: 'desc',
+            striped: true,      //是否显示行间隔色
+            pagination: true,
+            detailView: false,       //开启详细视图功能
+            sidePagination: 'server',
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: '[10, 30, 100]',
+            showRefresh: true,
+            showToggle: false,
+            showColumns: true,
+            iconSize: "outline",
+            toolbar: "#bootstrapTableToolbar"
+        });
+    });
+
+    function formatTrue(value) {
+        if(value == 1) {
+            return '外部链接'
+        }else if(value == 2) {
+            return '文章'
+        }else if(value == 3) {
+            return '才学堂'
+        }else if(value == 4) {
+            return '学财商'
+        }
+    }
+
+    //格式化图片
+    function formatImg(value, row) {
+        var html = '<img src="' + value + '" style="height: 50px;">';
+        return html;
+    }
+
+
+    function del(id){
+        swal({
+            title:"您确定要删除这条信息吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('Advertisement/del')}",
+                    data: {id: id},
+                    dataType: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这条信息。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
+
+
+    function add(){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/Advertisement/add", 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '添加轮播图',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: "/index/Advertisement/add",
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+    
+    function  edit(id){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/Advertisement/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑轮播图',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: "/index/Advertisement/add/id/" + id,
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+    //格式化操作
+    function formatOperation(value, row) {
+        var html = '';
+        html += '<div class="btn-group">';
+        html +=	'<button class="btn btn-info" type="button" onclick="edit(' + row.id + ')" data-target="#myModal"><i class="fa fa-paste"></i>编辑</button>';
+        html +=	'<button class="btn btn-primary" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删除</button>';
+        html +=	'</div>';
+        return html;
+    }
+
+</script>
+
+</body>
+</html>

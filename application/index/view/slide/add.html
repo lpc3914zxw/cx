@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>轮播图列表</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+        #page-wrapper {
+            padding: 0 15px;
+            position: inherit;
+            margin: 0 0 0 60px;
+        }
+
+    </style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div >
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <form method="post" class="form-horizontal" id="newsForm">
+                        <input type="hidden" name="id" value="{present name='id'}{$id}{else /}0{/present}">
+
+                        <div class="hr-line-dashed"></div>
+                        {present name="slideshow"}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">当前logo:</label>
+                            <div class="col-sm-8">
+                                <img src="{$slideshow.imgurl}" width="200"/>
+                            </div>
+                        </div>
+                        {/present}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">logo：</label>
+                            <div class="col-sm-5">
+                                <input type="file" class="form-control" name="logo" id="logo">
+                            </div>
+                            <div class="col-sm-3"  style="color:red">
+                                <span >建议上传像素:宽750px，高400px</span>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">跳转场景:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control kind" name="kind">
+                                    <option value="0" {present name="slideshow"}{eq name="$slideshow.kind" value="0"}selected{/eq}{/present}>内部链接</option>
+                                    <option value="1" {present name="slideshow"}{eq name="$slideshow.kind" value="1"}selected{/eq}{/present}>外部链接</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">链接地址:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="link" placeholder="链接地址"  value="{present name='slideshow'}{$slideshow.link}{/present}">
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-primary save" type="submit">保存内容</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="__STATIC__/js/demo/layer-demo.min.js"></script>
+<script src="__STATIC__/js/layer/layer.js"></script>
+<script>
+    $(function () {
+        $("input[type='file']").prettyFile();
+
+        $("#newsForm").submit(function() {
+           // $('.save').attr('disabled',true)
+            var id = $("input[name='id']").val();
+            var kind = $('.kind').val()
+            var link = $('.link').val()
+            $.ajaxfileupload({
+                url: "{:\\think\\Url::build('slide/add')}",
+                type: "post",
+                async: false,
+                secureuri: false,
+                fileElementId: ['logo'],
+                dataType: "json",
+                data: {id: id,kind:kind,link:link},
+                success: function(data){
+                    if (data.code === 1) {
+                        parent.layer.msg(data.msg);
+                        window.location.href = '/index/slide/index';
+                    } else {
+                        parent.layer.msg(data.msg);
+
+                    }
+                },
+                error: function(e){
+                    layer.msg('服务器异常', {icon: 2, shift: 6});
+                }
+            });
+            return false;
+        });
+    });
+
+
+    $('.back').click(function(){
+        window.location.href="/index/slide/index"
+    })
+</script>
+</body>
+</html>

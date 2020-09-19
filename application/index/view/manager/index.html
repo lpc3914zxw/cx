@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>操作员管理</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="__STATIC__/img/favicon.png">
+    <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <style>
+        .description  img{
+            width:100% !important;
+        }
+    </style>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div>
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <div class="example-wrap">
+                        <div class="example">
+                            <table id="bootstrapTable" data-click-to-select="true">
+                                <thead>
+                                <tr>
+                                    <th data-checkbox="true"></th>
+                                    <th data-field="logo" data-formatter="formatImage" align="center">头像</th>
+                                    <th data-field="username" align="center">用户名</th>
+                                    <th data-field="last_login_time" data-formatter="formatTime" align="center" data-sortable="true">最后登录时间</th>
+                                    <th data-field="" data-formatter="formatOperation" class="col-sm-2" align="center">操作</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="__STATIC__/js/plugins/layer/layer.js"></script>
+<script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+<script src="__STATIC__/js/contabs.min.js"></script>
+<script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+<script src="__STATIC__/js/content.min.js"></script>
+<script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="__STATIC__/js/common.js"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script>
+
+    $(function () {
+        $("#bootstrapTable").bootstrapTable({
+            url: "{:\\think\\Url::build('manager/index')}",
+            idField: 'id',
+            search: false,
+            cache: false,       //是否使用缓存
+            sortStable: true,
+            sortOrder: 'desc',
+            striped: true,      //是否显示行间隔色
+            pagination: true,
+            detailView: false,       //开启详细视图功能
+            detailFormatter: 'detailFormat',
+            sidePagination: 'server',
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: '[10, 30, 100]',
+            showRefresh: true,
+            showToggle: false,
+            showColumns: true,
+            iconSize: "outline",
+            toolbar: "#bootstrapTableToolbar"
+        });
+    });
+
+    function formatImage(value, row, index) {
+        return '<a><img src="' + value + '" width="100px"/></a>';
+    }
+
+    function formatOperation(value, row) {
+        var html = '<div class="btn-group">';
+        html += '<button type="button" class="btn btn-xs btn-outline btn-primary" onclick="edit(' + row.uid + ')"><i class="fa fa-edit" aria-hidden="true"></i>编辑管理员</button>';
+        html += '<button type="button" class="btn btn-xs btn-outline btn-primary" onclick="del(' + row.uid + ')"><i class="fa fa-edit" aria-hidden="true"></i>删除管理员</button>';
+        html += '<button type="button" class="btn btn-xs btn-outline btn-primary" onclick="getpower(' + row.uid + ')"><i class="fa fa-edit" aria-hidden="true"></i>权限</button>';
+        return html;
+    }
+
+    function getpower(uid){
+        window.location.href="/index/power/getpower/uid/" + uid;
+    }
+
+    function edit(uid){
+        window.location.href="/index/manager/edit/uid/" + uid;
+    }
+
+    function del(uid) {
+        swal({
+            title:"您确定要删除这条信息吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('manager/del')}",
+                    data: {uid: uid},
+                    dataType: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这条信息。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
+</script>
+</body>
+</html>
