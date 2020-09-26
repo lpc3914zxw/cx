@@ -51,6 +51,7 @@ class Menu extends Model {
         $menu = $this::get(function($query) use($map) {
             $query->where($map);
         });
+       // echo $this->getLastSql();exit;
         return $menu;
     }
 }

@@ -16,7 +16,7 @@ use think\Db;
  */
 class Dayarticle extends Base
 {
-    
+
 
     /*
      * 金句列表
@@ -41,20 +41,20 @@ class Dayarticle extends Base
     public function adddayarticle(){
         if ($this->request->isPost()) {
             $Dayarticle_model = new \app\index\model\Dayarticle();
-            
+
             $request = $this->request->param();
-            
+
             $id = $request['id'];
             unset($request['id']);
-            
+
             $data = [
                 'title'=>$request['title'],
                 'content'=>$request['content'],
-                
+                'is_shelves'=>$request['is_shelves'],
                 'contribution_value'=>$request['contribution_value'],
                 'imgurl'=>$request['imgurl'],
                 'type'=>$request['type']
-               
+
             ];
            	if(empty($data['title'])||empty($data['content'])||empty($data['imgurl'])||empty($data['type'])){
             	$this->error('参数缺失');
@@ -64,18 +64,18 @@ class Dayarticle extends Base
                 if(!$Dayarticle_model->insert($data)){
                    $this->error('添加失败');
                 }
-                
+
                 $msg = '添加成功';
             } else {                          //修改赛事
                 $where = ['id' => $id];
-                
+
                 if (false === $Dayarticle_model->where($where)->update($data)) {
                     $this->error('修改失败');
                 }
-                
+
                 $msg = '修改成功';
             }
-           
+
             $this->success($msg);
         }
         return $this->fetch('add');
@@ -91,7 +91,18 @@ class Dayarticle extends Base
         return $this->fetch('add');
     }
 
-    
+    /*
+ * 设置是否每日一课程/ 推荐
+ */
+    public function setTrue($id = 0,$type = 0,$value = '') {
+        $curse_model = new \app\index\model\Dayarticle();
+        if($type == 3) {
+            false !== $curse_model->where('id',$id)->update(['is_shelves'=>$value]) && $this->success('设置成功');
+            $this->error('设置失败');
+        }else{
+            $this->error('设置失败,参数错误');
+        }
+    }
 
     /*
      * 删除
@@ -115,11 +126,11 @@ class Dayarticle extends Base
         $this->error('删除失败');
     }
 
-    
 
 
-   
-   
+
+
+
 
     /**
      * 组装传过来的数据

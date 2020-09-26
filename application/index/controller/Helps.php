@@ -38,7 +38,20 @@ class Helps extends Base {
         }
         return $this->fetch('hothelp');
     }
-
+    /*
+    * 联系我们
+    */
+    public function contactHelps() {
+        $model = new \app\index\model\Helps();
+        if($this->request->isAjax()){
+            $where = ['type'=>3];
+            //搜索条件
+            $params = $this->request->param();
+            (isset($params['title']) && !empty($params['title'])) && $where['title'] = ['like', '%' . $params['title'] . '%'];
+            return $model->getList($where);
+        }
+        return $this->fetch('contacthelp');
+    }
     /*
      * 新增
      * @param int $type  1 常见问题  2 热门问题
@@ -68,7 +81,7 @@ class Helps extends Base {
             }
             $this->error('添加失败');
         }
-        
+
         $this->assign('type',$type);
         return $this->fetch();
     }
@@ -79,10 +92,10 @@ class Helps extends Base {
      * @return mixed
      */
     public function edit($id = 0) {
-        
-        
+
+
         $model = new \app\index\model\Helps();
-        
+
         $info = $model->where('id',$id)->find();
         if($this->request->isPost()) {
              $params = $this->request->param();
@@ -92,7 +105,7 @@ class Helps extends Base {
                 unlink('html/helps/helpdetaile'.$id.'.html');
             }
         }
-        
+
         $this->assign('info',$info);
         $this->assign('type',$info['type']);
         $this->assign('id',$id);
@@ -104,10 +117,10 @@ class Helps extends Base {
      * @return mixed
      */
     public function del($id = 0) {
-        
-        
+
+
         $model = new \app\index\model\Helps();
-        
+
         //$info = $model->where('id',$id)->find();
         $model->where('id',$id)->delete() && $this->success('删除成功');
         $this->error('删除失败');

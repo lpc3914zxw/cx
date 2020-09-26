@@ -31,7 +31,7 @@ class Course extends Base
         if($is_has>0){
             $this->error('此分类下还有课程');return;
         }
-        
+
         $xcsCourse_model = new \app\index\model\Advanced();
         $xcsCourse_model->where('id',$id)->update(['is_delete'=>1]) && $this->success('删除成功');
         $this->error('删除失败');
@@ -109,6 +109,8 @@ class Course extends Base
         $model = new \app\index\model\Course();
         $advanced_model = new \app\index\model\Advanced();
         $advancedList = $advanced_model->where('type',2)->select();
+
+        //var_dump($advancedList);exit;
         if($this->request->isAjax()){
             //搜索条件
             $where = ['is_delete'=>0];
@@ -128,6 +130,8 @@ class Course extends Base
             }
             return $model->getList($where);
         }
+        //$advancedList->toArray();exit;
+        //var_dump($advancedList);exit;
         $this->assign('advancedlist',$advancedList);
         return $this->fetch();
     }
@@ -140,7 +144,7 @@ class Course extends Base
         if($type == 1) {
             false !== $curse_model->where('id',$id)->update(['is_tj'=>$value]) && $this->success('设置成功');
             $this->error('设置失败');
-        }else{
+        }else if($type == 2){
             if($value == 0) {
                 false !== $curse_model->where('id',$id)->update(['is_daycourse'=>$value]) && $this->success('设置成功');
                 $this->error('设置失败');
@@ -149,6 +153,9 @@ class Course extends Base
                 false !== $curse_model->where('id',$id)->update(['is_daycourse'=>1]) && $this->success('设置成功');
                 $this->error('设置失败');
             }
+        }else{
+            false !== $curse_model->where('id',$id)->update(['is_shelves'=>$value]) && $this->success('设置成功');
+            $this->error('设置失败');
         }
     }
 
@@ -172,7 +179,8 @@ class Course extends Base
                 'advanced_id'=>$params['advanced_id'],
                 'type'=>2,
                 'course_bright'=>$params['course_bright'],
-                'addtime'=>time()
+                'addtime'=>time(),
+                'is_shelves'=>$params['is_shelves']
             ];
             if(!$xcsCourse_validate->check($data)) {
                 $this->error($xcsCourse_validate->getError());
@@ -191,6 +199,7 @@ class Course extends Base
         }
         if($id) {
             $info = $curse_model->where('id',$id)->find();
+            //var_dump($info);exit;
             $this->assign('info',$info);
             $this->assign('advanced_id',$info['advanced_id']);
             $this->assign('id',$id);

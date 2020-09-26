@@ -22,7 +22,8 @@ class Cxorders extends Base {
     public function addOrder($course_id = 0) {
 
         $token = input('token');
-      //
+        //$course_type = input('course_type');
+
         if(!empty($token)) {
             $this->getUserInfo($token);
         }
@@ -34,15 +35,23 @@ class Cxorders extends Base {
         $order_model = new \app\wxapp\model\Orders();
         $course_model = new Course();
         $advanced_model = new Advanced();
+        
         // 查询当前所学进阶
         $advanced_id = $course_model->where('id',$course_id)->value('advanced_id');
         $advancedInfo = $advanced_model->field('type,studying_num,reward,value,deadline,pay_type,learn_power')->where(['id'=>$advanced_id])->find();
         $courseInfo = $course_model->field('imgurl,name,advanced_id')->where('id',$course_id)->find();
 
-        $status = '1,2,3';
-        if($order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>['in',($status)]])->find()){
-            return returnjson(1001,'','已购买过，请勿重复购买');
-        }
+        
+            $status = '5,6,7';
+            if($order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>['in',($status)]])->find()){
+                return returnjson(1001,'','已购买过，请勿重复购买');
+            }
+        
+
+
+
+
+
         $order_id = time().rand(1000,9999);
         $data = [
             'order_id'=>$order_id,
@@ -55,7 +64,9 @@ class Cxorders extends Base {
             'advanced_id'=>$courseInfo['advanced_id'],
             'addtime'=>time(),
             'paytime'=>time(),
+            'course_type'=>1
         ];
+        //var_dump($data);exit;
         if(!$order_model->insert($data)) {
             return returnjson(1001,'','下单失败');
         }
@@ -113,22 +124,24 @@ class Cxorders extends Base {
         $advanced_name = $advanced_model->where('id',$advanced_id)->value('name');
         if($pay_type == 1) {   // 学分兑换
             Db::startTrans();
-            if(false === $order_model->where('order_id',$order_id)->update(['pay_type'=>$pay_type,'status'=>1])) {
+            if(false === $order_model->where('order_id',$order_id)->update(['pay_type'=>$pay_type,'status'=>1])) {//更新支付状态
                 return returnjson(1001,'','购买失败');
             }
+            //查看学分知否不足
             $userScore = $user_model->where('id',$this->uid)->value('score');
             if($orderInfo['value'] != 0) {
                 if(floatval($orderInfo['value']) > floatval($userScore)) {
                     return returnjson(1001,'','学分余额不足');
                 }
             }
+            //更新学分
             if(floatval($orderInfo['value']) > 0) {
                 if(false === $user_model->where('id',$this->uid)->setDec('score',$orderInfo['value'])) {
                     Db::rollback();
                     return returnjson(1001,'','购买失败');
                 }
                 $courseName = $course_model->where('id',$course_id)->value('name');
-                // 荣誉值
+                // 荣誉值--根据条件获取荣誉值
                 if(false === $common->honorLog($this->uid,1,$course_id)) {
                     Db::rollback();
                     return returnjson(1001,'','购买失败');
@@ -145,7 +158,7 @@ class Cxorders extends Base {
             // 名称
             $body='order';
             // 异步回调地址，这个后面不能带参数的
-            $notify_url = 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/paynotice/index';
+            $notify_url = 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/paynotice/alinotify';
 
             // 可根据具体需要写出具体需求 可创建支付订单 判断支付成功调用支付方法
 

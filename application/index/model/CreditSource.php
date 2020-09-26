@@ -21,8 +21,19 @@ class CreditSource extends Model {
         }
         return page_data($total, $list);
     }
+    public function get_score_sum($status,$contrast) {
 
-   
+        $sum = $this::where('status','=',1)->where(['type'=>['in',("$status")]])->where('score',$contrast,0)->sum('score');
+
+        return $sum;
+    }
+    public function get_score__time_sum($begin,$end,$status,$contrast) {
+
+
+        $sum = $this::where('status','=',1)->where(['type'=>['in',("$status")]])->where('score',$contrast,0)->where(['addtime'=>['between',[$begin,$end]]])->sum('score');
+
+        return $sum;
+    }
 }
 
 

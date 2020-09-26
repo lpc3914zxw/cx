@@ -33,7 +33,7 @@ class Course extends Base{
         $course_model = new \app\index\model\Course();
         $section_model = new Sectiones();
         $teacher_model = new \app\index\model\Teacher();
-        $tjCourseData = $course_model->field('id,teacher_id,name')->where('is_tj',1)->where('is_delete',0)->limit(3)->select();
+        $tjCourseData = $course_model->field('id,teacher_id,name')->where('is_tj',1)->where('is_delete',0)->where('is_shelves',1)->limit(3)->select();
         if($tjCourseData) {
             foreach ($tjCourseData as $k=>$val) {
                 $sectionList = $section_model->field('name')->where('c_id',$val['id'])->limit(2)->select();
@@ -45,7 +45,8 @@ class Course extends Base{
             $tjCourseData = [];
         }
         // 每次一课
-        $dayCourse = $course_model->field('id,advanced_id,name,abstract,samll_imgurl,people_num')->where(['id'=>99])->find();
+        $dayCourse = $course_model->field('id,advanced_id,name,abstract,samll_imgurl,people_num')->where('is_shelves',1)->where(['id'=>99])->find();
+
         if($dayCourse) {
             $advancedInfo = $advanced_model->field('chapter_count,pay_type,value')->where(['id'=>$dayCourse['advanced_id'],'is_delete'=>0])->find();
             $payTypes = explode(',',$advancedInfo['pay_type']);
@@ -70,7 +71,7 @@ class Course extends Base{
                 $pay_type = 1;
             }
             $courseList = $course_model->field('name,abstract,samll_imgurl,people_num')
-                        ->where('advanced_id',$val['id'])->order('sort')->limit(4)->select();
+                        ->where('advanced_id',$val['id'])->where('is_shelves',1)->order('sort')->limit(4)->select();
             foreach ($courseList as $key=>$value) {
                 $courseList[$key]['pay_type'] = $pay_type;
                 $courseList[$key]['value'] = $val['value'];
@@ -118,7 +119,7 @@ class Course extends Base{
         if($this->uid == 0) {
             return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
         }
-        $map = ['advanced_id'=>$cate_id];
+        $map = ['advanced_id'=>$cate_id,'is_shelves'=>1];
         $list = $course_model->getCourseList($map,$this->uid);
         return returnjson(1000,$list,'获取成功');
     }

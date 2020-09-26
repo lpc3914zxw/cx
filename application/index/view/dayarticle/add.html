@@ -50,7 +50,7 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="ibox-content">
             <div class="row row-lg">
                 <div class="col-sm-12">
@@ -62,12 +62,12 @@
                                 <input type="text" class="form-control" name="title" placeholder="请输入金句标题" required value="{present name='info'}{$info.title}{/present}">
                             </div>
                         </div>
-                        
-                        
+
+
                         <div class="form-group">
                             <label class="col-sm-2 control-label">内容:</label>
                             <div class="col-sm-8">
-                                
+
                                 <textarea type="text" class="form-control" rows="5" cols="10"  name="content" placeholder="请输入内容" >{present name='info'}{$info.content}{/present}</textarea>
                                 <!--input type="text" class="form-control" name="content" placeholder="请输入内容" required value="{present name='info'}{$info.content}{/present}"-->
                             </div>
@@ -111,9 +111,18 @@
 
                         <input type="hidden"  name="imgurl"   value="{present name='info'}{$info.imgurl}{/present}"  id="imgurlsrc"/>
 
-                        
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">上下架:</label>
+                            <div class="col-sm-7">
+                                <label class="radio-inline">
+                                    <input type="radio" {eq name="info.is_shelves" value="0" }checked=""{/eq} value="0"  name="is_shelves">下架</label>
+                                <label class="radio-inline">
+                                    <input type="radio"  {eq name="info.is_shelves" value="1" }checked=""{/eq} value="1"  name="is_shelves">上架</label>
+                            </div>
+                        </div>
+
                         <div class="hr-line-dashed"></div>
-                            
+
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
                                 <button class="btn btn-primary" type="submit" id="save">保存内容</button>
@@ -150,13 +159,13 @@ $("input[type='file']").prettyFile();
             success: function(data){
                 if (data.code === 1) {
                     layer.msg(data.msg, {icon: 1, time: 1500});
-                    //添加数据成功，关闭弹出窗之前，刷新列表页面的数据  
-                        
+                    //添加数据成功，关闭弹出窗之前，刷新列表页面的数据
+
                         //$("#bootstrapTable",window.parent.document).bootstrapTable('refresh');return
-                        
-                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引  
-                        parent.layer.close(index); 
-                    
+
+                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        parent.layer.close(index);
+
                 } else {
                     layer.msg(data.msg, {icon: 2, shift: 6});
                 }
@@ -164,14 +173,14 @@ $("input[type='file']").prettyFile();
         });
         return false;
     });
-   
+
     /**
      * 上传大图
      * @param obj
      * @returns {boolean}
      */
     function uploadimgurl(obj){
-        
+
         $.ajaxfileupload({
             url : "/index/upload/uploadImg",
             secureuri : false,// 一般设置为false

@@ -69,12 +69,12 @@ class User extends AdminBase {
                   	if($pname){
                     	$where['u']['u.pid'] = $pname['id'];
                     }
-                	
+
                 }else{
                 	$where['u']['u.pid'] = $params['pname'];
                 }
             }
-          
+
             $list = $user_model->get_list($where);
             return $list;
         }
@@ -106,7 +106,7 @@ class User extends AdminBase {
         false !== $user_model->where('id',$id)->update(['start_level'=>$level]) && $this->success('更改成功');
         $this->error('更改失败');
     }
-    
+
     /*
      * 赠送课程
      */
@@ -125,13 +125,13 @@ class User extends AdminBase {
           //echo $new_pwd;exit;
           	if($member['pay_password']!=$new_pwd){
               $num = (int)$member['error_num']+1;
-              
+
               	$res = Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>$num]);
              if($num>=3){
               	$this->redirect ( '/index/index/empty_page');
               }
             	$this->error('密码错误');
-              
+
             }else{
             	Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>0]);
             }
@@ -152,9 +152,9 @@ class User extends AdminBase {
             }
         }
         Db::startTrans();
-        
+
         $common = new \app\common\Common();
-        
+
         if(false === $common->userChangeLevel_admin($id,$course_id,3,$course_id)){
             Db::rollback();
             $this->error('赠送失败');
@@ -162,7 +162,7 @@ class User extends AdminBase {
         Db::commit();
         $this->success('赠送成功');
     }
-    
+
     /*
      * 充值学分/学习力/荣誉值/贡献值
      */
@@ -181,7 +181,7 @@ class User extends AdminBase {
             $dedication = new \app\wxapp\model\DedicationLog();
             $learnPower = new LearnPowerLog();
             $honor = new HonorLog();
-            
+
           $partner = Session::get('memberinfo');
           if(empty($pay_passwordr)){
           	$this->error('充值密码不能为空');
@@ -194,13 +194,13 @@ class User extends AdminBase {
           //echo $new_pwd;exit;
           	if($member['pay_password']!=$new_pwd){
               $num = (int)$member['error_num']+1;
-              
+
               	$res = Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>$num]);
              if($num>=3){
               	$this->redirect ( '/index/index/empty_page');
               }
             	$this->error('充值密码错误');
-              
+
             }else{
             	Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>0]);
             }
@@ -399,7 +399,7 @@ class User extends AdminBase {
         Db::startTrans();
         $user_model->where('id',$id)->update(['is_auth'=>1]);
         $common = new \app\common\Common();
-        
+
         $userInfo = $user_model->field('pid')->where('id',$id)->find();
         if(!empty($userInfo['pid'])){
             if(false === $user_model->where('id',$userInfo['pid'])->setInc('invate_num')) {
@@ -407,7 +407,7 @@ class User extends AdminBase {
                 $this->error('审核失败');
             }
         }
-        
+
         if(false === $common->userChangeLevel($id)){
             Db::rollback();
             $this->error('审核失败');
@@ -1050,12 +1050,62 @@ class User extends AdminBase {
         $arr = ['1'=>'学习课程','2'=>'兑换课程'];
         return $arr[$type];
     }
-    
+
     /*
-     * 购买课程明细
+     * 才学堂购买课程明细
      * @param int $uid
      */
     public function buyCourseOrder($uid = 0) {
+        if($this->request->isAjax()){
+            $params = input('param.');
+            $where = [];
+            if(!empty($uid)){
+                $where['o.uid']= $uid;
+            }
+            if(isset($params['pay_type']) && $params['pay_type'] != '') {
+                $where['o.pay_type'] = $params['pay_type'];
+            }
+
+            if(isset($params['status'])){
+                if($params['status']!=''){
+                    $where['o.status'] = $params['status'];
+                }
+            }
+            if(isset($params['cname'])){
+                if($params['cname']!=''){
+                    $where['c.name'] = $params['cname'];
+                }
+            }
+            if(isset($params['scoretime'])&&$params['scoretime']!=''){
+                $time = explode(' - ',$params['scoretime']);
+                $time1 = strtotime($time[0]);
+                $time2 = strtotime($time[1]);
+                $where['o.addtime'] = array('between',$time1.','.$time2);
+            }
+            if(!empty($uid)){
+                if(!empty($params['name'])){
+                    $where['u.name|u.tel|o.order_id'] = ['like','%'.$params['name'].'%'];
+                }
+            }else{
+                if(!empty($params['name'])){
+                    $where['o.uid|u.name|u.tel|o.order_id'] = ['like','%'.$params['name'].'%'];
+                }
+            }
+            $where['o.status']=array('gt',3);//财学堂的状态   4 未支付 5 已支付  6 已过期  7 学习完
+            //var_dump($where);exit;
+            $creditScore = new Orders();
+            $is_export = 0;
+            //var_dump($where);exit;
+            return $creditScore->getLearnCourse($where,$is_export);
+        }
+        $this->assign('uid',$uid);
+        return $this->fetch();
+    }
+    /*
+     * 学才商购买课程明细
+     * @param int $uid
+     */
+    public function buyxcsCourseOrder($uid = 0) {
         if($this->request->isAjax()){
             $params = input('param.');
             $where = [];
@@ -1098,7 +1148,6 @@ class User extends AdminBase {
         $this->assign('uid',$uid);
         return $this->fetch();
     }
-
     /*
      * 课程购买明细
      */
@@ -1190,7 +1239,7 @@ class User extends AdminBase {
             ];
         return $arr[$type];
     }
-    
+
     public function importUser(){
         $params = input('');
         //var_dump($params['name']);exit;
@@ -1213,25 +1262,25 @@ class User extends AdminBase {
          $str='';
          $str1 = '';
          for($k='A';$k<=$highestColumn;$k++){            //从A列读取数据
-         //这种方法简单，但有不妥，以'\\'合并为数组，再分割\\为字段值插入到数据库,实测在excel中，如果某单元格的值包含了\\导入的数据会为空       
+         //这种方法简单，但有不妥，以'\\'合并为数组，再分割\\为字段值插入到数据库,实测在excel中，如果某单元格的值包含了\\导入的数据会为空
           $str.=$objPHPExcel->getActiveSheet()->getCell("$k$j")->getValue().'\\';//读取单元格
           if($j !=1 ){
                 $jj = $j -1;
                  $str1.=$objPHPExcel->getActiveSheet()->getCell("$k$jj")->getValue().'\\';
              }
          }
-          
+
          //explode:函数把字符串分割为数组。
          $strs=explode("\\",$str);
          //echo  $strs[0];echo "-------------";
-         
+
          if($j !=1 ){
                       $strs1=explode("\\",$str1);
                       //echo $strs1[0];echo "<br>";
                       $userInfo = $user_model->where('tel',$strs[0])->find();
                       $info1 = $user_model->where('tel',$strs1[0])->find();
-                      
-              
+
+
          }elseif($j ==1 ){
              $userInfo = $user_model->where('tel',$strs[0])->find();
              $info1 = $puserInfo;
@@ -1258,15 +1307,15 @@ class User extends AdminBase {
                         'regetime'=>time(),
                       	'pid'=>$info1['id']
         ];
-                 
+
         if($info1['pid'] == 0) {
             $data['parentids'] = "0,";
         }else{
             $data['parentids'] = $info1['parentids'].$info1['id'].',';
         }
-        
+
         $user_model->insert($data);
-        
+
         }
         //unlink($file_url); //删除excel文件
     }

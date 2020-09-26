@@ -112,11 +112,11 @@ class User extends Base{
         if($userInfo){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
             $level = new level();
             $mylevel = $level->where('value',$userInfo['level'])->field('name')->find();
-            
-            $userInfo['levelname'] = $mylevel['name'];
-            
 
-            
+            $userInfo['levelname'] = $mylevel['name'];
+
+
+
         }
         $data['userinfo'] = $userInfo;
         $data['startinfo'] = $startInfo;
@@ -321,7 +321,7 @@ class User extends Base{
         $param = $post['param'];
         $user = new \app\wxapp\model\User;
         $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,salt,pay_salt')->find();
-      
+
         if($post['type'] == 1){
             $key = 'headimg';
         }elseif($post['type'] == 2){
@@ -340,7 +340,7 @@ class User extends Base{
             }
             $key = 'tel';
         }elseif($post['type'] == 6){
-          
+
             $key = 'pay_password';
             $param = splice_password($param,$userInfo['pay_salt']);
         }elseif($post['type'] == 7){  // 微信号
@@ -351,7 +351,7 @@ class User extends Base{
             return returnjson(1001,'','修改类型非法');
         }
         $res = $user->where('id',$this->uid)->update([$key=>$param]);
-        
+
         $userInfo1 = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,is_auth')->find();
         if($userInfo1){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
             $level = new level();
@@ -424,14 +424,14 @@ class User extends Base{
         if(!empty($authnum)){
             $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
             $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
-            
+
             $authwhere['paytime'] = ['between',$beginToday.','.$endToday];
           $authwhere['uid'] = $this->uid;
             $count = Db::name('face_order')->where(['is_auth'=>1])->where($authwhere)->count();
             if($authnum<=$count){
                 return returnjson(1001,'','今日已超过验证次数，请明日再来');
             }
-          
+
         }
         $user_model = new \app\wxapp\model\User();
       	//判断此身份证是佛存在
@@ -443,7 +443,7 @@ class User extends Base{
         if($userinfo['is_auth']==1){
             return returnjson(1001,'','您已实名认证过！');
         }
-        
+
 
         $user_model->where('id', $this->uid)->update(['realname'=>$post['realname'],'identityid'=>$post['identityid']]);
       	$faceorder = Db::name('face_order')->where(['uid'=>$this->uid,'status'=>1])->find();
@@ -458,10 +458,10 @@ class User extends Base{
         //$advancedInfo = $advanced_model->field('reward,value,deadline,pay_type,learn_power')->where('id',$courseInfo['advanced_id'])->find();
         //$pay_types = explode(',',$advancedInfo['pay_type']);
         //$courseInfo['is_score'] = 0;
-        $rdata['pay_types'] = array('2','3');
-        $rdata['paytype'] = array('2','3');
+        $rdata['pay_types'] = array('2');
+        $rdata['paytype'] = array('2');
         $rdata['is_alipay'] = 1;
-        $rdata['is_wxpay'] = 1;
+        $rdata['is_wxpay'] = 0;
         // foreach ($pay_types as $val) {
         //    if($val == 1) {
         //$courseInfo['is_score'] = 1;
@@ -475,9 +475,9 @@ class User extends Base{
 
         return returnjson(1000,$rdata,'已提交');
     }
-  	
+
   	//腾讯人脸获取token
-  
+
 	function get_tengxun_acctoken($uid){
         $token = Db::name('face_token')->where(['id'=>1])->field('tengxun_updatetime,tengxun_access_token')->find();
         $uptime = 7200 + $token['tengxun_updatetime'];
@@ -493,7 +493,7 @@ class User extends Base{
         {
             $o.= "$k=" . urlencode( $v ). "&" ;
         }
-      	
+
       	$post_data = substr($o,0,-1);
       	$url = 'https://idasc.webank.com/api/oauth2/access_token?'.$post_data;
         //echo $url;exit;
@@ -502,16 +502,16 @@ class User extends Base{
       	//echo "<pre>";
       	//print_r($data);exit;
         $data1['tengxun_updatetime'] = time();
-       
+
       	$data1['tengxun_access_token'] = $data['access_token'];
         Db::name('face_token')->where(['id'=>1])->update($data1);
         return $data['access_token'];
-       
+
 
     }
-  
+
   	//腾讯人脸获取ticket
-  	
+
   	function get_tengxun_ticket($uid){
         $token = Db::name('face_token')->where(['id'=>1])->field('ticket_update_time,tengxun_ticket')->find();
         $uptime = 1 + $token['ticket_update_time'];
@@ -523,7 +523,7 @@ class User extends Base{
       	$post_data['type']       = 'NONCE';
       	$post_data['version']    = '1.0.0';
       	$post_data['user_id']    = $uid;
-      	
+
         $o = "";
         foreach ( $post_data as $k => $v )
         {
@@ -531,20 +531,20 @@ class User extends Base{
         }
         $post_data = substr($o,0,-1);
 		 $url = 'https://idasc.webank.com/api/oauth2/api_ticket?'.$post_data;
-		 
+
         $res = $this->request_get($url);
-      
+
         $data = json_decode($res,true);
-      	
+
         $data1['ticket_update_time'] = time();
       	$data1['tengxun_ticket'] = $data['tickets'][0]['value'];
         Db::name('face_token')->where(['id'=>1])->update($data1);
         return $data['tickets'][0]['value'];
-        
+
 
     }
     //腾讯人脸获取ticket
-  	
+
   	function get_tengxun_ticket_n($uid){
         $token = Db::name('face_token')->where(['id'=>1])->field('ticket_n_updatetime,tengxun_ticket_n')->find();
         $uptime = 1 + $token['ticket_n_updatetime'];
@@ -556,7 +556,7 @@ class User extends Base{
       	$post_data['type']       = 'SIGN';
       	$post_data['version']    = '1.0.0';
       	//$post_data['user_id']    = $uid;
-      	
+
         $o = "";
         foreach ( $post_data as $k => $v )
         {
@@ -564,27 +564,27 @@ class User extends Base{
         }
         $post_data = substr($o,0,-1);
 		 $url = 'https://idasc.webank.com/api/oauth2/api_ticket?'.$post_data;
-		 
+
         $res = $this->request_get($url);
-      
+
         $data = json_decode($res,true);
-      	
+
         $data1['ticket_n_updatetime'] = time();
       	$data1['tengxun_ticket_n'] = $data['tickets'][0]['value'];
         Db::name('face_token')->where(['id'=>1])->update($data1);
         return $data['tickets'][0]['value'];
-        
+
 
     }
   	//签名
   	function get_sign($data){
-  	    
+
   	    $arr_test = array_values($data);
-  	    
+
         asort($arr_test);
-        
+
         $arr_test =implode('',$arr_test);
-  	    
+
         return sha1($arr_test);
     }
   	//获取32位随机数
@@ -599,23 +599,23 @@ class User extends Base{
      }
   	//前端调起人脸参数
   	function get_param(){
-  	        
+
       	$token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
         }
-        
+
         if($this->uid == 0) {
             return returnjson(1100,'','该用户已在其他设备登陆');
         }
         $len = strlen($this->uid);
         $uid = $this->getRandom(32 - $len).$this->uid;
-      
+
       	$data['version'] = '1.0.0';
       	$data['wbappid'] = 'IDAieejR';
       	$data['ticket'] = $this->get_tengxun_ticket($uid);
       	//echo 11111212311111;exit;
-      	
+
       	$data['userId'] = $uid;
       	$data['nonceStr'] = $this->getRandom(32);
       	$si[] = '1.0.0';
@@ -625,7 +625,7 @@ class User extends Base{
       	$si[] = $data['nonceStr'];
       	$res = $this->get_sign($si);
       	$data['sign'] = $res;
-      	
+
       	return returnjson(1000,$data,'');
     }
   	//腾讯 获取人脸id
@@ -655,10 +655,10 @@ class User extends Base{
       	//}else{
       	    $data['userId'] = $post['userId'];
       	//}
-      	
-      	
+
+
       	$data['sign'] =$post['sign'];
-      
+
       	$url = 'https://idasc.webank.com/api/server/getfaceid';
       	$res = $this->json_post($url, $data);
       	$reslut = json_decode($res,true);
@@ -667,20 +667,20 @@ class User extends Base{
           	if($reslut['result']['success'] ===false){
             	//return returnjson(1001,$data,'失败');
             }
-          	
+
           	$data['wbappid'] = $post['wbappid'];
           	$data['nonceStr'] =$post['nonceStr'];
           	$data['faceId'] = $reslut['result']['faceId'];
           	$data['keyLicence'] = 'kaTdEV0NWMJ2g4cnHSftAw/PgUrvIRfi0p4VTyu/bcg0gQNdXjsEIE7WZX2Lp9G76N8fEFyV92LFS7yYcyIKuh16dHRdIJNL/1FlaxDAlW+Vi/+fNGxyDRWFuO4NRyCJM1zx3x1olNlZEdwwTPELkUA+84OE1lLgx6Ml6rHup/h4Mc24MTYWEHTFsTC8VYi53Eh2UNm1LhJ01UKmCiwmdlTNMKp6rpFxyRbj+JqNoAMdAqOYcKP/qeCXsM0YTMYPrxmUyEDhiKfKYPlue9hcoOzyoEU9rRTdDcZFa2VnMdcD+i9y+0ReKzd8YjRh0LNrMxmOhXFZKJgnQT3XJz3l/A==';
-          
+
         	return returnjson(1000,$data,'验证通过');
         }
     }
   	function json_post($url, $data = NULL)
     {
- 
+
         $curl = curl_init();
- 
+
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -708,9 +708,9 @@ class User extends Base{
         }
         curl_close($curl);
         return $res;
- 
+
     }
-    
+
   	//腾讯查询是否认证成功
   	function sync(){
     	$token = input('token');
@@ -728,7 +728,7 @@ class User extends Base{
                  // return returnjson(1001,'','请先支付!');
         $face_order = Db::name('face_order')->where($forderwhere)->find();
         if(!$face_order){
-                      
+
              return returnjson(1001,'','请先支付!');
         }
                // }
@@ -745,19 +745,19 @@ class User extends Base{
         $uid = $this->getRandom(32 - $len).$this->uid;
       	$data['version'] = '1.0.0';
       	$data['wbappid'] = 'IDAieejR';
-      	
+
       	$data['order_no'] = $post['order_no'];
       	$data['api_ticket'] = $this->get_tengxun_ticket_n($uid);
       	$data['nonceStr'] = $this->getRandom(32);
       	$res = $this->get_sign($data);
-      	
+
         $data1['sign'] = $res;
       	$data1['version'] = '1.0.0';
       	$data1['app_id'] = 'IDAieejR';
       	$data1['nonce'] = $data['nonceStr'];
-      	
+
         $data1['order_no'] = $post['order_no'];
-      	
+
         $o = "";
         foreach ( $data1 as $k => $v )
         {
@@ -771,15 +771,15 @@ class User extends Base{
         //-------------------------------------------
         Db::name('face_log')->insert(['uid'=>$this->uid,'addtime'=>time()]);
         //return $res;
-        
-        
+
+
         //-------------------------------------------------
         if($reslut['code']==0){
             $user_model= new \app\wxapp\model\User;
-          
+
             $user = $user_model->where(['id'=>$this->uid])->field('identityid,realname,is_auth,level,pid')->find();
-          	
-                
+
+
                // $face_order = Db::name('face_order')->where($forderwhere)->update(['is_auth'=>1]);
               	if($user['pid']){
                 	$user_model->where(['id'=>$user['pid']])->setInc('invate_num',1);
@@ -788,11 +788,11 @@ class User extends Base{
                 	// Db::rollback();
                    // return returnjson(1001,'','认证失败!');
                 //}
-          		
+
               	Db::startTrans();
               	$user_model->where(['id'=>$this->uid])->update(['is_auth'=>1]);
                 $common = new Common();
-                
+
                 if(false === $common->userChangeLevel($this->uid)){
                     Db::rollback();
                     return returnjson(1001,'','认证失败');
@@ -803,7 +803,7 @@ class User extends Base{
             return returnjson(1001,array('result'=>0),'验证未通过');
         }
     }
-  	
+
     //活体检测 获取token
     function get_acctoken(){
        /* $token = Db::name('face_token')->where(['id'=>1])->field('updatetime,access_token')->find();
@@ -866,7 +866,7 @@ class User extends Base{
         $bodys['id_card_number'] = $user['identityid'];
         $bodys['name'] = $user['realname'];
         $bodys = json_encode($bodys);
-        
+
         $res = $this->request_post($url, $bodys);
         Db::name('face_log')->insert(['uid'=>$this->uid,'addtime'=>time()]);
         //return $res;
@@ -885,8 +885,8 @@ class User extends Base{
                 	 Db::rollback();
                     return returnjson(1001,'','认证失败');
                 }
-              	
-              	
+
+
                 $common = new Common();
                 Db::startTrans();
                 if(false === $common->userChangeLevel($this->uid)){
@@ -1382,7 +1382,7 @@ class User extends Base{
       	if(empty($userInfo['bonus_learn_power'])){
         	$userInfo['bonus_learn_power'] = 0;
         }
-      	
+
         $data = ['frozenLearningPower'=>$frozenLearningPower,'effectPower'=>$effectPower,'basicsLearning'=>$userInfo['learning_power'],'additionLearning'=>$userInfo['bonus_learn_power'],'comLearning'=>$res['all_power'],'smallComLearning'=>$res['min_dedication_value']];
         return returnjson(1000,$data,'获取成功');
     }
@@ -1770,7 +1770,7 @@ class User extends Base{
             $sameGrade = $res['other'];
             $otherGrade = $res['pnum'];
         }
-      
+
         //$sameGrade = '1103';
         //$otherGrade = '100';
         $level = new level();
@@ -1798,7 +1798,7 @@ class User extends Base{
         $level = new level();
         $userList = $user_model->field('id,name,headimg,score,is_auth,level')->where('pid',$this->uid)->limit($limit)->select();
       $common_model = new common();
-        
+
         if($userList) {
             foreach ($userList as $k=>$val) {
                 if($val['is_auth'] == 0) {
@@ -2085,7 +2085,43 @@ class User extends Base{
         }
         return returnjson(1000,$list,'获取成功');
     }
-
+    /*
+     * 财学堂已购课程
+     * @return \type
+     */
+    public function cxCourseList(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $post = Request::instance()->post();
+        if($this->uid == 0) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        $page = empty($post['page'])?1:$post['page'];
+        $status = empty(input('status')) ? 1 : input('status');
+        $order_model = new Orders();
+        
+        $start = ($page - 1) * 10;
+        $limit = $start . ',' . 10;
+        $orderInfo = $order_model->where(['uid'=>$this->uid])->where('status',$status)->where('course_type',1)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
+        $list = array();
+        if(!empty($orderInfo)){
+            $course_model = new Course();
+            foreach($orderInfo as $okey=>$oval){
+                $cour = $course_model->where(['id'=>$oval['course_id']])->field('id,name,chapter_count,abstract,imgurl,teacher_id')->find();
+                if(empty($cour['imgurl'])){
+                    $cour['imgurl'] = '';
+                }
+                
+                $list[$okey] = $cour;
+                $list[$okey]['teacher_name'] = Db::name('teacher')->where('id',$cour['teacher_id'])->value('name');
+                $list[$okey]['status'] = $oval['status'] == 1 ? '学习中' : '已过期';
+                $list[$okey]['time'] = date('Y.m.d',$oval['paytime']);
+            }
+        }
+        return returnjson(1000,$list,'获取成功');
+    }
     /*
      * 排行榜信息
      */
@@ -2350,7 +2386,7 @@ class User extends Base{
         switch ($type) {
             case 1:
                 $dayArticle = new Dayarticle();
-                $info = $dayArticle->field('title')->where('id',$obj_id)->find();
+                $info = $dayArticle->field('title')->where('id',$obj_id)->where('is_shelves',1)->find();
                 $title = $date."每日财学";
                 $content = "每日财学 | ".$info['title'];
                 break;
@@ -2436,7 +2472,7 @@ class User extends Base{
                 $title = $date."点赞了课程";
                 $content = $advancedInfo['name'] ." | ".$info['name'];
                 break;
-                
+
             case 16:  //课程分享
                 $course_model = new Course();
                 $advanced_model = new Advanced();
@@ -2481,10 +2517,10 @@ class User extends Base{
         }
         $common_model = new common();
         $res = $common_model ->minShequnD($this->uid,1,1);
-            
+
         //return returnjson(1000,$res,'成功');
     }
-    
+
     //获取学分接口
     public function getSource(){
         $res = $this->detype();
@@ -2494,7 +2530,7 @@ class User extends Base{
         $tltid = $res['id'];
         $tel = $res['tel'];
        $identityid = $res['identityid'];
-        
+
         $userinfo = Db::name('user')->where('identityid',$identityid)->where('tel',$tel)->where('is_auth',1)->field('score,level,start_level,is_open_tlt')->find();
         if(empty($userinfo)){
             return returnjson(1001,'','无此用户');
@@ -2512,7 +2548,7 @@ class User extends Base{
             $data['levelname'] = $mylevel['name'];
             $data['is_open_tlt'] =  $userinfo['is_open_tlt'];
             return returnjson(1000,$data,'获取成功');
-            
+
         }
     }
     //开启置换
@@ -2549,7 +2585,7 @@ class User extends Base{
         }else{
             Db::rollback();
             return returnjson(1001,'','开通失败');
-        }   
+        }
          Db::commit();
         return returnjson(1000,'','开通成功');
     }
@@ -2565,10 +2601,10 @@ class User extends Base{
         $type = $res['type'];
         $tltid = $res['id'];
         $score = $res['score'];
-        
+
         $torderid = 0;
         $userinfo = Db::name('user')->where('identityid',$identityid)->where('realname',$realname)->where('tel',$tel)->where('is_auth',1)->field('id,score,level,start_level,honor_value,is_open_tlt')->find();
-        
+
         if(empty($userinfo)){
             return returnjson(1001,'','无此用户');
         }
@@ -2584,7 +2620,7 @@ class User extends Base{
             }
             $realratio = 10 - $mylevel['service_charge']/10;
             //手续费
-            
+
             $service_charge = $score/$realratio * $mylevel['service_charge']/10;
             $totalscore = $score + $service_charge;
             //$totalscore = $score+$score*$mylevel['service_charge']/100;
@@ -2600,8 +2636,8 @@ class User extends Base{
                     return returnjson(1003,'','学分不足');
                 }
            }
-            
-            
+
+
             Db::startTrans();
             if($userinfo['is_open_tlt']==0){
                 $opentlt = $userinfo['score'] - ($totalscore+1);
@@ -2609,10 +2645,10 @@ class User extends Base{
            }else{
                $res = Db::name('user')->where('id',$userinfo['id'])->setDec('score',$totalscore);
            }
-            
-            
+
+
             if($res){
-                
+
                 if($userinfo['is_open_tlt']==0){
                     $data =[
                         'type'=>11,'uid'=>$userinfo['id'],'pay_type'=>0,'score'=>-1,
@@ -2648,7 +2684,7 @@ class User extends Base{
                     if($mystartlevel['bonus']>0){
                         $bonus_source = $service_charge * $mystartlevel['bonus'];
                         $uids = Db::name('user')->where(['is_auth'=>1,'start_level'=>$userinfo['start_level']])->field('id')->select();
-                        
+
                         $uidscount = count($uids);
                         $uidss = '';
                         if($uidscount>0){
@@ -2662,14 +2698,14 @@ class User extends Base{
                                 'uids' =>$uidss,
                                 'start_level' => $userinfo['start_level'],
                                 'source' => $service_charge,
-                                
+
                                 'num' => $uidscount,
                                 'addtime' => time(),
                                 'csid' => $creditres,
                             ];
                         $csres = Db::name('creditSourceBonus')->insert($csbdata);
                         if($csres){
-                            
+
                         }else{
                             Db::rollback();
                             return returnjson(1001,'','兑换失败');
@@ -2694,7 +2730,7 @@ class User extends Base{
                     Db::rollback();
                     return returnjson(1001,'','兑换失败');
                 }
-                if(false === $common->honorLog($userinfo['id'],2,$torderid,$score)) {   
+                if(false === $common->honorLog($userinfo['id'],2,$torderid,$score)) {
                     Db::rollback();
                     return returnjson(1001,'','购买失败');
                 }
@@ -2706,7 +2742,7 @@ class User extends Base{
             }
         }
     }
-    
+
     //校验手机有没有
     public function check_tel(){
         $res = $this->detype();
@@ -2714,7 +2750,7 @@ class User extends Base{
             return returnjson(1001,'','数据错误');
         }
         $tel = $res['tel'];
-        
+
         $user = Db::name('user')->where(['tel'=>$tel])->find();
         if($user['is_auth'] == 0){
             return returnjson(1001,'','无此用户');
@@ -2758,7 +2794,7 @@ class User extends Base{
             return returnjson(1000,$data,'有');
         }
     }
-    
+
     /**
  * 公钥解密
  */
@@ -2768,24 +2804,24 @@ class User extends Base{
         $tlt_white = $system['tlt_white'];
         $whites = explode(',',$tlt_white);
         if(!in_array($addr,$whites)){
-            
+
             return false;
         }
         $encrypted = input('post.data');
-        
+
         if(empty($encrypted)){
             return false;
         }
-        
+
         //原始数据解码
         $decrypted = "sha1";
-    
+
         //获取公钥
         $pu_key = file_get_contents('test.cer');
-        
+
         //私钥加密的内容通过公钥可用解密出来
         openssl_public_decrypt(base64_decode($encrypted),$decrypted,$pu_key);
-        
+
         $api = $system['tlt_public'];
         $domain  =  strstr ($decrypted ,  '&sign');
         if(empty($domain)){
@@ -2793,7 +2829,7 @@ class User extends Base{
         }
         $domain_  =  strstr ($decrypted ,  '&sign',true);
         $sign = substr($domain,6);
-        
+
         $md5srt = md5($domain_.$api);
         if($md5srt!=$sign){
             return false;
@@ -2810,7 +2846,7 @@ class User extends Base{
         //var_dump($return);exit;
         return $return;
     }
-   
-    
+
+
 }
 

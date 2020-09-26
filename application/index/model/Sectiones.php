@@ -23,6 +23,7 @@ class Sectiones extends Model {
      */
     public function getApiSectionList($where =[],$uid = 0) {
         $list = $this::field('audiourl,audiotime,name,people_num,id,sort')->where($where)->order('sort')->select();
+        //echo $this->getLastSql();exit;
         $course_model = new Course();
         $order_model = new \app\wxapp\model\Orders();
         $learnLog = new CourseLearnLog();
@@ -32,6 +33,7 @@ class Sectiones extends Model {
         // 过期时间
         $deadline = $adver_model->where('id',$courseInfo['advanced_id'])->value('deadline');
         $paytime = $order_model->where(['uid'=>$uid,'course_id'=>$course_id,'status'=>1])->value('paytime');
+
         $days = intval((time() - $paytime) / 86400);
         $syDays = $deadline - $days;
         foreach ($list as $k=>$val) {
@@ -45,12 +47,12 @@ class Sectiones extends Model {
                     }else{
                     	$list[$k]['is_lock'] = 1;
                     }
-                    
+
                 }else {
                     $list[$k]['is_lock'] = 0;
                 }
             }
-            
+
           	$task = Db::name('task')->where(['section_id'=>$val['id']])->find();
           	if(!empty($task)){
             	$task_result = Db::name('task_result')->where(['uid'=>$uid,'task_id'=>$task['id']])->find();
@@ -58,7 +60,7 @@ class Sectiones extends Model {
                 	$list[$k]['is_lock'] = 2;
                 }
             }
-          
+
             $list[$k]['name'] = $val['sort'].'、'.$val['name'];
         }
         return $list;

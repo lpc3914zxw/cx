@@ -26,7 +26,7 @@ use  think\Db;
  */
 class Xcscourse extends Base
 {
-    
+
     /*
      * 财商的觉醒
      * 课程详情
@@ -268,10 +268,11 @@ class Xcscourse extends Base
         $order_model = new Orders();
         $where = ['c_id'=>$course_id,'is_delete'=>0];
         $orderInfo = $order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>1])->find();
+        //echo $order_model->getLastSql();exit;
         $list = $section_model->getApiSectionList($where,$this->uid);
         return returnjson(1000,$list,'获取成功');
     }
-    
+
     //h5课程详情页面
     public function h5_curriculum(){
         $input = input('get.');
@@ -295,21 +296,21 @@ class Xcscourse extends Base
         $course_model = new Course();
         $learnLog_model = new CourseLearnLog();
         $teacher_model = new Teachers();
-        
-        
+
+
         $courseInfo = $course_model->field('id,name,people_num,chapter_count,teacher_id,deadline,reward')->where('id',$input['c_id'])->find();
         $teacherInfo = $teacher_model->field('name,headimg')->where('id',$courseInfo['teacher_id'])->find();
-        
+
         $courseInfo['teacher_name'] = $teacherInfo['name'];
         $courseInfo['teacher_img'] = $teacherInfo['headimg'];
         $section_model = new Sectiones();
-        
+
         $where = ['c_id'=>$input['c_id'],'is_delete'=>0];
 //        $start = ($page - 1) * $this->num;
 //        $limit = $start . ',' . $this->num;
         //$orderInfo = $order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>1])->find();
         //if($orderInfo['pay_type'] == 1 || $orderInfo['pay_type'] == 2) {  // 如果是学分购买或者现金购买，再此需要解锁课程
-        
+
             //$this->unlockCourse($course_id,$this->uid);
         //}
         $list = $section_model->getApiSectionList($where);

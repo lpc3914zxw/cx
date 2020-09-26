@@ -15,6 +15,7 @@ class Course extends Model {
         $list = $this::all(function($query) use($map) {
             $query->where($map)->order('addtime desc')->limit(page());
         });
+        //var_dump($list);exit;
         $teacher_model = new Teachers();
         $advanced_model = new Advanced();
         foreach ($list as $k=>$val) {
@@ -41,7 +42,7 @@ class Course extends Model {
         }else{
         	$data['paytype'] = 0;
         }
-      
+
         $data['pay_type'] = $advancedInfo['pay_type'];
         //$data['paytype'] = $advancedInfo['pay_type'];
         $data['value'] = $advancedInfo['value'];
@@ -115,7 +116,7 @@ class Course extends Model {
         $advanced_model = new Advanced();
         $list = $this::field('id,name,teacher_id,advanced_id,abstract,people_num')
             ->where($where)->where('is_delete',0)->select();
-      	
+
         // 判断是否购买
         $order_model = new Orders();
         foreach ($list as $k=>$val) {

@@ -98,12 +98,14 @@
                                             <th data-field="cate" data-sortable="true"  >分类</th>
                                             <th data-field="abstract" data-sortable="true"  >摘要</th>
                                             <th data-field="is_tj" data-formatter="is_tj" data-sortable="true">是否推荐</th>
+
                                             <th data-field="is_daycourse" data-formatter="is_daycourse" data-sortable="true">是否每日一课</th>
                                             <th data-field="imgurl" data-sortable="true" data-formatter="formatImg" >课程图片</th>
                                             <th data-field="teacher" data-sortable="true"   >授课老师</th>
                                             <th data-field="people_num" data-sortable="true"  >学习人数</th>
                                             <th data-field="complete_course" data-sortable="true"  data-formatter="formatCompImg" class="col-sm-4">完整课程图片</th>
                                             <th data-field="haschapter_num" data-sortable="true"  >已添加课时(讲)</th>
+                                            <th data-field="is_shelves" data-formatter="is_shelves" data-sortable="true">上下架</th>
                                             <th data-field="addtime" data-formatter="formatTime" align="center" >添加时间</th>
                                             <th data-field="" data-formatter="formatOperation" >操作</th>
                                         </tr>
@@ -221,7 +223,20 @@
         html += '</label></div></div>';
         return html;
     }
-
+    function is_shelves(value, row, index) {
+        var html = '';
+        html += '<div class="switch">';
+        html += '<div class="onoffswitch">';
+        if (value == 1) {
+            html += '<input type="checkbox" checked onchange="is_true(3, this)" data-id="' + row.id + '" class="onoffswitch-checkbox" id="shelves' + row.id + '">';
+        } else {
+            html += '<input type="checkbox" onchange="is_true(3, this)" data-id="' + row.id + '" class="onoffswitch-checkbox" id="shelves' + row.id + '">';
+        }
+        html += '<label class="onoffswitch-label" for="shelves' + row.id + '">';
+        html += '<span class="onoffswitch-inner"></span><span class="onoffswitch-switch"></span>';
+        html += '</label></div></div>';
+        return html;
+    }
     function is_daycourse(value, row, index) {
         var html = '';
         html += '<div class="switch">';
@@ -243,8 +258,10 @@
         var value = $(target).is(':checked');
         if(name == 1) {
             var msg = '为推荐'
-        }else{
+        }else if(name == 2){
             var msg = "每日一课"
+        }else {
+            var msg = "上下架"
         }
         if(value == true) {
             value = 1;
@@ -253,6 +270,7 @@
             value = 0;
             var status = '取消'
         }
+        console.log(name);
         swal({
             title:"您确定要" + status + msg + "?",
             text:"请谨慎操作！",

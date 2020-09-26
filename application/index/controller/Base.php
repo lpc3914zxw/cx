@@ -45,17 +45,17 @@ class Base extends Controller {
 	    Config::set('sysinfo',$systeminfo);
     }
 
-	
+
 	/**
 	 * 验证登录
-	 * 
+	 *
 	 * @author Steed
 	 */
 	protected function check_login() {
 		// 获取session信息
         $partner = Session::get('memberinfo');
       	//$partner = (array)$partner;
-      
+
 		if (empty ( $partner )) {
 			// 如果不存在session则验证cookie
 			$this->check_cookie () || $this->redirect ( '/index/index/empty_page' );
@@ -66,17 +66,17 @@ class Base extends Controller {
 		empty ( $partner ) && $this->redirect ( '/index/index/empty_page' );
 		$member_model = new Member();
       	$member = $member_model->where('username',$partner['username'])->find();
-        
+
         if ($partner['password']!= $member ['password']||$member['error_num']>=3) {
            $this->redirect ( '/index/index/empty_page' );
         }
 		$this->partner = $partner;
 		$this->assign ( 'member', $partner );
 	}
-	
+
 	/**
 	 * 验证cookie 记录session
-	 * 
+	 *
 	 * @author Steed
 	 * @return bool
 	 */
@@ -111,8 +111,11 @@ class Base extends Controller {
         $authGroupAccess = new AuthGroupAccess();
         $group_id = $authGroupAccess->where('uid',$this->partner['uid'])->value('group_id');
         $menu = $menu_model->getMenu($group_id);
+        /*echo $menu_model->getLastSql();exit;
+        var_dump($menu);exit;*/
         //处理数据
         $menu = recursion_data($menu);
+
         $this->assign('menu', $menu);
         //查询当前请求的菜单信息
         $controller = \think\Request::instance()->controller();
@@ -122,6 +125,7 @@ class Base extends Controller {
             'action' => $action
         ];
         $current_menu = $menu_model->findMenu($map);
+
         $this->assign('current_menu', $current_menu);
         $this->assign('controller', $controller);
         $this->assign('action', $action);

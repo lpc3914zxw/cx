@@ -26,9 +26,30 @@ class User extends Model {
         ];
         $list = $this::all(function($query) use($u,$s,$join,$join1) {
             $query->alias('u')->join($join)->join($join1)->where($u)->whereOr($s)->order('id desc')->field('u.*,sl.name as sname,l.name as lname')->limit(page());
-            
+
         });
         return page_data($total, $list);
+    }
+
+    public function get_face_time_count($begin,$end) {
+
+       // $total = $this::alias('u')->where($u)->whereOr($s)->count(1);
+        $join = [
+            ['face_order f','f.uid=u.id','left']
+        ];
+        $count = $this::alias('u')->join($join)->where('f.status','=','1')->where(['f.paytime'=>['between',[$begin,$end]]])->count();
+
+        return $count;
+    }
+    public function get_face_count() {
+
+        // $total = $this::alias('u')->where($u)->whereOr($s)->count(1);
+        $join = [
+            ['face_order f','f.uid=u.id','left']
+        ];
+        $count = $this::alias('u')->join($join)->where('f.status','=','1')->count();
+
+        return $count;
     }
 
 }

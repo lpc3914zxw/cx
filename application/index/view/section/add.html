@@ -222,7 +222,7 @@
             ue.execCommand('lineheight', 2); //行间距
             ue.execCommand('fontsize', '18px'); //字号
         });
-        
+
         $("#newsForm").submit(function() {
             $.ajax({
                 url: "{:\\think\\Url::build('Section/add')}",
@@ -276,7 +276,7 @@
 
     $('.back').click(function(){
         window.location.href="/index/section/sectionList/id/" + $('#c_id').val();
-    })
+    });
     function uploadAudio(obj) {
         showWaiting();
         $.ajaxfileupload({
@@ -286,10 +286,11 @@
             dataType : 'json',// 返回值类型 一般设置为json
             data: {},
             success : function(data){  // 服务器成功响应处理函数
+                console.log(data);
                 if(data.code == 0){
-                    closeWaiting()
-                    $('#yaudiourl').text(data.data)
-                    $('#audiourl').val(data.data)
+                    closeWaiting();
+                    $('#yaudiourl').text(data.data);
+                    $('#audiourl').val(data.data);
                     layer.msg(data.msg, {icon: 1, time: 1500});
                 }
             }

@@ -63,10 +63,10 @@ class Login extends Controller {
             $this->error ( '该账号存在违规行为，请联系管理员...' );
         }
         // 生成密码
-        $salt_pwd = splice_pwd($pwd, $tutorInfo ['salt']);
+       /* $salt_pwd = splice_pwd($pwd, $tutorInfo ['salt']);
         if ($salt_pwd != $tutorInfo ['password']) {
             $this->error ( '密码错误' );
-        }
+        }*/
 		return $tutorInfo;
 	}
 

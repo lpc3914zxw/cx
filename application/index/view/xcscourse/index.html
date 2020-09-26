@@ -102,6 +102,7 @@
                                             <th data-field="complete_course" data-sortable="true"  data-formatter="formatCompImg"  >完整课程图片</th>
                                             <th data-field="haschapter_num" data-sortable="true"  >已添加课时(讲)</th>
                                             <th data-field="stock" data-sortable="true"  >今日总库存</th>
+                                            <th data-field="is_shelves" data-formatter="is_shelves" data-sortable="true">上下架</th>
                                             <th data-field="addtime" data-formatter="formatTime" align="center" >添加时间</th>
                                             <th data-field="" data-formatter="formatOperation" >操作</th>
                                         </tr>
@@ -181,7 +182,68 @@
             }
         });
     }
-
+    function is_shelves(value, row, index) {
+        var html = '';
+        html += '<div class="switch">';
+        html += '<div class="onoffswitch">';
+        if (value == 1) {
+            html += '<input type="checkbox" checked onchange="is_true(3, this)" data-id="' + row.id + '" class="onoffswitch-checkbox" id="shelves' + row.id + '">';
+        } else {
+            html += '<input type="checkbox" onchange="is_true(3, this)" data-id="' + row.id + '" class="onoffswitch-checkbox" id="shelves' + row.id + '">';
+        }
+        html += '<label class="onoffswitch-label" for="shelves' + row.id + '">';
+        html += '<span class="onoffswitch-inner"></span><span class="onoffswitch-switch"></span>';
+        html += '</label></div></div>';
+        return html;
+    }
+    function is_true(name, target) {
+        var id = $(target).attr('data-id');
+        var value = $(target).is(':checked');
+        if(name == 1) {
+            var msg = '为推荐'
+        }else if(name == 2){
+            var msg = "每日一课"
+        }else {
+            var msg = "上下架"
+        }
+        if(value == true) {
+            value = 1;
+            var status = '设置'
+        }else{
+            value = 0;
+            var status = '取消'
+        }
+        console.log(name);
+        swal({
+            title:"您确定要" + status + msg + "?",
+            text:"请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要" + status + "！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('Course/setTrue')}",
+                    data: {id: id, type: name,value:value},
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.code === 1) {
+                            swal("操作成功", data.msg, "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal(data.msg,"错误","error")
+                        }
+                    }
+                });
+            }else{
+                swal("已取消","您取消了" + status + msg + "操作！","error")
+            }
+        })
+    }
     /*
     * 完整图片
      */

@@ -17,7 +17,7 @@ class Xcscourse extends Base
     public function index() {
         $model = new \app\index\model\Course();
         $advanced_model = new \app\index\model\Advanced();
-      $where['type'] = array('in','1,3');
+        $where['type'] = array('in','1,3');
         $advancedList = $advanced_model->where(['is_delete'=>0])->where($where)->select();
         if($this->request->isAjax()){
             $where = ['is_delete'=>0];
@@ -39,7 +39,7 @@ class Xcscourse extends Base
             }
             return $model->getList($where);
         }
-       
+
         $this->assign('advancedlist',$advancedList);
         return $this->fetch();
     }
@@ -64,7 +64,8 @@ class Xcscourse extends Base
                 'stock'=>$params['stock'],
                 'type'=>2,
                 'course_bright'=>$params['course_bright'],
-                'addtime'=>time()
+                'addtime'=>time(),
+                'is_shelves'=>$params['is_shelves']
             ];
             if(!$xcsCourse_validate->check($data)) {
                 $this->error($xcsCourse_validate->getError());

@@ -45,9 +45,9 @@ class Useranther extends Base{
         $beginToday = mktime(0,0,0,date('m'),date('d'),date('Y'));
         $endToday = mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
         $day = new \app\wxapp\model\Dayarticle();
-        $dayarticle = $day->where(['addtime'=>['between',[$beginToday,$endToday]]])->find();
+        $dayarticle = $day->where(['addtime'=>['between',[$beginToday,$endToday]]])->where('is_shelves','=',1)->find();
         if(empty($dayarticle)){
-            $dayarticle = $day->order('addtime desc')->find();
+            $dayarticle = $day->where('is_shelves','=',1)->order('addtime desc')->find();
         }
         if($dayarticle){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
             $dayarticle['addtime'] = date('Y/m/d',$dayarticle['addtime']);
@@ -79,7 +79,7 @@ class Useranther extends Base{
         if(!empty($type)){
             $where['type'] = $type;
         }
-        $dayarticle = $Day->where($where)->order('addtime desc')->limit($limit)->select();
+        $dayarticle = $Day->where($where)->where('is_shelves','=',1)->order('addtime desc')->limit($limit)->select();
         if($dayarticle){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
             foreach($dayarticle as $key=>$value){
                 $dayarticle[$key]['addtime'] = date('Y/m/d',$value['addtime']);
@@ -109,13 +109,13 @@ class Useranther extends Base{
             }
         }else{
             $userInfo = "";
-            
+
         }
-        
-        
+
+
         return returnjson(1000,$userInfo,'获取成功');
     }
-    
+
     //我的班级-同学详情
     public function schoolmateDetail(){
          $token = input('token');
@@ -128,11 +128,11 @@ class Useranther extends Base{
         //用户id
         $id  = input('id');
         $user = new \app\wxapp\model\User();
-        
+
         if($id){
             $userInfo = $user->where('id',$id)->field('id,name,level,wechat,tel,is_auth,start_level,dedication_value,learning_power,honor_value,regetime')->find();
-            
-           
+
+
             if($userInfo){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
                 $level = new level();
                 $mylevel = $level->where('value',$userInfo['level'])->field('name')->find();
@@ -154,21 +154,21 @@ class Useranther extends Base{
                     $userInfo['is_auth'] = '未实名';
                 }
                 $userInfo['addtime'] = date('Y-m-d H:i:s',$userInfo['regetime']);
-                
+
                 $common_model = new Common();
                 $res = $common_model->isMaxOrMin($id);
-               
+
                     $userInfo['class_learning_power'] = $res['all_power'];
-                
-                
+
+
             }else{
                 $userInfo = '';
             }
         }else{
             return returnjson(1001,'','参数缺失！');
         }
-        
-        
+
+
         return returnjson(1000,$userInfo,'获取成功');
     }
 
@@ -440,7 +440,7 @@ class Useranther extends Base{
         //获取邀请人最多的两个社群
        // $max_invate_nums = $user_model->field('id')->where(['parentids'=>'0,'])->order('invate_num desc')->limit(2)->select();
         //获取小社群的全部id
-        
+
         //获取我的全部上级
         /*$parentids = $user_model -> where(['id'=>$this->uid])->field('parentids,pid');
         if(!empty($parentids)){
@@ -448,18 +448,18 @@ class Useranther extends Base{
                 $parentids_ = explode(',',$parentids['parentids']);
                 foreach($parentids_ as $pk=>$pv){
                     if($pv==0){
-                        
+
                     }else{
-                        
+
                     }
                 }
             }
-            
+
         }*/
-        
+
         return returnjson(1000,$max_invate_nums,'获取成功');
     }
-  
+
       //校验学分支付密码
     public function checkPass(){
 		$token = input('token');
@@ -489,7 +489,7 @@ class Useranther extends Base{
         }
       	Db::name('checkpass')->where('uid',$this->uid)->delete();
       	return returnjson(1000,0,'验证通过');
-      
+
     }
   public function updateVersion(){
         $token = input('token');
@@ -505,7 +505,7 @@ class Useranther extends Base{
     }
   	public function giveOut(){
     $common = new Common();
-      	
+
       $common->giveOut();
     }
   //自动执行未送基础包的用户
@@ -523,7 +523,7 @@ class Useranther extends Base{
      // echo "<pre>";
       //print_r($ustr);exit;
       foreach($ustr as $k => $v){
-        
+
       	 Db::startTrans();
           $common = new Common();
       	//$documentRoot = $_SERVER['DOCUMENT_ROOT'];
@@ -547,14 +547,14 @@ class Useranther extends Base{
             $has = Db::name('order')->where($data)->find();
             $I = 0;
             if($has){
-                
+
                 continue;
             }
            $I = $I+1;
            // Db::startTrans();
           	$str .= $uval['id'].',';
             //$common = new Common();
-                
+
                 //if(false === $common->userChangeLevel($uval['id'])){
                  //   Db::rollback();
                   //  return returnjson(1001,'','认证失败');
@@ -565,9 +565,9 @@ class Useranther extends Base{
       	$data1['text'] = $text;
      	Db::name('text')->insert($data1);
         echo 455555666;exit;
-        
+
     }
-    
+
     public function class_dedication_count(){
         ini_set ("memory_limit","-1");
         $token = input('token');
@@ -582,14 +582,14 @@ class Useranther extends Base{
         $user = new \app\wxapp\model\User();
         $users  = $user->where('is_puls',0)->limit(500)->select();
         foreach($users as $k=>$v){
-            
+
             $res = $common_model->isMaxOrMin($v['id'],1);
               //$num = $v['class_dedication']+$res['total_num'];
               Db::name('user')->where('id',$v['id'])->update(['class_dedication'=>$res['total_num'],'is_puls'=>1]);
-              
+
         }
         echo '执行完成';
-        
+
     }
     //全球手续费分红
     public function CreditSourceBonus(){
@@ -631,10 +631,10 @@ class Useranther extends Base{
                 Db::rollback();
                 return returnjson(1001,'','兑换失败');
             }
-            Db::commit();  
+            Db::commit();
         }
         echo '执行完成';
-        
+
     }
-  
-}    
+
+}

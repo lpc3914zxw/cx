@@ -171,6 +171,18 @@
                         <div class="hr-line-dashed"></div>
 
                         <div class="form-group">
+                            <label class="col-sm-2 control-label">上下架:</label>
+                            <div class="col-sm-7">
+                                <label class="radio-inline">
+                                    <input type="radio" {eq name="info.is_shelves" value="0" }checked=""{/eq} value="0"  name="is_shelves">下架</label>
+                                <label class="radio-inline">
+                                    <input type="radio"  {eq name="info.is_shelves" value="1" }checked=""{/eq} value="1"  name="is_shelves">上架</label>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+
+                        <div class="form-group">
                             <label class="col-sm-2 control-label">课程亮点</label>
                             <div class="col-sm-7">
                                 <textarea type="text" cols="30"  rows="10" name="course_bright" placeholder="请输入课程课程亮点" class="form-control" required >{present name='info'}{$info.course_bright}{/present}</textarea>
@@ -213,8 +225,8 @@
                 success: function(data){
                     if (data.code === 1) {
                         layer.msg(data.msg, {icon: 1, time: 1500});
-                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引  
-                        parent.layer.close(index); 
+                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        parent.layer.close(index);
                         window.location.href = '/index/Xcscourse/index';
                     } else {
                         layer.msg(data.msg, {icon: 2, shift: 6});

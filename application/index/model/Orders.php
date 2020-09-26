@@ -27,7 +27,7 @@ class Orders extends Model {
         }
         $teacher_model = new Teachers();
         $advanced_model = new Advanced();
-        foreach ($data as $k=>$val) {
+        foreach ($data as $k => $val) {
             $data[$k]['paytime'] = date('Y.m.d H:i:s',$val['paytime']);
             $data[$k]['addtime'] = date('Y.m.d H:i:s',$val['addtime']);
             $data[$k]['teacherImg'] = $teacher_model->where('id',$val['teacher_id'])->value('headimg');
@@ -44,6 +44,6 @@ class Orders extends Model {
             }
         }
         return page_data($total, $data);
-       
+
     }
 }
