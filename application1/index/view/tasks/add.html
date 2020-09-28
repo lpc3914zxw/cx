@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>问卷管理</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+
+
+    <style type="text/css">
+        input[type=number] {
+            -moz-appearance:textfield;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .form-group  .col-sm-7{
+            outline: none;
+            border:1px solid #ccc ;
+        }
+        .form-group    .col-sm-1 i{
+            cursor: pointer;
+            line-height: 36px;
+            font-size: 22px;
+
+        }
+        .form-group   .divinner1,.form-group   .divinner2,.form-group   .divinner3{
+            position: relative;
+            margin-right: 8px;
+            height: 36px;
+            float: left;
+        }
+        .form-group   .divinner2,.form-group   .divinner3{
+            display: none;
+        }
+        .divinner1  div,.divinner2  div,.divinner3  div{
+            position: absolute;
+            top:0;
+            left:0;
+            width: 100%;
+            height: 100%;
+            z-index: 99;
+            opacity: 0;
+        }
+        .divinner1  input{
+            line-height: 36px;
+        }
+        .vote{
+            width: 100%;
+            float: left;
+            border: 1px dashed #ccc;
+        }
+        .btn_add{
+            display: block;
+            margin: 50px auto;
+            background-color: #1ab394;
+            border-color: #1ab394;
+            color: #FFF;
+            line-height: 35px;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+<!--右侧部分开始-->
+<div id="page-wrapper" class="gray-bg dashbard-1" style="overflow: auto;">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>作业</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <form class="form-horizontal" id="addForm"  enctype="multipart/form-data">
+                            <input type="hidden" name="section_id"  value="{present name='section_id'}{$section_id}{/present}" id="section_id">
+                            <input type="hidden" name="id"  value="{present name='info'}{$info.id}{/present}">
+                            <div class="form-group tags  price-tag">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">标题</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" name="title" placeholder="标题" class="form-control" value="{present name='info'}{$info.title}{/present}">
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">选择方式</label>
+                                    <div class="col-sm-8"  style="border: none;">
+                                        <label class="radio-inline">
+                                            <input type="radio" {present name='info'}{eq name="info.type" value="1" }checked="checked"{/eq}{/present} value="1" id="optionsRadios1" name="changetype">单选
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" {present name='info'}{eq name="info.type" value="2" }checked="checked"{/eq}{/present} value="2" id="optionsRadios1" name="changetype">多选</label>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+
+                                {present name='optionlist'}
+                                {volist name="optionlist" id="vo"}
+                                <div class="form-group  xuanxiang">
+                                    <label class="col-sm-2 control-label">{$vo.option}</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="answer[]" placeholder="{$vo.option}" class="form-control" value="{$vo.options}"  required="required">
+                                    </div>
+
+
+                                    <label class="col-sm-1 control-label">答案:</label>
+                                    <div class="col-sm-5">
+                                        <label class="radio-inline">
+                                            <input type="radio" value="1"  name="is_true" {eq name="$vo.is_true" value="1"}checked=""{/eq}>正确</label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="0"  name="is_true"  {eq name="$vo.is_true" value="0"}{/eq}>错误</label>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="divinner2"  onclick="addxuan(this)" data-id="{$key + 1}"><i class="fa fa-plus-square" ></i> </div>
+                                        <div class="divinner3"  onclick="removexuan(this)"> <i class="fa fa-minus-square"></i></div>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                {/volist}
+
+                                {else /}
+                                <div class="form-group  xuanxiang">
+                                    <label class="col-sm-2 control-label">选项一</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name="answer[]" placeholder="选项一" class="form-control" value=""  required="required">
+                                    </div>
+
+                                    <label class="col-sm-1 control-label">答案:</label>
+                                    <div class="col-sm-5">
+                                        <label class="radio-inline">
+                                            <input type="radio" checked="" value="option1" id="optionsRadios1" name="optionsRadios">正确</label>
+                                        <label class="radio-inline">
+                                            <input type="radio" value="option2" id="optionsRadios2" name="optionsRadios">错误</label>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="divinner2"  onclick="addxuan(this)" data-id="1"><i class="fa fa-plus-square" ></i> </div>
+                                        <div class="divinner3"  onclick="removexuan(this)"> <i class="fa fa-minus-square"></i></div>
+                                    </div>
+
+                                </div>
+                                <div class="hr-line-dashed"></div>
+
+                                <div class="form-group  xuanxiang">
+                                    <label class="col-sm-2 control-label">选项二</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="answer[]" placeholder="选项二" class="form-control" value=""  required="required">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="divinner2"  onclick="addxuan(this)"  data-id="1"><i class="fa fa-plus-square" ></i> </div>
+                                        <div class="divinner3"  onclick="removexuan(this)"> <i class="fa fa-minus-square"></i></div>
+                                    </div>
+
+                                </div>
+                                <div class="hr-line-dashed"></div>
+
+                                <div class="form-group  xuanxiang">
+                                    <label class="col-sm-2 control-label">选项三</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" name="answer[]" placeholder="选项三" class="form-control" value=""  required="required">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="divinner2"  onclick="addxuan(this)" data-id="1"><i class="fa fa-plus-square" ></i> </div>
+                                        <div class="divinner3"  onclick="removexuan(this)"> <i class="fa fa-minus-square"></i></div>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                {/present}
+                            </div>
+                        </form>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2"  style="margin-top: 50px;">
+                                <button class="btn btn-primary save" type="button">保存内容</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--右侧部分结束-->
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="__STATIC__/js/plugins/layer/layer.js"></script>
+<script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+<script src="__STATIC__/js/contabs.min.js"></script>
+<script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+<script src="__STATIC__/js/content.min.js"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+
+<script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="__STATIC__/js/common.js"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script>
+
+    var number =1
+    $(function() {
+        $("input[type='file']").prettyFile();
+        var length = $(".price-tag input[name='answer[]']").length;
+        if(length < 3){
+            $(".xuanxiang:last").find(".divinner2").css("display", "block")
+        }else{
+            $(".xuanxiang:gt(1)").find(".divinner2").css("display", "block")
+            $(".xuanxiang:gt(1)").find(".divinner3").css("display", "block")
+        }
+
+    })
+
+    $('.blockindex').click(function(){
+        window.location.href= "/index/Tasks/index/id/" + $('#section_id').val()
+    })
+
+
+    $('.save').click(function(){
+        //$('.save').attr('disabled',true)
+        $.ajax({
+            url: "{:\\think\\Url::build('tasks/add')}",
+            data: $('#addForm').serialize(),
+            dataType: "json",
+            type: "post",
+            success: function(data){
+                console.log(data)
+                if (data.code === 1) {
+                    
+                    var id = data.data;
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                    window.location.href= data.url;
+                } else {
+                    
+                    $('.save').attr('disabled',false)
+                    layer.msg(data.msg, {icon: 2});
+                }
+            },
+
+        });
+    })
+
+    var newchar = "";
+    function addxuan(addxuan){
+        var index = $(".xuanxiang:last").find('input[type="file"]').attr('data-index');
+        index = parseInt(index)+1;
+
+        var addnum =  parseInt($(addxuan).parents(".price-tag").children(".xuanxiang").length)+1;
+        ArabiSimplified(addnum)
+        $(addxuan).parents(".price-tag").append('<div class="form-group  xuanxiang">' +
+            '<label class="col-sm-2 control-label">选项'+ newchar + '</label>' +
+            '<div class="col-sm-6">' +
+            '<input type="text" name="answer[]" placeholder="选项'+ newchar + '" class="form-control" value=""  required="required">' +
+            '</div>' +
+            '<div class="col-sm-2">' +
+            '<div class="divinner2" onclick="addxuan(this)"><i class="fa fa-plus-square"></i> </div>' +
+            '<div class="divinner3" onclick="removexuan(this)"> <i class="fa fa-minus-square"></i></div>' +
+            '</div>' +
+            '</div>'+
+            '<div class="hr-line-dashed"></div>')
+
+        $("input[type='file']").prettyFile();
+        var length = $(".price-tag input[name='answer[]']").length;
+        if(length < 3){
+            $(".xuanxiang:last").find(".divinner2").css("display", "block")
+        }else{
+            $(".xuanxiang:gt(1)").find(".divinner2").css("display", "block")
+            $(".xuanxiang:gt(1)").find(".divinner3").css("display", "block")
+            $(".xuanxiang:lt(1)").find(".divinner2").css("display", "none")
+        }
+    }
+
+    function removexuan(removesd){
+        var removenum =document.getElementsByClassName("price-tag")[0].getElementsByClassName("xuanxiang")
+        $(removesd).parents(".xuanxiang").next(".hr-line-dashed").remove()
+        $(removesd).parents(".xuanxiang").remove()
+
+        for(var i=0;i<removenum.length;i++){
+            ArabiSimplified(i+1)
+            $(removenum[i]).find(".control-label").html("选项 "+newchar)
+            $(removenum[i]).find(".form-control").attr("placeholder","选项 "+newchar)
+        }
+        var length = $(".price-tag input[name='answer[]']").length;
+        if(length < 3){
+            $(".xuanxiang:last").find(".divinner2").css("display", "block")
+        }else{
+            $(".xuanxiang:gt(1)").find(".divinner2").css("display", "block")
+            $(".xuanxiang:gt(1)").find(".divinner3").css("display", "block")
+        }
+    }
+
+    function ArabiSimplified(Num) {
+        newchar = ""
+        for (var i = Num.length - 1; i >= 0; i--) {
+            Num = Num.replace(",", "")//替换Num中的“,”
+            Num = Num.replace(" ", "")//替换Num中的空格
+        }
+        if (isNaN(Num)) { //验证输入的字符是否为数字
+            //alert("请检查小写金额是否正确");
+            return;
+        }
+        //字符处理完毕后开始转换，采用前后两部分分别转换
+        var part = String(Num).split(".");
+
+        //小数点前进行转化
+        for (var i = part[0].length - 1; i >= 0; i--) {
+            tmpnewchar = ""
+            perchar = part[0].charAt(i);
+            switch (perchar) {
+                case "0":  tmpnewchar = "" + tmpnewchar;break;
+                case "1": tmpnewchar = "一" + tmpnewchar; break;
+                case "2": tmpnewchar = "二" + tmpnewchar; break;
+                case "3": tmpnewchar = "三" + tmpnewchar; break;
+                case "4": tmpnewchar = "四" + tmpnewchar; break;
+                case "5": tmpnewchar = "五" + tmpnewchar; break;
+                case "6": tmpnewchar = "六" + tmpnewchar; break;
+                case "7": tmpnewchar = "七" + tmpnewchar; break;
+                case "8": tmpnewchar = "八" + tmpnewchar; break;
+                case "9": tmpnewchar = "九" + tmpnewchar; break;
+                case "9": tmpnewchar = "十" + tmpnewchar; break;
+                case "9": tmpnewchar = "十一" + tmpnewchar; break;
+                case "9": tmpnewchar = "十二" + tmpnewchar; break;
+                case "9": tmpnewchar = "十三" + tmpnewchar; break;
+                case "9": tmpnewchar = "十四" + tmpnewchar; break;
+                case "9": tmpnewchar = "十五" + tmpnewchar; break;
+                case "9": tmpnewchar = "十六" + tmpnewchar; break;
+                case "9": tmpnewchar = "十七" + tmpnewchar; break;
+                case "9": tmpnewchar = "十八" + tmpnewchar; break;
+                case "9": tmpnewchar = "十九" + tmpnewchar; break;
+                case "9": tmpnewchar = "二十" + tmpnewchar; break;
+            }
+            switch (part[0].length - i - 1) {
+                case 0: tmpnewchar = tmpnewchar; break;
+                case 1: if (perchar != 0) tmpnewchar = tmpnewchar + "十"; break;
+                case 2: if (perchar != 0) tmpnewchar = tmpnewchar + "百"; break;
+                case 3: if (perchar != 0) tmpnewchar = tmpnewchar + "千"; break;
+                case 4: tmpnewchar = tmpnewchar + "万"; break;
+                case 5: if (perchar != 0) tmpnewchar = tmpnewchar + "十"; break;
+                case 6: if (perchar != 0) tmpnewchar = tmpnewchar + "百"; break;
+                case 7: if (perchar != 0) tmpnewchar = tmpnewchar + "千"; break;
+                case 8: tmpnewchar = tmpnewchar + "亿"; break;
+                case 9: tmpnewchar = tmpnewchar + "十"; break;
+            }
+            newchar = tmpnewchar + newchar;
+        }
+
+        return newchar;
+    }
+
+</script>
+
+
+</body>
+</html>

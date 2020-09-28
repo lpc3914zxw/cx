@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>才学APP - {$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+        #page-wrapper {
+            padding: 0 15px;
+            position: inherit;
+            margin: 0 0 0 60px;
+        }
+
+    </style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div >
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name|default="编辑APP设置"}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <form method="post" class="form-horizontal" id="newsForm">
+                        <input type="hidden" name="id" value='{present name="info"}{$info.id}{/present}'>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">客服电话</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="tel" placeholder="客服电话"  value="{present name='info'}{$info.tel}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">E-mail</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="email" placeholder="E-mail"  value="{present name='info'}{$info.email}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">APP说明</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="app_note" placeholder="APP说明"  value="{present name='info'}{$info.app_note}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">版本号:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="version" placeholder="版本号"  value="{present name='info'}{$info.version}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                      
+                      
+
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">安卓下载地址</label>
+                            <div class="col-sm-7">
+                              <input type="text" class="form-control" name="andown" id="andown" data-index="0"  value="{present name='info'}{$info.andown}{/present}">
+                               
+                            </div>
+                        </div>
+						<div class="form-group logo">
+                            <label class="col-sm-2 control-label">ios下载地址</label>
+                            <div class="col-sm-7">
+                              <input type="text" class="form-control" name="iosdown" id="iosdown" data-index="0"  value="{present name='info'}{$info.iosdown}{/present}">
+                                
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">介绍才学</label>
+                            <div class="col-sm-8">
+                                <textarea type="text" class="form-control" rows="5" cols="10"  name="introduce" placeholder="介绍才学" >{present name='info'}{$info.introduce}{/present}</textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">文章赞赏奖励最小值</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control link" name="reward_min" placeholder="文章赞赏奖励最小值"  value="{present name='info'}{$info.reward_min}{/present}">
+                            </div>
+
+                            <label class="col-sm-1 control-label">最大值:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control link" name="reward_max" placeholder="文章赞赏奖励最大值"  value="{present name='info'}{$info.reward_max}{/present}">
+                            </div>
+                            
+                            
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">停服开始时间</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control link" name="stop_starttime" placeholder="停服开始时间"  value="{present name='info'}{$info.stop_starttime}{/present}">
+                            </div>
+
+                            <label class="col-sm-1 control-label">结束时间:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control link" name="stop_endtime" placeholder="停服结束时间"  value="{present name='info'}{$info.stop_endtime}{/present}">
+                            </div>
+                            
+                            
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">停服说明：</label>
+                            <div class="col-sm-8">
+                                <textarea  name="stop_content" id="stop_content" rows="10"  cols="100">{present name="info"}{$info.stop_content}{/present}</textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">班级说明：</label>
+                            <div class="col-sm-8">
+                                <textarea  name="invite_class_content" id="invite_class_content" rows="10"  cols="100">{present name="info"}{$info.invite_class_content}{/present}</textarea>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">等级白名单</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="levels" placeholder="自动升级不校验等级，填入用户id，以逗号隔开"  value="{present name='info'}{$info.levels}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">星级等级白名单</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="startlevels" placeholder="自动升级不校验等级，填入用户id，以逗号隔开"  value="{present name='info'}{$info.startlevels}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">广告插入步长</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="adv_step" placeholder="涨知识-广告插入频率"  value="{present name='info'}{$info.adv_step}{/present}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">每日实名认证数（0为不限制）</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control link" name="authnum" placeholder="每日实名认证最大数量，0为不限制"  value="{present name='info'}{$info.authnum}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">兑换须知：</label>
+                            <div class="col-sm-8">
+                                <textarea  name="exchangenote" id="exchangenote" rows="10"  cols="100">{present name="info"}{$info.exchangenote}{/present}</textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">龙虎榜说明：</label>
+                            <div class="col-sm-8">
+                                <textarea  name="longcontent" id="longcontent" rows="10"  cols="100">{present name="info"}{$info.longcontent}{/present}</textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="hr-line-dashed"></div>
+                        <!-- 邀请海报模板 Start -->
+                        {present name="info"}
+                            {notempty name="info.poster_temp"}
+                            <div class="form-group logo">
+                                <label class="col-sm-2 control-label">原邀请海报模板</label>
+                                <div class="col-sm-8">
+                                    <img src="{$info.poster_temp}" width="150" class="yylogo"/>
+                                </div>
+                            </div>
+                            {else /}
+                            <div class="form-group logo">
+                                <label class="col-sm-2 control-label yname"></label>
+                                <div class="col-sm-8">
+                                    <img src="" width="150" class="ylogo"/>
+                                </div>
+                            </div>
+                            {/notempty}
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yname"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="ylogo"/>
+                            </div>
+                        </div>
+                        {/present}
+
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">邀请海报模板</label>
+                            <div class="col-sm-7">
+                                <input type="file" class="form-control" name="logo" id="logo" data-index="0"  onchange ="uploadImg(this)"  accept="image/*">
+                            </div>
+                            <div class="col-sm-1"  style="color:red">
+                                <span >建议尺寸:750*755</span>
+                            </div>
+                        </div>
+                        <input type="hidden"  name="poster_temp"   value="{present name='info'}{$info.poster_temp}{/present}"  id="poster_temp"/>
+                        <div class="hr-line-dashed"></div>
+
+                        <!-- 邀请海报模板 End -->
+
+                        <!-- 今日排行榜图片 Start -->
+                        {present name="info"}
+                        {notempty name="info.rankimg"}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">今日排行榜图片</label>
+                            <div class="col-sm-8">
+                                <img src="{$info.rankimg}" width="150" class="yyrankimg"/>
+                            </div>
+                        </div>
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yrankname"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yrankimg"/>
+                            </div>
+                        </div>
+                        {/notempty}
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yrankname"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yyrankimg"/>
+                            </div>
+                        </div>
+                        {/present}
+
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">今日排行榜图片</label>
+                            <div class="col-sm-7">
+                                <input type="file" class="form-control" name="imgurl" id="imgurl" data-index="0"  onchange ="uploadRankimg(this)"  accept="image/*">
+                            </div>
+                            <div class="col-sm-1"  style="color:red">
+                                <span >建议尺寸:750*755</span>
+                            </div>
+                        </div>
+                        <input type="hidden"  name="rankimg"   value="{present name='info'}{$info.rankimg}{/present}"  id="rankimg"/>
+                        <div class="hr-line-dashed"></div>
+
+                        <!-- 今日排行榜图片 End -->
+
+                        <!--邀请好友背景图Start-->
+                        {present name="info"}
+                        {notempty name="info.inviteimg"}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">邀请好友背景图</label>
+                            <div class="col-sm-8">
+                                <img src="{$info.inviteimg}" width="150" class="yyinviteimg"/>
+                            </div>
+                        </div>
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yinvitename"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yinviteimg"/>
+                            </div>
+                        </div>
+                        {/notempty}
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yinvitename"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yyinviteimg"/>
+                            </div>
+                        </div>
+                        {/present}
+
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">邀请好友背景图</label>
+                            <div class="col-sm-7">
+                                <input type="file" class="form-control" name="inviteimg" id="inviteimg"  onchange ="uploadInviteImg(this)"  accept="image/*">
+                            </div>
+                            <div class="col-sm-1"  style="color:red">
+                                <span >建议尺寸:514 * 258</span>
+                            </div>
+                        </div>
+                        <input type="hidden"  name="inviteimg"   value="{present name='info'}{$info.inviteimg}{/present}" id="inviteimgurl"/>
+                        <div class="hr-line-dashed"></div>
+                        <!-- 邀请好友背景图End-->
+
+
+                        <!--我的班级顶部图 Start-->
+                        {present name="info"}
+                        {notempty name="info.classimg"}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">班级顶部图</label>
+                            <div class="col-sm-8">
+                                <img src="{$info.classimg}" width="150" class="yyclassimg"/>
+                            </div>
+                        </div>
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yclassimgname"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yclassimg"/>
+                            </div>
+                        </div>
+                        {/notempty}
+                        {else /}
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label yclassimgname"></label>
+                            <div class="col-sm-8">
+                                <img src="" width="150" class="yyclassimg"/>
+                            </div>
+                        </div>
+                        {/present}
+
+                        <div class="form-group logo">
+                            <label class="col-sm-2 control-label">班级顶部图</label>
+                            <div class="col-sm-7">
+                                <input type="file" class="form-control" name="classimg" id="classimg"  onchange ="uploadClassImg(this)"  accept="image/*">
+                            </div>
+                            <div class="col-sm-1"  style="color:red">
+                                <span >建议尺寸:450 * 240</span>
+                            </div>
+                        </div>
+                        <input type="hidden"  name="classimg"   value="{present name='info'}{$info.classimg}{/present}" id="classimgurl"/>
+                        <div class="hr-line-dashed"></div>
+                        <!-- 邀请好友背景图End-->
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">算力银行说明</label>
+                            <div class="col-sm-8">
+                                <textarea  name="colliers_note" id="colliers_note" rows="15"  cols="60">{present name="info"}{$info.colliers_note}{/present}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">星级等级说明</label>
+                            <div class="col-sm-8">
+                                <textarea  name="start_level_content" id="start_level_content" rows="15"  cols="60">{present name="info"}{$info.start_level_content}{/present}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-primary" type="submit" id="save">保存内容</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+<script src="__UEDITOR__/ueditor.all.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+
+<script>
+    $(function () {
+        var ue = UE.getEditor('colliers_note', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        ue.ready(function(){
+            ue.execCommand('lineheight', 2); //行间距
+            ue.execCommand('fontsize', '18px'); //字号
+        });
+        
+        var long = UE.getEditor('longcontent', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        long.ready(function(){
+            long.execCommand('lineheight', 2); //行间距
+            long.execCommand('fontsize', '18px'); //字号
+        });
+        
+        var sc = UE.getEditor('stop_content', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        sc.ready(function(){
+            sc.execCommand('lineheight', 2); //行间距
+            sc.execCommand('fontsize', '18px'); //字号
+        });
+         var icc = UE.getEditor('invite_class_content', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        icc.ready(function(){
+            icc.execCommand('lineheight', 2); //行间距
+            icc.execCommand('fontsize', '18px'); //字号
+        });
+        var slc = UE.getEditor('start_level_content', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        slc.ready(function(){
+            slc.execCommand('lineheight', 2); //行间距
+            slc.execCommand('fontsize', '18px'); //字号
+        });
+        $("input[type='file']").prettyFile();
+        $("#newsForm").submit(function() {
+            $.ajax({
+                url: "{:\\think\\Url::build('system/appSet')}",
+                data: $(this).serialize(),
+                dataType: "json",
+                type: "post",
+                success: function(data){
+                    if (data.code === 1) {
+                        layer.msg(data.msg, {icon: 1, time: 1500});
+                        window.location.href = '/index/system/appSet';
+                    } else {
+                        layer.msg(data.msg, {icon: 2, shift: 6});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    function uploadRankimg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadImgurl",
+            secureuri : false,// 一般设置为false
+            fileElementId : "imgurl",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                if(data.code == 0){
+                    $('#rankimg').val(data.data)
+                    $('.yrankimg').attr('src',data.data)
+                    $('.yyrankimg').attr('src',data.data)
+                    $('.yrankname').text("今日排行榜图片")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/System/uploadPostImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "logo",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#poster_temp').val(data.data)
+                    $('.ylogo').attr('src',data.data)
+                    $('.yylogo').attr('src',data.data)
+                    $('.yname').text("邀请海报模板")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadInviteImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadInviteImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "inviteimg",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#inviteimgurl').val(data.data)
+                    $('.yinviteimg').attr('src',data.data)
+                    $('.yyinviteimg').attr('src',data.data)
+                    $('.yinvitename').text("邀请好友背景图")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadClassImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadClassImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "classimg",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#classimgurl').val(data.data)
+                    $('.yclassimg').attr('src',data.data)
+                    $('.yyclassimg').attr('src',data.data)
+                    $('.yclassimgname').text("班级顶部图")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+  function showWaiting(){
+        var node=document.createElement("div");  //创建一个div元素节点，作为整个背景的容器
+        var nodeClass=document.createAttribute("class"); //创建class元素属性
+        var nodeStyle = document.createAttribute("style"); //创建style元素属性
+        var nodeName = document.createAttribute("name"); //创建name元素属性
+        nodeName.value = "divWaiting"; //给元素节点命名
+        nodeClass.value = "div-waiting"; //元素属性赋值
+        nodeStyle.value = "height:"+window.innerHeight + "px; width:"+window.innerWidth+"px;";
+        node.setAttributeNode(nodeClass); //设置元素节点的属性及值
+        node.setAttributeNode(nodeStyle);
+        node.setAttributeNode(nodeName);
+        var iconNode = document.createElement("div");  //创建一个div元素节点，作为旋转图标的容器
+        var iconClass = document.createAttribute("class");
+        iconClass.value = "icon-waiting";
+        //iconClass.value = "fa fa-spinner fa-pulse icon-position";
+        iconNode.setAttributeNode(iconClass);
+        node.appendChild(iconNode);  //将图标节点放到整个背景的元素节点
+        document.body.appendChild(node); //将整个背景div插入到body中
+    }
+
+    function closeWaiting() {
+        var wait = document.getElementsByName("divWaiting"); //获取name为divWaiting的元素节点
+        console.log(wait);
+        //遍历所有的节点，将body中的所有等待旋转效果去掉
+        for (var i = wait.length - 1; i >= 0; i--) {
+            document.body.removeChild(wait[i]);
+        }
+    }
+  function uploadApk(obj) {
+        showWaiting();
+        $.ajaxfileupload({
+            url : "/index/upload/uploadApk",
+            secureuri : false,// 一般设置为false
+            fileElementId : "apk",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+              
+                if(data.code == 0){
+                    closeWaiting()
+                    $('#yaudiourl').text(data.data)
+                    $('#audiourl').val(data.data)
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }else{
+                  
+                }
+            }
+        });
+        return false;
+    }
+
+
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ use app\index\model\Advertisment;
 use app\wxapp\model\CourseBehavior;
 use app\wxapp\model\CourseLearnLog;
 use app\wxapp\model\Teachers;
-
+use  think\Db;
 class Course extends Base{
 
     /*
@@ -36,8 +36,15 @@ class Course extends Base{
         $tjCourseData = $course_model->field('id,teacher_id,name')->where('is_tj',1)->where('is_delete',0)->where('is_shelves',1)->limit(3)->select();
         if($tjCourseData) {
             foreach ($tjCourseData as $k=>$val) {
+                $order = Db::name('order')->where('course_id',$val['id'])->where('uid',$this->uid)->where('course_type',1)->where(['status'=>['in',[4,5,6]]])->find();
+                if($order){
+                    $is_buy = 1;
+                }else{
+                    $is_buy = 0;
+                }
                 $sectionList = $section_model->field('name')->where('c_id',$val['id'])->limit(2)->select();
                 $tjCourseData[$k]['sectionlist'] = $sectionList;
+                $tjCourseData[$k]['is_buy'] = $is_buy;
                 $teacherImg = $teacher_model->where('id',$val['teacher_id'])->value('headimg');
                 $tjCourseData[$k]['teacherimg'] = $teacherImg;
             }
@@ -57,6 +64,13 @@ class Course extends Base{
             }
             $dayCourse['chapter_count'] = $advancedInfo['chapter_count'];
             $dayCourse['value'] = $advancedInfo['value'];
+            $order = Db::name('order')->where('course_id',$dayCourse['id'])->where('uid',$this->uid)->where('course_type',1)->where(['status'=>['in',[4,5,6]]])->find();
+                if($order){
+                    $is_buy = 1;
+                }else{
+                    $is_buy = 0;
+                }
+            $dayCourse['is_buy'] = $is_buy;
         }else{
             $dayCourse = (object)array();
         }
@@ -70,12 +84,19 @@ class Course extends Base{
             }else{
                 $pay_type = 1;
             }
-            $courseList = $course_model->field('name,abstract,samll_imgurl,people_num')
+            $courseList = $course_model->field('id,name,abstract,samll_imgurl,people_num')
                         ->where('advanced_id',$val['id'])->where('is_shelves',1)->order('sort')->limit(4)->select();
             foreach ($courseList as $key=>$value) {
                 $courseList[$key]['pay_type'] = $pay_type;
                 $courseList[$key]['value'] = $val['value'];
                 $courseList[$key]['chapter_count'] = $val['chapter_count'];
+                $order = Db::name('order')->where('course_id',$value['id'])->where('uid',$this->uid)->where('course_type',1)->where(['status'=>['in',[4,5,6]]])->find();
+                if($order){
+                    $is_buy = 1;
+                }else{
+                    $is_buy = 0;
+                }
+                $courseList[$key]['is_buy'] = $is_buy;
             }
             unset($advancedList[$k]['pay_type']);
             unset($advancedList[$k]['value']);
@@ -128,6 +149,7 @@ class Course extends Base{
      * 推荐课程-已购页面
      */
     public function getCourseInfo($course_id = 0) {
+        
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -143,7 +165,8 @@ class Course extends Base{
         $teacher_model = new Teachers();
         $order_model = new \app\wxapp\model\Orders();
         $advanced_model = new Advanced();
-        if($order_model->where(['uid'=>$this->uid,'course_id'=>$course_id,'status'=>1])->find()) {
+        
+        if($order_model->where(['uid'=>$this->uid,'course_id'=>$course_id,'status'=>['in',[4,5,6]]])->find()) {
             $learnedCount = $learnLog_model->where(['course_id'=>$course_id,'uid'=>$this->uid])->count();
             $courseInfo = $course_model->field('id,name,people_num,advanced_id,teacher_id')->where('id',$course_id)->find();
             $teacherInfo = $teacher_model->field('name,headimg')->where('id',$courseInfo['teacher_id'])->find();
@@ -153,7 +176,7 @@ class Course extends Base{
             $courseInfo['chapter_count'] = $chapter_count;
             $courseInfo['teacher_name'] = $teacherInfo['name'];
             $courseInfo['teacher_img'] = $teacherInfo['headimg'];
-            $paytime = $order_model->where(['uid'=>$this->uid,'course_id'=>$course_id,'status'=>1])->value('paytime');
+            $paytime = $order_model->where(['uid'=>$this->uid,'course_id'=>$course_id,'status'=>['in',[4,5,6]]])->value('paytime');
             $courseInfo['shareLink'] = GetCurUrl()."/wxapp/Xcscourse/h5_curriculumlist?c_id=".$course_id.'&muid='.$this->uid;
             return returnjson(1000,$courseInfo,'获取成功');
         }
@@ -166,6 +189,7 @@ class Course extends Base{
      * @param int $page
      */
     public function sectionList($course_id = 0) {
+        
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -174,7 +198,8 @@ class Course extends Base{
             return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
         }
         $order_model = new \app\wxapp\model\Orders();
-        if(!$order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>1])->find()) {
+        
+        if(!$order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>['in',[4,5,6]]])->find()) {
             return returnjson(1001,'','请先购买该课程');
         }
         $section_model = new Sectiones();
@@ -208,7 +233,11 @@ class Course extends Base{
         $data['image'] = $teacherImg;
         $preSection = $section_model->field('id')->where(['id'=>['lt',$s_id],'c_id'=>$data['c_id']])->order('id desc')->find();
         $nextSection = $section_model->field('id')->where(['id'=>['gt',$s_id],'c_id'=>$data['c_id']])->order('id')->find();
-
+        $res = Db::name('studus_section')->where('uid',$this->uid)->where('cid',$data['c_id'])->where('sid',$s_id);
+        if(empty($res)){
+            $scdata = ['cid'=>$data['c_id'],'sid'=>$s_id,'uid'=>$this->uid,'addtime'=>time()];
+            Db::name(studus_section)->insert($scdata);
+        }
         if($preSection) {
             $data['preSectionId'] = $preSection['id'];
         }else{

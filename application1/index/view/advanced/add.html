@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>才学APP - {$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+        #page-wrapper {
+            padding: 0 15px;
+            position: inherit;
+            margin: 0 0 0 60px;
+        }
+
+    </style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div >
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name|default="编辑进阶信息"}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <form method="post" class="form-horizontal" id="newsForm">
+                        <input type="hidden" name="id" value="{present name='id'}{$id}{/present}">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">进阶名称</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="name" placeholder="填写进阶名称" class="form-control" required value="{present name='info'}{$info.name}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">开放条件</label>
+                            <div class="col-sm-7">
+                                <select name="open_tj" class="ftype form-control">
+                                    <option value="0" {present name="info"}{eq name="$info.open_tj" value="0"}selected{/eq}{/present}>无条件</option>
+                                    <option value="1" {present name="info"}{eq name="$info.open_tj" value="1"}selected{/eq}{/present}>一星以上开放</option>
+                                    <option value="2" {present name="info"}{eq name="$info.open_tj" value="2"}selected{/eq}{/present}>二星以上开放</option>
+                                    <option value="3" {present name="info"}{eq name="$info.open_tj" value="3"}selected{/eq}{/present}>三星以上开放</option>
+                                    <option value="4" {present name="info"}{eq name="$info.open_tj" value="4"}selected{/eq}{/present}>四星以上开放</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">排序</label>
+                            <div class="col-sm-8">
+                                <input type="number" placeholder="排序" name="sort"  class="form-control"   value="{present name='info'}{$info.sort}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">支付方式:</label>
+                            <div class="col-sm-9">
+                                <label class="checkbox-inline" for="-NaN">
+                                    <input type="checkbox" value="1"  {present name='info'}
+                                           {volist name="info.pay_type" id="vo"} {eq name="$vo" value="1"}checked{/eq}{/volist}
+                                    {/present} >学分兑换</label>
+                                <label class="checkbox-inline" for="-NaN">
+                                    <input type="checkbox" value="2"  {present name='info'}
+                                           {volist name="info.pay_type" id="vo"} {eq name="$vo" value="2"}checked{/eq}{/volist}
+                                    {/present} >支付宝支付</label>
+                                <label class="checkbox-inline" for="-NaN">
+                                    <input type="checkbox" value="3"  {present name='info'}
+                                           {volist name="info.pay_type" id="vo"} {eq name="$vo" value="3"}checked{/eq}{/volist}
+                                    {/present} >微信支付</label>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">兑换所需学分/金额</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="value" placeholder="兑换所需学分/金额" class="form-control" value="{present name='info'}{$info.value}{/present}" required ></input>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课时数</label>
+                            <div class="col-sm-7">
+                                <input type="number" name="chapter_count" placeholder="请输入课程的课时数" class="form-control" value="{present name='info'}{$info.chapter_count}{/present}" required ></input>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">学习力</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="learn_power" placeholder="学习力"  class="form-control"   value="{present name='info'}{$info.learn_power}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">学分奖励</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="reward"  placeholder="学分奖励"  class="form-control"   value="{present name='info'}{$info.reward}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">有效期(天)</label>
+                            <div class="col-sm-7">
+                                <input type="number"  name="deadline"  placeholder="有效期(天)" class="form-control"  value="{present name='info'}{$info.deadline}{/present}" />
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">难度系数</label>
+                            <div class="col-sm-8">
+                                <input type="text" placeholder="难度系数" name="difficulty"  class="form-control"  required value="{present name='info'}{$info.difficulty}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">同时在学课程数</label>
+                            <div class="col-sm-8">
+                                <input type="number" placeholder="同时在学课程数" name="studying_num"  class="form-control"   value="{present name='info'}{$info.studying_num}{/present}">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <input type="hidden"  value="{present name='info'}{$info.str_pay_type}{/present}"  name="pay_type" id="pay_type"/>
+
+                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-primary" type="submit" id="save">保存内容</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+<script src="__UEDITOR__/ueditor.all.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+
+<script>
+    $(function () {
+        $("input[type='file']").prettyFile();
+        $('input[type=checkbox]').change(function(){
+            $('#pay_type').val($('input[type=checkbox]:checked').map(function(){return this.value}).get().join(','))
+        })
+
+        $("#newsForm").submit(function() {
+            $.ajax({
+                url: "{:\\think\\Url::build('Advanced/add')}",
+                data: $(this).serialize(),
+                dataType: "json",
+                type: "post",
+                success: function(data){
+                    if (data.code === 1) {
+                        layer.msg(data.msg, {icon: 1, time: 1500});
+                       // var index = parent.layer.getFrameIndex(window.name);
+                       // parent.layer.close(index);
+                      var index = parent.layer.getFrameIndex(window.name); //获取窗口索引  
+                        parent.layer.close(index); 
+                         window.location.href =  '/index/advanced/index';
+                    } else {
+                        layer.msg(data.msg, {icon: 2, shift: 6});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    $('.bank').click(function () {
+        window.location.href="/index/advanced/index"
+    })
+    function uploadImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/upload/uploadHeadImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "logo",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#headimgurl').val(data.data)
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadimgurl(obj){
+        $.ajaxfileupload({
+            url : "/index/upload/uploadImgurl",
+            secureuri : false,// 一般设置为false
+            fileElementId : "imgurl",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                if(data.code == 0){
+                    $('#imgurlsrc').val(data.data)
+                }
+            }
+        });
+        return false;
+    }
+
+</script>
+</body>
+</html>

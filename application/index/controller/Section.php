@@ -70,7 +70,7 @@ class Section extends Base
                 false !== $section_model->where('id',$id)->update($data) && $this->success('更新成功',$url);
             }
             if($chapter_count < $courseInfo['haschapter_num'] || $chapter_count == $courseInfo['haschapter_num']) {
-                $this->error('课时数量已达上线');
+                //$this->error('课时数量已达上线');
             }
             Db::startTrans();
             $maxsort = $section_model->where(['c_id'=>$params['c_id']])->max('sort');

@@ -42,7 +42,7 @@ class Cxorders extends Base {
         $courseInfo = $course_model->field('imgurl,name,advanced_id')->where('id',$course_id)->find();
 
         
-            $status = '5,6,7';
+            $status = '4,5,6';
             if($order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>['in',($status)]])->find()){
                 return returnjson(1001,'','已购买过，请勿重复购买');
             }

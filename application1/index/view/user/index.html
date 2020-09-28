@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>用户管理</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="__STATIC__/img/favicon.png">
+    <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    
+    
+    <style>
+           .description  img{
+                width:100% !important;
+           }
+    </style>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+    <div>
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$current_menu.name}</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="example-wrap">
+                            <div class="example">
+                                 <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+                                    <form role="form" class="form-inline">
+                                        <div class="form-group">
+                                            <label>用户</label>
+                                            <input type="text" name="name" id="name" placeholder="用户名称/ID/手机号/学号" class="form-control" value="">
+                                        </div>
+                                      &nbsp;&nbsp;&nbsp;&nbsp;
+                                      	<div class="form-group">
+                                            <label>上级</label>
+                                            <input type="text" name="pname" id="pname" placeholder="上级id/手机号" class="form-control" value="">
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        
+                                         <div class="form-group">
+                                            <label>状态&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="is_auth" name="is_auth">
+                                                <option value="" >-是否实名-</option>
+                                                
+                                                   <option value="1">是</option>
+                                                   <option value="0">否</option>
+                                                  
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <label>等级&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="level" name="level">
+                                                <option value="" >-请选择等级-</option>
+                                                    {volist name="levels" id="vo"}
+                                                      <option value="{$vo.value}">{$vo.name}</option>
+                                                    {/volist}
+                                                  
+                                                  
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <label>星际等级&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="start_level" name="start_level">
+                                                <option value="" >-请选择星际等级-</option>
+                                                    {volist name="stleves" id="vo1"}
+                                                      <option value="{$vo1.value}">{$vo1.name}</option>
+                                                    {/volist}
+                                                   
+                                                  
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                         <div class="form-group">
+                                            <label>注册时间&nbsp;&nbsp;</label>
+                                            <input type="text" name="time" placeholder="请选择时间" class="form-control" value="" id="scoretime">
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-outline btn-primary" onclick="exportes()" style="margin-bottom: 0">
+                                                导出
+                                            </button>
+                                        </div>
+                                        
+                                    </form>
+                                </div>
+                                <table id="bootstrapTable" data-click-to-select="true">
+                                    <thead>
+                                    <tr>
+                                        <th data-checkbox="true"></th>
+                                        <th data-field="id" align="center">ID</th>
+                                        <th data-field="headimg" data-formatter="formatImage" align="center">头像</th>
+                                        <th data-field="name" align="center">姓名</th>
+                                        <th data-field="pid" align="center">上级id</th>
+                                        <th data-field="student_no" align="center">学号</th>
+                                        <th data-field="tel" align="center">手机号</th>
+                                        <th data-field="lname" align="center">等级</th>
+                                        <th data-field="sname" align="center">星际等级</th>
+                                        <th data-field="dedication_value" align="center">贡献值</th>
+                                        <th data-field="minShequnD" align="center">小社群贡献值</th>
+                                        <th data-field="score" align="center">学分</th>
+                                        <th data-field="learning_power" data-sortable="true" align="center">学习力</th>
+                                        <th data-field="honor_value" data-sortable="true" align="center">荣誉值</th>
+                                        <th data-field="is_auth" data-formatter="formatAuth" align="center">是否认证</th>
+                                        <th data-field="regetime" data-formatter="formatTime" align="center" data-sortable="true">注册时间</th>
+                                        <th data-field="lasttime" data-formatter="formatTime" align="center" data-sortable="true">最近登录时间</th>
+                                        <th data-field="" data-formatter="formatOperation" class="col-sm-2" align="center">操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--更改等级-->
+    <div class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="editLevel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">更改等级</h4>
+                </div>
+                <form class="form-horizontal" id="editLevelForm">
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">等级</label>
+                            <div class="col-sm-7">
+                                <select name="level" class="ftype form-control level">
+                                    <option value="" >-请选择等级-</option>
+                                    {foreach name="levels" item="item"}
+                                    <option value="{$item.value}">{$item.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-white" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-primary">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--更改星际等级-->
+    <div class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="editStartLevel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">更改星际等级</h4>
+                </div>
+                <form class="form-horizontal" id="editStartLevelForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">星际等级</label>
+                            <div class="col-sm-7">
+                                <select name="startlevel" class="ftype form-control startlevel">
+                                    <option value="" >-请选择星际等级-</option>
+                                    {foreach name="stleves" item="item"}
+                                    <option value="{$item.value}">{$item.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-white" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-primary">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--赠送课程-->
+    <div class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="give">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">赠送课程</h4>
+                </div>
+                <form class="form-horizontal" id="giveForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课程</label>
+                            <div class="col-sm-7">
+                                <select name="give" id='give' class="ftype form-control give">
+                                    <option value="" >-请选择课程-</option>
+                                    {foreach name="courselist" item="item1"}
+                                    <option value="{$item1.id}">{$item1.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">密码:</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="pay_password" id="pay_password" class="form-control" placeholder="密码连续输错三次直接退出登录">
+                                 </div>
+                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-white" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-primary">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="uid" value=""  id="uid">
+    
+<script src="/static/web/js/laydate.js"></script>
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+<script src="__UEDITOR__/ueditor.all.js"></script>
+<script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="__STATIC__/js/plugins/layer/layer.js"></script>
+<script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+<script src="__STATIC__/js/contabs.min.js"></script>
+<script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+<script src="__STATIC__/js/content.min.js"></script>
+<script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="__STATIC__/js/common.js"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/hplus/js/plugins/sweetalert/xlsx.core.min.js"></script>
+    <script src="https://cdn.bootcss.com/xlsx/0.11.9/xlsx.core.min.js"></script>
+<script>
+
+ $(function () {
+       $("#bootstrapTable").bootstrapTable({
+           url: "{:\\think\\Url::build('user/index')}",
+           idField: 'id',
+           search: false,
+           cache: false,       //是否使用缓存
+           sortStable: true,
+           sortOrder: 'desc',
+           striped: true,      //是否显示行间隔色
+           pagination: true,
+           detailView: false,       //开启详细视图功能
+           detailFormatter: 'detailFormat',
+           sidePagination: 'server',
+           pageNumber: 1,
+           pageSize: 20,
+           pageList: '[20, 50, 100]',
+           showRefresh: true,
+           showToggle: false,
+           showColumns: true,
+           iconSize: "outline",
+           toolbar: "#bootstrapTableToolbar"
+       });
+    });
+
+ function formatOperation(value, row) {
+     var html = '<div class="btn-group">';
+     html += '<button type="button" class="btn btn-success" onclick="dedica(' + row.id + ')" >贡献值明细</button>';
+     html += '<button type="button" class="btn btn-primary" onclick="score(' + row.id + ')" >学分明细</button>';
+     html += '<button type="button" class="btn btn-info" onclick="honor(' + row.id + ')" >荣誉值明细</button>';
+     if(row.is_auth == 0) {
+         html += '<button type="button" class="btn btn-warning" onclick="authPass(' + row.id + ')" >实名通过</button>';
+     }
+     html += '<button type="button" class="btn  btn-white" onclick="editOption(' + row.id + ')" >用户充值</button>';
+     html += '<button type="button" class="btn  btn-white" onclick="editLevel(' + row.id + ')" >更改等级</button>';
+     html += '<button type="button" class="btn  btn-white" onclick="editStartLevel(' + row.id + ')" >更改星际等级</button>';
+     html += '<button type="button" class="btn  btn-white" onclick="give(' + row.id + ')" >赠送课程</button>';
+     if(row.frozen == 0) {
+        // html += '<button type="button" class="btn  btn-white" onclick="frozen(' + row.id + ')" >冻结账户</button>';
+     }else{
+         //html += '<button type="button" class="btn  btn-white" onclick="unseal(' + row.id + ')" >解封账户</button>';
+     }
+     return html;
+ }
+
+    function exportes() {
+        var name = $("input[name='name']").val();
+      	var pname = $("input[name='pname']").val();
+        var is_auth = $('#is_auth').val();
+        var level = $('#level').val();
+        var start_level = $('#start_level').val();
+        var scoretime = $('#scoretime').val();
+        if(name != ''){
+            var strname = "/name/"+name;
+        }else{
+            var strname = '';
+        }
+        if(is_auth != ''){
+            var stris_auth = "/is_auth/"+is_auth;
+        }else{
+            var stris_auth = '';
+        }
+        if(level !=''){
+            var strlevel = "/level/"+level;
+        }else{
+            var strlevel = '';
+        }
+        if(start_level != ''){
+            var strstart_level = "/start_level/"+start_level;
+        }else{
+            var strstart_level = '';
+        }
+        if(scoretime != ''){
+            var strscoretime = "/scoretime/"+scoretime;
+        }else{
+            var strscoretime = '';
+        }
+        
+        window.location.href="/index/user/export"+ strname + stris_auth + strlevel + strstart_level + strscoretime;
+    }
+    // function importUser() {
+         
+       //导入excel文件
+	$("#saveZipButton").on('click', function(){			
+		  var formData = new FormData();
+		    var name = $("#articleImageFile").val();
+		    var ptel = $("#ptel").val();
+		    formData.append("file",$("#articleImageFile")[0].files[0]);
+		    formData.append("name",name);//这个地方可以传递多个参数
+		    formData.append("ptel",ptel);//这个地方可以传递多个参数
+		    $.ajax({
+		        url :  "/index/user/importUser",
+		        type : 'POST',
+		        async : false,
+		        data : formData,
+		        // 告诉jQuery不要去处理发送的数据
+		        processData : false,
+		        // 告诉jQuery不要去设置Content-Type请求头
+		        contentType : false,
+		        beforeSend:function(){
+		            console.log("正在进行，请稍候");
+		        },
+		        success : function(responseStr) {
+		            if(responseStr=="01"){
+		                alert("导入成功");
+		            }else{
+		                alert("导入失败");
+		            }
+		        }
+		    });
+	});
+        //window.location.href="/index/user/importUser/name/" + name + '/is_auth/' + is_auth + '/level/' + level + '/start_level/' + start_level + '/scoretime/' + scoretime;
+    //}
+     
+
+     function editLevel(id) {
+         $('#uid').val(id)
+         
+         $("#editLevel").modal();
+     }
+
+     function editStartLevel(id) {
+         $('#uid').val(id)
+         $("#editStartLevel").modal();
+     }
+    function give(id) {
+         $('#uid').val(id)
+         $("#give").modal();
+     }
+     $("#editLevelForm").submit(function () {
+         var uid = $('#uid').val();
+         var level = $('.level').val()
+         $.ajax({
+             url: "{:\\think\\Url::build('User/editLevel')}",
+             type: "post",
+             data: {id: uid,level:level},
+             dataType: "json",
+             success: function (data) {
+                 if (data.code === 1) {
+                     swal(data.msg, "操作成功", "success");
+                     $("#editLevel").modal('hide');
+                     $("#bootstrapTable").bootstrapTable('refresh');
+                 } else {
+                     swal(data.msg,"操作失败","error")
+                 }
+             },
+             error: function (e) {
+                 swal(data.msg,"操作失败","error")
+
+             }
+         });
+         return false;
+     });
+
+ $("#editStartLevelForm").submit(function () {
+     var uid = $('#uid').val();
+     var startlevel = $('.startlevel').val()
+     $.ajax({
+         url: "{:\\think\\Url::build('User/editStartLevel')}",
+         type: "post",
+         data: {id: uid,level:startlevel},
+         dataType: "json",
+         success: function (data) {
+             if (data.code === 1) {
+                 swal(data.msg, "操作成功", "success");
+                 $("#editStartLevel").modal('hide');
+                 $("#bootstrapTable").bootstrapTable('refresh');
+             } else {
+                 swal(data.msg,"操作失败","error")
+             }
+         },
+         error: function (e) {
+             swal(data.msg,"操作失败","error")
+
+         }
+     });
+     return false;
+ });
+ $("#giveForm").submit(function () {
+     var uid = $('#uid').val();
+     var courseid = $('#give option:selected').val()
+     var pay_password = $('#pay_password').val()
+     
+     $.ajax({
+         url: "{:\\think\\Url::build('User/give')}",
+         type: "post",
+         data: {id: uid,course_id:courseid,pay_passwordr:pay_password},
+         dataType: "json",
+         success: function (data) {
+             if (data.code === 1) {
+                 $('#pay_password').val('')
+                 swal(data.msg, "操作成功", "success");
+                 $("#give").modal('hide');
+                 $("#bootstrapTable").bootstrapTable('refresh');
+             } else {
+                 $('#pay_password').val('')
+                 swal(data.msg,"操作失败","error")
+             }
+         },
+         error: function (e) {
+             swal(data.msg,"操作失败","error")
+
+         }
+     });
+     return false;
+ });
+
+    function search() {
+        var name = $("input[name='name']").val();
+      	var pname = $("input[name='pname']").val();
+        var is_auth = $('#is_auth').val();
+        var level = $('#level').val();
+        var start_level = $('#start_level').val();
+        var scoretime = $('#scoretime').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {name: name,pname: pname, is_auth:is_auth, level:level, start_level:start_level, scoretime:scoretime};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+   
+    laydate.render({
+      elem: '#scoretime'
+      ,type: 'datetime'
+      ,range: true
+    }); 
+     function formatAuth(value) {
+         if(value == 0) {
+             return '未认证';
+         }else if(value == 1) {
+             return '已认证';
+         }
+     }
+
+
+
+
+     function editOption(id) {
+         parent.layer.open({
+             type: 2,
+             title: false,
+             closeBtn: false,
+             shade: [0],
+             area: ['400px', '255px'],
+             offset: 'rb', //右下角弹出
+             time: 50, //2秒后自动关闭
+             shift: 2,
+             content: ['/index/user/editOption/uid/' + id, 'yes'], //iframe的url，no代表不显示滚动条
+             end: function(){ //此处用于演示
+                 parent.layer.open({
+                     type: 2,
+                     title: '新增',
+                     shadeClose: true,
+                     shade: false,
+                     maxmin: true, //开启最大化最小化按钮
+                     area: ['1150px', '650px'],
+                     content: '/index/user/editOption/uid/' + id,
+                     end:function() {
+                         location.reload();
+                     }
+                 });
+             }
+         });
+     }
+
+     function dedica(uid) {
+         window.location.href="/index/user/dedica/uid/" + uid;
+     }
+
+     function score(uid) {
+         window.location.href="/index/user/score/uid/" + uid;
+     }
+
+     function learnpower(uid) {
+         window.location.href="/index/user/learnpower/uid/" + uid;
+     }
+
+     function honor(uid) {
+         window.location.href="/index/user/honor/uid/" + uid;
+     }
+
+     function exports(){
+         window.location.href="/index/user/expload/type/2";
+     }
+
+   function formatImage(value, row, index) {
+       return '<a><img src="' + value + '" height="50px"/></a>';
+   }
+
+   function frozen(id) {
+       swal({
+           title:"您确定冻结该用户?",
+           text:"请谨慎操作！",
+           type:"warning",
+           showCancelButton:true,
+           confirmButtonColor:"#DD6B55",
+           confirmButtonText:"是的，我要冻结！",
+           cancelButtonText:"让我再考虑一下…",
+           closeOnConfirm:false,closeOnCancel:false
+       },function(isConfirm){
+           if(isConfirm){
+               $.ajax({
+                   url: "{:\\think\\Url::build('User/isFrozen')}",
+                   data: {uid: id,'is_frozen':1},
+                   dataType: "json",
+                   type: "post",
+                   success: function(data) {
+                       if (data.code === 1) {
+                           swal(data.msg, "已冻结", "success");
+                           $("#bootstrapTable").bootstrapTable('refresh');
+                       } else {
+                           swal("错误",data.msg,"error")
+                       }
+                   },
+                   error: function(e) {
+                       swal("操作错误","服务器错误，请重试！","error")
+                   }
+               });
+           }else{
+               swal("已取消","您取消了操作！","error")
+           }
+       })
+   }
+
+   function unseal(id) {
+       swal({
+           title:"您确定解封该用户?",
+           text:"请谨慎操作！",
+           type:"warning",
+           showCancelButton:true,
+           confirmButtonColor:"#DD6B55",
+           confirmButtonText:"是的，我要冻结！",
+           cancelButtonText:"让我再考虑一下…",
+           closeOnConfirm:false,closeOnCancel:false
+       },function(isConfirm){
+           if(isConfirm){
+               $.ajax({
+                   url: "{:\\think\\Url::build('User/isFrozen')}",
+                   data: {uid: id,'is_frozen':0},
+                   dataType: "json",
+                   type: "post",
+                   success: function(data) {
+                       if (data.code === 1) {
+                           swal(data.msg, "已解封", "success");
+                           $("#bootstrapTable").bootstrapTable('refresh');
+                       } else {
+                           swal("错误",data.msg,"error")
+                       }
+                   },
+                   error: function(e) {
+                       swal("操作错误","服务器错误，请重试！","error")
+                   }
+               });
+           }else{
+               swal("已取消","您取消了操作！","error")
+           }
+       })
+   }
+
+   function authPass(id) {
+       swal({
+           title:"您确定该用户实名通过",
+           text:"操作后将无法恢复，请谨慎操作！",
+           type:"warning",
+           showCancelButton:true,
+           confirmButtonColor:"#DD6B55",
+           confirmButtonText:"是的，我要通过！",
+           cancelButtonText:"让我再考虑一下…",
+           closeOnConfirm:false,closeOnCancel:false
+       },function(isConfirm){
+           if(isConfirm){
+               $.ajax({
+                   url: "{:\\think\\Url::build('User/authPass')}",
+                   data: {id: id},
+                   dataType: "json",
+                   type: "post",
+                   success: function(data) {
+                       if (data.code === 1) {
+                           swal(data.msg, "该用户已实名。", "success");
+                           $("#bootstrapTable").bootstrapTable('refresh');
+                       } else {
+                           swal("错误",data.msg,"error")
+                       }
+                   },
+                   error: function(e) {
+                       swal("操作错误","服务器错误，请重试！","error")
+                   }
+               });
+           }else{
+               swal("已取消","您取消了操作！","error")
+           }
+       })
+   }
+   
+    function uploade(obj) {
+        //showWaiting();
+        
+        $.ajaxfileupload({
+            url : "/index/upload/uploade",
+            secureuri : false,// 一般设置为false
+            fileElementId : "articleImageFile",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data);
+                if(data.code == 0){
+                    
+                    //closeWaiting()
+                    //$('#yaudiourl').text(data.data)
+                    //$('#audiourl').val(data.data)
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+</script>
+</body>
+</html>

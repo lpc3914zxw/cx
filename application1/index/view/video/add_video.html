@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>视频添加</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=" rel="stylesheet">
+    <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="__STATIC__/css/demo/style.css?v=4" />
+</head>
+<style type="text/css">
+        .shanpic{
+            width: 220px;
+            height: 116px;
+            border: 1px solid #999;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .shanpic2{
+            width: 100px;
+            height: 100px;
+            border: 1px solid #999;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        #picFile{
+            position: absolute;
+            top:0;
+            left:0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 20;
+            cursor: pointer;
+            display: block;
+        }
+       .shanpic2 .shangchuan_h{
+     
+            font-size: 8rem;
+            position: absolute;
+            top: -11px;
+            left: 24px;
+            font-weight: normal;
+            z-index: 10;
+            margin: auto;
+            overflow: hidden;
+        }
+         .shanpic .shangchuan_h{
+      
+            font-size: 8rem;
+            position: absolute;
+            top: -2px;
+            left: 82px;
+            font-weight: normal;
+            z-index: 10;
+            margin: auto;
+            overflow: hidden;
+        }
+        .tuimg,.tuimg2{
+            width: 100%;
+            height:auto;
+            position: absolute;
+            top:0;
+            left:0;
+            z-index: 16;
+            display: block;
+        }
+
+        .htmleaf-container,.htmleaf-container2{
+                top: 10px;
+            }
+            .gunlun {
+                bottom: 68px;
+            }
+            .nav_imgs{
+              width: 100%;
+              height: 100%;
+              position:absolute;
+              top:0;
+              left:0;
+              z-index: 99;
+              opacity: 0;
+            }
+          #resultBox {
+            width: 100%;
+            float: right;
+            padding: 5px;
+            overflow: auto;
+            
+          }
+          .uploaderMsgBox {
+            width: 100%;
+            color: #ff0000;
+          }
+          [act=cancel-upload]{
+            text-decoration: none;
+            cursor:pointer;
+          }
+          .btn-outline{
+            
+            margin-bottom: 20px; 
+          }
+
+</style>
+
+<body class="gray-bg">
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+         <div class="col-sm-4"></div>
+            <div class="col-sm-7">
+                <div class="ibox float-e-margins">
+                   
+                   <div class="input-group">
+                    
+                        <div class="page-container">
+                         
+                              <div class="row cl">
+                            <form id="form2">
+                              <input id="addVideo-file"  style="display: none;" type="file">
+                              <input id="addCover-file" style="display: none;" type="file">
+                              <input type="hidden" class="video_fileId" value="" name="">
+                              <input type="hidden" class="video_cover" value="" name="">
+                            </form>
+                            <label class="form-label col-xs-4 col-sm-5">上传视频：</label>
+                            <div class="formControls col-xs-8 col-sm-9">
+                              <a id="addVideo" href="javascript:void(0);" class="btn btn-outline">添加视频</a>
+                              <a id="addCover" href="javascript:void(0);" class="btn btn-outline">添加封面</a>
+                              <a id="uploadFile" href="javascript:void(0);" class="btn btn-outline">&nbsp;&nbsp;立即上传&nbsp;&nbsp;</a>
+                              <div id="resultBox"></div>
+                            </div>
+                          </div>
+ 
+
+                            </div>
+                          </div>
+                        </div>
+                      <!--   图标：<input type="file" name="" >
+                        标签：<input type="text" name="" > -->
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-1">
+                                    <button class="btn btn-primary" onclick="add_video()" type="button">添加</button>
+                                </div>
+                            </div>
+                    </div>
+
+
+                </div>
+            </div>
+          
+    <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="__STATIC__/js/content.min.js?v=1.0.0"></script>
+    <script src="__STATIC__/js/plugins/iCheck/icheck.min.js"></script>
+    <script src="__STATIC__/jquery.min.js?v=4" type="text/javascript"></script>
+    <script src="__STATIC__/iscroll-zoom.js?v=4" type="text/javascript"></script>
+    <script src="__STATIC__/hammer.js?v=4" type="text/javascript"></script>
+    <script src="__STATIC__/jquery.photoClip.js?v=4" type="text/javascript"></script>
+    <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="//imgcache.qq.com/open/qcloud/js/vod/sdk/ugcUploader.js"></script>
+    <script src = "http://qzonestyle.gtimg.cn/open/qcloud/video/h5/h5connect.js" charset = "utf-8" ></script>
+    <script src="__STATIC__/js/demo/layer-demo.min.js"></script>
+    <script src="__STATIC__/js/layer/layer.js"></script>
+    <script>
+    var imgsource=""
+    var imgurl=""
+    //上传视频
+    function add_video(){
+         var image = $('.video_cover').val();
+         var video_fileId = $('.video_fileId').val();
+           if(image == "") {
+               parent.layer.msg("未上传视频或视频还没上传完！");
+              return;
+             }else if(video_fileId == "") {
+               parent.layer.msg("未上传视封面或视频封面未上传完！");
+              return;
+             }else{
+             $.ajax({
+             url: "{:\\think\\Url::build('video/add_video')}",
+                 data: {
+                        filed: video_fileId,
+                        image: image
+                           },
+                     dataType: "json",
+                     type: "post",
+                     success: function(data) {
+                         console.log(data)
+                        if(data.code == 1){
+                        
+                             parent.layer.msg(data.msg);
+                             window.location.href="{:\\think\\Url::build('video/index')}"
+                         }else{
+                           
+                             parent.layer.msg(data.msg);
+                         } 
+                     }
+             })
+       }
+
+    }
+          //取消编辑
+   function quxiao(){
+    window.location.href="{:\\think\\Url::build('video/index')}"
+   }
+  var index = 0;
+  var cosBox = [];
+/** 
+   * 计算签名
+  **/
+  var getSignature = function(callback){
+
+    $.ajax({
+      //url: 'http://123.206.83.120:80/interface.php',
+      //url: 'http://58.250.10.156/v8/index.php',
+      url: 'https://smallwebsite.xundian9.com/index/video/makesign',
+      data: JSON.stringify({
+        "Action":"GetVodSignatureV2"
+      }),
+      type: 'POST',
+      dataType: 'json',
+      success: function(res){
+
+        if(res && res.signature) {
+  
+          callback(res.signature);
+        } else {
+   
+          return '获取签名失败';
+        }
+        
+      }
+    });
+  };
+
+  /**
+   * 添加上传信息模块
+   */
+  
+  var addUploaderMsgBox = function(type){
+    var html = '<div class="uploaderMsgBox" name="box'+index+'">';
+    if(!type || type == 'hasVideo') {
+      html += '视频名称：<span name="videoname'+index+'"></span>；' + 
+        '<span style="display:none;">计算sha进度：<span name="videosha'+index+'">0%</span></span>' + 
+        '上传进度：<span name="videocurr'+index+'">0%</span>；' + 
+        '<span style="display:none;">fileId：<span name="videofileId'+index+'">   </span></span>' + 
+        '上传结果：<span name="videoresult'+index+'">   </span>；<br>' + 
+        '<span style="display:none">地址：<span  name="videourl'+index+'">   </span>；'+
+        '<a href="javascript:void(0);" name="cancel'+index+'" cosnum='+index+' act="cancel-upload">取消上传</a><br></span>';
+    }
+    
+    if(!type || type == 'hasCover') {
+      html += '封面名称：<span name="covername'+index+'"></span>；' + 
+      '<span style="display:none;">计算sha进度：<span name="coversha'+index+'">0%</span>；</span>' + 
+      '上传进度：<span name="covercurr'+index+'">0%</span>；' + 
+      '上传结果：<span name="coverresult'+index+'">   </span>；<br>' + 
+      '<span style="display:none;">地址：<span name="coverurl'+index+'">   </span>；<br></span>' + 
+      '</div>'
+      
+    }
+    html += '</div>';
+    
+    $('#resultBox').append(html);
+    return index++;
+  };
+
+
+  /*
+   * 取消上传绑定事件，示例一与示例二通用
+   */
+  $('#resultBox').on('click', '[act=cancel-upload]', function() {
+    var cancelresult = qcVideo.ugcUploader.cancel({
+      cos: cosBox[$(this).attr('cosnum')],
+      taskId: $(this).attr('taskId')
+    });
+    console.log(cancelresult);
+  });
+
+
+  /** 
+   * 示例2：上传视频+封面
+  **/
+  var videoFileList = [];
+  var coverFileList = [];
+  // 给addVideo添加监听事件
+  $('#addVideo-file').on('change', function (e) {
+    var videoFile = this.files[0];
+    videoFileList[0] = videoFile;
+    $('#result').append(videoFile.name +　'\n');
+
+  });
+  $('#addVideo').on('click', function () {
+    $('#addVideo-file').click();
+  });
+  // 给addCover添加监听事件
+  $('#addCover-file').on('change', function (e) {
+    var coverFile = this.files[0];
+    coverFileList[0] = coverFile;
+    $('#result').append(coverFile.name +　'\n');
+
+  });
+  $('#addCover').on('click', function () {
+    $('#addCover-file').click();
+  });
+
+  var startUploader = function(){
+    if(videoFileList.length){
+      var num = addUploaderMsgBox();
+      if(!coverFileList[0]){
+        $('[name=covername'+num+']').text('没有上传封面');
+      }
+      var resultMsg = qcVideo.ugcUploader.start({
+        videoFile: videoFileList[0],
+        coverFile: coverFileList[0],
+        getSignature: getSignature,
+        //allowAudio: 1,
+        success: function(result){
+          if(result.type == 'video') {
+            $('[name=videoresult'+num+']').text('上传成功');
+            $('[name=cancel'+num+']').remove();
+            cosBox[num] = null;
+          } else if (result.type == 'cover') {
+            $('[name=coverresult'+num+']').text('上传成功');
+          }
+        },
+        error: function(result){
+          if(result.type == 'video') {
+            $('[name=videoresult'+num+']').text('上传失败>>'+result.msg);
+          } else if (result.type == 'cover') {
+            $('[name=coverresult'+num+']').text('上传失败>>'+result.msg);
+          }
+        },
+        progress: function(result){
+          if(result.type == 'video') {
+            $('[name=videoname'+num+']').text(result.name);
+            $('[name=videosha'+num+']').text(Math.floor(result.shacurr*100)+'%');
+            $('[name=videocurr'+num+']').text(Math.floor(result.curr*100)+'%');
+            $('[name=cancel'+num+']').attr('taskId', result.taskId);
+            cosBox[num] = result.cos;
+          } else if (result.type == 'cover') {
+            $('[name=covername'+num+']').text(result.name);
+            $('[name=coversha'+num+']').text(Math.floor(result.shacurr*100)+'%');
+            $('[name=covercurr'+num+']').text(Math.floor(result.curr*100)+'%');
+          }
+        },
+        finish: function(result){
+          $('[name=videofileId'+num+']').text(result.fileId);
+          $(".video_fileId").attr('value',result.fileId);
+          $('[name=videourl'+num+']').text(result.videoUrl);
+          if(result.coverUrl) {
+            $('[name=coverurl'+num+']').text(result.coverUrl);
+            $('.video_cover').attr('value',result.coverUrl)
+          }
+          if(result.message) {
+            $('[name=videofileId'+num+']').text(result.message);
+          }
+          
+              }
+            });
+      if(resultMsg){
+        $('[name=box'+num+']').text(resultMsg);
+      }
+    } else {
+      $('#result').append('请添加视频！\n');
+    }
+    
+  }
+
+  // 上传按钮点击事件
+  $("body").on('click','#uploadFile', function () {
+    var secretId = $('#secretId').val();
+    var secretKey = $('#secretKey').val();
+
+    startUploader();     
+  });
+
+  /** 
+   * 示例3：直修改封面
+  **/
+  $('#changeCover-file').on('change', function (e) {
+    var num = addUploaderMsgBox('hasCover');
+    var changeCoverFile = this.files[0];
+    var fileId = $('[name=fileId]').val();
+    var resultMsg = qcVideo.ugcUploader.start({
+    fileId: fileId,
+    coverFile: changeCoverFile,
+    getSignature: getSignature,
+    success: function(result){
+      if(result.type == 'video') {
+        $('[name=videoresult'+num+']').text('上传成功');
+      } else if (result.type == 'cover') {
+        $('[name=coverresult'+num+']').text('上传成功');
+      }
+    },
+    error: function(result){
+      if(result.type == 'video') {
+        $('[name=videoresult'+num+']').text('上传失败>>'+result.msg);
+      } else if (result.type == 'cover') {
+        $('[name=coverresult'+num+']').text('上传失败>>'+result.msg);
+      }
+    },
+    progress: function(result){
+      if(result.type == 'video') {
+        $('[name=videoname'+num+']').text(result.name);
+        $('[name=videosha'+num+']').text(Math.floor(result.shacurr*100)+'%');
+        $('[name=videocurr'+num+']').text(Math.floor(result.curr*100)+'%');
+      } else if (result.type == 'cover') {
+        $('[name=covername'+num+']').text(result.name);
+        $('[name=coversha'+num+']').text(Math.floor(result.shacurr*100)+'%');
+        $('[name=covercurr'+num+']').text(Math.floor(result.curr*100)+'%');
+      }
+      
+    },
+    finish: function(result){
+      $('[name=coverurl'+num+']').text(result.coverUrl);
+      if(result.message) {
+        $('[name=coverurl'+num+']').text(result.message);
+      }
+    }
+    });
+    if(resultMsg){
+      $('[name=box'+num+']').text(resultMsg);
+    }
+    $('#form1')[0].reset();
+  });
+  $('#changeCover').on('click', function () {
+    $('#changeCover-file').click();
+  });
+    </script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/form_basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:15 GMT -->
+</html>

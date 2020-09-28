@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户列表</title>
+    <!--Open Sans Font [ OPTIONAL ]-->
+
+    <link rel="shortcut icon" href="__STATIC__/img/favicon.png">
+    <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+
+    <!--Bootstrap Stylesheet [ REQUIRED ]-->
+    <link href="{$Think.config.web_root}/static/power/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--Nifty Stylesheet [ REQUIRED ]-->
+    <link href="{$Think.config.web_root}/static/power/css/nifty.min.css" rel="stylesheet">
+
+    <!--Nifty Premium Icon [ DEMONSTRATION ]-->
+    <link href="{$Think.config.web_root}/static/power/css/demo/nifty-demo-icons.min.css" rel="stylesheet">
+
+    <!--Demo [ DEMONSTRATION ]-->
+    <link href="{$Think.config.web_root}/static/power/css/demo/nifty-demo.min.css" rel="stylesheet">
+
+    <link href="{$Think.config.web_root}/static/power/plugins/ionicons/css/ionicons.min.css" rel="stylesheet">
+
+    <!--Morris.js [ OPTIONAL ]-->
+    <link href="{$Think.config.web_root}/static/power/plugins/morris-js/morris.min.css" rel="stylesheet">
+    <!--Magic Checkbox [ OPTIONAL ]-->
+    <link href="{$Think.config.web_root}/static/power/plugins/magic-check/css/magic-check.min.css" rel="stylesheet">
+
+    <link href="{$Think.config.web_root}/static/power/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <!--JAVASCRIPT-->
+    <!--=================================================-->
+    <!--Pace - Page Load Progress Par [OPTIONAL]-->
+    <link href="{$Think.config.web_root}/static/power/plugins/pace/pace.min.css" rel="stylesheet">
+    <script src="{$Think.config.web_root}/static/power/plugins/pace/pace.min.js"></script>
+    <!--jQuery [ REQUIRED ]-->
+    <script src="{$Think.config.web_root}/static/power/js/jquery-2.2.4.min.js"></script>
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="{$Think.config.web_root}/static/power/js/bootstrap.min.js"></script>
+    <!--NiftyJS [ RECOMMENDED ]-->
+    <script src="{$Think.config.web_root}/static/power/js/nifty.min.js"></script>
+    <!--=================================================-->
+    <!--Demo script [ DEMONSTRATION ]-->
+    <script src="{$Think.config.web_root}/static/power/js/demo/nifty-demo.min.js"></script>
+
+    <!--Morris.js [ OPTIONAL ]-->
+    <script src="{$Think.config.web_root}/static/power/plugins/morris-js/morris.min.js"></script>
+    <script src="{$Think.config.web_root}/static/power/plugins/morris-js/raphael-js/raphael.min.js"></script>
+
+    <!--Sparkline [ OPTIONAL ]-->
+    <script src="{$Think.config.web_root}/static/power/plugins/sparkline/jquery.sparkline.min.js"></script>
+    <!--Specify page [ SAMPLE ]-->
+    <script src="{$Think.config.web_root}/static/power/js/demo/dashboard.js"></script>
+
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <script src="__STATIC__/js/ajaxfileupload.js"></script>
+
+    <style type="text/css">
+        input[type=number] {
+            -moz-appearance:textfield;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+
+</head>
+
+<!--TIPS-->
+<!--You may remove all ID or Class names which contain "demo-", they are only used for demonstration. -->
+<body>
+    <div id="container" class="effect aside-float aside-bright mainnav-lg">
+
+        <div class="boxed">
+            <div >
+
+                <div id="page-title">
+
+                </div>
+
+                <!--End breadcrumb-->
+                <div class="panel">
+                    <div class="panel-body">
+                        <form class="form-inline" id="addForm">
+                            <input type="hidden" name="uid" value="{$user_data['uid']}">
+                            <table class="table table-striped table-bordered table-hover table-condensed">
+                                <tr>
+                                    <th>管理组</th>
+                                    <td>
+                                        {foreach name="data" item="v"}
+                                            {$v['title']}
+                                            <input class="xb-icheck" type="checkbox" name="group_ids[]" value="{$v['id']}" {in name="v['id']" value="$group_data"} checked="checked" {/in} >&emsp;
+                                        {/foreach}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>姓名</th>
+                                    <td>
+                                        <input class="form-control" type="text" name="username" value="{$user_data['username']}" required="required">
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>头像</th>
+                                    <td>
+                                        {notempty name="user_data.logo"}
+                                        <div class="form-group logo">
+                                            <label class="col-sm-2 control-label">当前头像</label>
+                                            <div class="col-sm-8">
+
+                                                <img src="{present name='user_data'}{$user_data.logo}{/present}" width="100"/>
+
+                                            </div>
+                                        </div>
+                                        {/notempty}
+                                        <div class="form-group logo">
+                                            <div class="col-sm-7">
+                                                <input type="file" class="form-control" name="logo" id="logo" data-index="0" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>初始密码</th>
+                                    <td>
+                                        <input class="form-control" type="password" name="password"  >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input class="btn btn-success" type="submit" value="修改">
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SCROLL PAGE BUTTON -->
+        <!--===================================================-->
+        <button class="scroll-top btn">
+            <i class="pci-chevron chevron-up"></i>
+        </button>
+        <!--===================================================-->
+    </div>
+    <!--===================================================-->
+</body>
+
+<script src="__STATIC__/js/plugins/layer/layer.js"></script>
+
+<script>
+    $(function(){
+        $("input[type='file']").prettyFile();
+        $("#addForm").submit(function(){
+            //$('#save').attr('disabled',true)
+            //var id = [];
+            // $(".logo").find('input[type="file"]').each(function(index) {
+            //     id[index] = $(this).attr('id');
+            // });
+            $.ajaxfileupload({
+                url: "{:\\think\\Url::build('power/add_user')}",
+                type: "post",
+                async: false,
+                secureuri: false,
+                fileElementId: 'logo',
+                dataType: "json",
+                data: $(this).serialize(),
+                success: function(data){
+                    if (data.code == 0) {
+                        layer.msg(data.msg, {icon: 1, shift: 6});
+                        window.location.href = window.location.href
+                    } else {
+                        layer.msg(data.msg, {icon: 2, shift: 6});
+                        window.location.href = window.location.href
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</html>

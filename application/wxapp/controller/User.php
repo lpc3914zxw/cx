@@ -2099,12 +2099,17 @@ class User extends Base{
             return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
         }
         $page = empty($post['page'])?1:$post['page'];
-        $status = empty(input('status')) ? 1 : input('status');
+        $type = empty(input('type')) ? 1 : input('type');
         $order_model = new Orders();
         
         $start = ($page - 1) * 10;
         $limit = $start . ',' . 10;
-        $orderInfo = $order_model->where(['uid'=>$this->uid])->where('status',$status)->where('course_type',1)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
+        if($post['is_hidden_finish']==1){
+            $orderInfo = $order_model->where(['uid'=>$this->uid])->where(['status'=>['in',[4]]])->where('course_type',1)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
+        }else{
+            $orderInfo = $order_model->where(['uid'=>$this->uid])->where(['status'=>['in',[4,5,6]]])->where('course_type',1)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
+        }
+        
         $list = array();
         if(!empty($orderInfo)){
             $course_model = new Course();
@@ -2116,7 +2121,24 @@ class User extends Base{
                 
                 $list[$okey] = $cour;
                 $list[$okey]['teacher_name'] = Db::name('teacher')->where('id',$cour['teacher_id'])->value('name');
-                $list[$okey]['status'] = $oval['status'] == 1 ? '学习中' : '已过期';
+                //
+                $coursecount = Db::name('section')->where('c_id',$oval['course_id'])->where('is_delete',0)->count();
+                $studuscount = Db::name('studus_section')->where('uid',$this->uid)->where('cid',$oval['course_id'])->count();
+                
+                if($studuscount==0){
+                    $list[$okey]['status'] = '未学习';
+                }
+                if($coursecount==$studuscount){
+                    $list[$okey]['status'] = '已学完';
+                }
+                if($studuscount==0||$coursecount==0){
+                    $ratio = 0;
+                }else{
+                    $ratio = $studuscount/$coursecount;
+                    $ratio = round($ratio,2)*100;
+                }
+                
+                $list[$okey]['ratio'] = $ratio;
                 $list[$okey]['time'] = date('Y.m.d',$oval['paytime']);
             }
         }
@@ -2808,7 +2830,7 @@ class User extends Base{
             return false;
         }
         $encrypted = input('post.data');
-
+        
         if(empty($encrypted)){
             return false;
         }
@@ -2818,10 +2840,10 @@ class User extends Base{
 
         //获取公钥
         $pu_key = file_get_contents('test.cer');
-
+        
         //私钥加密的内容通过公钥可用解密出来
         openssl_public_decrypt(base64_decode($encrypted),$decrypted,$pu_key);
-
+        
         $api = $system['tlt_public'];
         $domain  =  strstr ($decrypted ,  '&sign');
         if(empty($domain)){
@@ -2846,7 +2868,33 @@ class User extends Base{
         //var_dump($return);exit;
         return $return;
     }
-
+    
+    
+    
+    
+    
+    
+    /**
+     * 生成公钥和私钥并保存
+     */
+    public function generate(){
+        $config = array(
+            "digest_alg" => "sha512",//加密方式
+            "private_key_bits" => 2048, //加密长度
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,//加密类型
+        );
+        $res = openssl_pkey_new($config);//创建公钥和私钥
+    
+        //获取私钥
+        openssl_pkey_export($res, $privateKey);
+        //保存密钥到文件
+        file_put_contents('./Uploads/test.pfx',$privateKey);
+    
+        //获取公钥
+        $pubblic = openssl_pkey_get_details($res);
+        $pubblicKey = $pubblic['key'];
+        file_put_contents('./Uploads/test.cer',$pubblicKey);
+    }
 
 }
 

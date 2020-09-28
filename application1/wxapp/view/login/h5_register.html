@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1809818_jkoken1b4wo.css" />
+    <link rel="stylesheet" href="/static/wxapp/css/alayout.css" />
+    <link rel="stylesheet" href="/static/wxapp/css/logon.css" />
+    <script src="/static/wxapp/js/flexible.js"></script>
+    
+  </head>
+  
+  <body>
+    
+    <section class="padding-30">
+      <form method="post" class="form-horizontal" id="newsForm">
+      <input type="hidden" value="<?php echo $p_id?>" id="pid"  name="pid"/>
+      <div class="margin-top-50">
+        <div class="font-50 font-weight-500">注册每日财学</div>
+        <div class="font-26 text-gray margin-top-20 font-weight-500">尊敬的用户，欢迎注册</div>
+      </div>
+
+      <div class="margin-top-30">
+        
+        <div class="cell-item">
+          <div class="cell-left text-orange flex align-center ">+86 <i class="iconfont iconsanjiao_xia font-22"></i>
+          </div>
+          <div class="cell-right padding-left-20">
+            <input type="text" class="cell-input" id="tel" placeholder="请输入手机号"  name="tel"  autocomplete="off" /></div>
+        </div>
+        <div class="cell-item flex">
+          <div class="cell-left">验证码：</div>
+          <div class="cell-right padding-left-20 flex">
+            <input type="text" class="cell-input code-input" placeholder="请输入验证码" name="code" autocomplete="off" />
+            <div class="get-code text-orange flex center">获取验证码</div>
+          </div>
+        </div>
+        <div class="cell-item ">
+          <div class="cell-left">密码：</div>
+          <div class="cell-right padding-left-20 flex">
+            <input type="text" class="cell-input flex1" placeholder="请输入密码" name="password" autocomplete="off" />
+          </div>
+        </div>
+        <div class="cell-item ">
+          <div class="cell-left">确认密码：</div>
+          <div class="cell-right padding-left-20 flex">
+            <input type="text" class="cell-input flex1" placeholder="请输入确认密码" name="rpwd" autocomplete="off" />
+          </div>
+        </div>
+        <div class="cell-item ">
+          <div class="cell-left">邀请码：</div>
+          <div class="cell-right padding-left-20 flex">
+            <input type="text" class="cell-input flex1" placeholder="请输入邀请码" name="student_no" value="{$myinfo['student_no']}" autocomplete="off" disabled />
+          </div>
+        </div>
+      </div>
+      <div class="flex center flex-column margin-top-100">
+        <button class="my-btn submit"  type="submit">注册</button>
+        <div class="text-gray font-24 margin-top-30">点击按钮表示您同意并愿意遵守每日财学</div>
+        <div class="flex center font-24 text-gray margin-top-10">
+          <a class="text-orange" href="{$useprotocol}">《使用协议》</a>
+          和
+          <a class="text-orange" href="{$privacyprotocol}">《隐私协议》</a>
+        </div>
+      </div>
+      </form>
+    </section>
+
+    <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__STATIC__/js/demo/layer-demo.min.js"></script>
+    <script src="__STATIC__/js/layer/layer.js"></script>
+    <script src="__STATIC__/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+
+    <script type="text/javascript">
+      $("#newsForm").submit(function() {
+          $.ajax({
+            url: "{:\\think\\Url::build('Login/h5_register')}",
+            data: $(this).serialize(),
+            dataType: "json",
+            type: "post",
+            success: function(data){
+              if (data.code === 1) {
+                layer.msg(data.msg, {icon: 1, time: 1500});
+                  setTimeout(function(){
+                    window.location.href = "https://{$_SERVER['SERVER_NAME']}/wxapp/system/download";
+
+                  },1500);
+				
+                
+              } else {
+                layer.msg(data.msg, {icon: 2, shift: 6});
+              }
+            }
+          });
+          return false;
+      });
+      
+      $(".get-code").click(function(){
+          var text = $(".get-code").text();
+          if(text != "获取验证码"){
+              return
+          }
+          var tel = $('#tel').val();
+          if(tel==''){
+              alert('手机号不能为空');return
+          }
+          var pid = $("#pid").val();
+          var url = "<?php echo $url?>"+tel+'&pid='+pid;
+          $.post(url,'',function(res){
+              var time = 60;
+             var timer = setInterval(function(){
+                    time--;
+                    $(".get-code").text(""+time+"秒重发");
+                    if(time==0){
+                        clearInterval(timer);
+                        $(".get-code").text("获取验证码");
+                    }
+                },1000);
+          });
+          
+
+      });
+    </script>
+  </body>
+</html>

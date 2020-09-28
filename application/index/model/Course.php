@@ -121,7 +121,7 @@ class Course extends Model {
         $order_model = new Orders();
         foreach ($list as $k=>$val) {
             $list[$k]['teacher_img'] = $teacher_model->where('id',$val['teacher_id'])->value('imgurl');
-            $count= $order_model->where(['course_id'=>$val['id'],'uid'=>$uid,'status'=>1])->count();
+            $count= $order_model->where(['course_id'=>$val['id'],'uid'=>$uid,'status'=>['in','4,5,6']])->count();
             $advancedInfo = $advanced_model->field('chapter_count,value')->where('id',$val['advanced_id'])->find();
             $list[$k]['chapter_count'] = $advancedInfo['chapter_count'];
             $list[$k]['value'] = $advancedInfo['value'];

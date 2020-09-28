@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>{$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/hplus/js/plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1" style="overflow: auto;">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <style>
+                .table th, .table td {
+                    text-align: center;
+                }
+                #page-wrapper {
+                    padding: 0 15px;
+                    position: inherit;
+                    margin: 0 0 0 60px;
+                }
+
+            </style>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$current_menu.name|default=''}</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row row-lg">
+                        <div class="col-sm-12  col-md-12">
+                            <div class="example-wrap">
+                                <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+                                    <form role="form" class="form-inline">
+                                       
+                                        <div class="form-group">
+                                            <label>分类&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="categroy" name="categroy">
+                                                <option value="" >-请选择分类-</option>
+                                                    {volist name="cate" id="vo"}
+                                                      <option value="{$vo.id}">{$vo._name}</option>
+                                                    {/volist}
+                                                  
+                                                  
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                         <div class="form-group">
+                                            <label>状态&nbsp;&nbsp;</label>
+                                            <select class="form-control" id="status" name="status">
+                                                <option value="" >-请选择状态-</option>
+                                                
+                                                   <option value="0">未完成</option>
+                                                   <option value="1">已处理</option>
+                                                  <option value="1">已取消</option>
+                                            </select>
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                         <div class="form-group">
+                                            <label>时间&nbsp;&nbsp;</label>
+                                            <input type="text" name="time" placeholder="请选择时间" class="form-control" value="" id="scoretime">
+                                        </div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                            </button>
+                                        </div>
+                                        
+                                    </form>
+                                </div>
+                                <div class="example">
+                                    <button type="button" class="btn btn-danger" onclick="del()"> &nbsp;&nbsp;批量删除</button>
+                                    <table id="bootstrapTable" data-click-to-select="true">
+                                        <thead>
+                                        <tr>
+                                           <th data-checkbox="true"></th>
+                                            <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
+                                            <th data-field="fname"  class="col-sm-1">分类</th>
+                                            <th data-field="content">反馈内容</th>
+                                            
+                                            <th data-field="tel">联系电话</th>
+                                            <th data-field="imgurls" data-sortable="true" data-formatter="detailFormat" >反馈图片</th>
+                                            <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true">反馈时间</th>
+                                            <th data-field="status" data-formatter="formatStatus">状态</th>
+                                            <th data-field="reply"  >回复</th>
+                                            <th data-field="" data-formatter="formatOperation" >操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <!--右侧部分结束-->
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/hplus/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/hplus/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/static/hplus/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+<script src="/static/hplus/js/hplus.min.js?v=4.1.0"></script>
+<script src="/static/hplus/js/contabs.min.js"></script>
+<script src="/static/hplus/js/plugins/pace/pace.min.js"></script>
+<script src="/static/hplus/js/content.min.js"></script>
+
+<script src="/static/hplus/js/plugins/toastr/toastr.min.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/bootstrap-table.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="/static/hplus/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/static/hplus/js/common.js"></script>
+
+<script src="/static/hplus/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="/static/hplus/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/hplus/js/plugins/fancybox/jquery.fancybox.js"></script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+
+<script>
+
+    $(function () {
+        $(document).ready(function(){$(".fancybox").fancybox({openEffect:"none",closeEffect:"none"})});
+        $("#bootstrapTable").bootstrapTable({
+                url: "/index/Feedback/index" ,
+                idField: 'id',
+                search: false,
+                cache: false,       //是否使用缓存
+                sortStable: true,
+                sortOrder: 'desc',
+                striped: true,      //是否显示行间隔色
+                pagination: true,
+                detailView: false,       //开启详细视图功能
+                detailFormatter: 'detailFormat',
+                sidePagination: 'server',
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: '[10, 30, 100]',
+                showRefresh: true,
+                showToggle: false,
+                showColumns: true,
+                iconSize: "outline",
+                toolbar: "#bootstrapTableToolbar"
+            });
+    });
+    function search() {
+        var status = $('#status').val();
+      	
+        var categroy = $('#categroy').val();
+        
+        var scoretime = $('#scoretime').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {status: status,categroy: categroy,scoretime:scoretime};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+    function detailFormat(index, row) {
+        var html = '';
+        html += '<div class="col-sm-6">';
+        var imgs = row.imgurls
+        if(imgs != ''){
+            var images= imgs.split(',');//注split可以用字符或字符串分割
+            var imglens = images.length;
+            for(var j = 0;j < imglens; j ++){
+                html += '<a class="fancybox" href="'+ images[j] +'" title="图片16"><img alt="image" style="height:100px;float:left" src="'+ images[j] +'" /> </a>';
+            }
+        }
+        html += '<div class="col-sm-6"></div>';
+        html += '</div>';
+        return html;
+    }
+
+    //格式化操作
+    function formatOperation(value, row) {
+        var html = '';
+        
+        html += '<div class="btn-group">';
+        html +=	'<button class="btn btn-primary" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">回复</button>';
+        html +=	'<button class="btn btn-danger" type="button" onclick="delThis(' + row.id + ')" data-target="#myModal">删除</button>';
+        html +=	'</div>';
+        return html;
+    }
+    /*
+     * s缩略图
+     * @param value
+     * @returns {string}
+     */
+    function formatSmallImg(value) {
+        var html = '<img src="' + value + '" style="width: 100px;height: 100px;">';
+        return html;
+    }
+    // 回复反馈
+        
+    function  edit(id){
+        
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/Feedback/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['600px', '400px'],
+                    content: "/index/Feedback/edit/id/" + id,
+                    end:function() {
+                        //location.reload();
+                    }
+                });
+            }
+        });
+    }
+    function del() {
+        var rows = $("#bootstrapTable").bootstrapTable('getAllSelections');
+        if (rows.length < 1) {
+            swal("提示","请至少选择一项！","error");
+            return;
+        }
+        swal({
+            title:"您确定要删除选中的反馈吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                var ids = [];
+                for (var i = 0; i < rows.length; i++) {
+                    ids[i] = rows[i].id;
+                }
+                $.ajax({
+                    url: "{:\\think\\Url::build('Feedback/piDel')}",
+                    data: {ids: ids},
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这些反馈。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
+
+    function delThis(id){
+        swal({
+            title:"您确定要删除这条信息吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('Feedback/del')}",
+                    data: {id: id},
+                    dataType: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这条信息。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
+    function formatStatus(value) {
+         if(value == 0) {
+             return '处理中';
+         }else if(value == 1) {
+             return '已处理';
+         }else if(value == 2) {
+             return '已取消';
+         }
+         
+     }
+</script>
+
+</body>
+</html>

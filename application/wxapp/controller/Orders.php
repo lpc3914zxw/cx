@@ -356,7 +356,7 @@ class Orders extends Base {
         $res = json_decode($result,true);
         $type = input('type');
         $is_face = input('is_face');
-        $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+        
         if(!isset($is_face)){
             $is_face=1;
         }else{
@@ -364,7 +364,7 @@ class Orders extends Base {
         }
         $documentRoot = $_SERVER['DOCUMENT_ROOT'];
         file_put_contents($documentRoot.'/log_666.txt',print_r($result,true),FILE_APPEND);
-//file_put_contents($documentRoot.'/log_667.txt',print_r($result,true),FILE_APPEND);
+
         if(input('pay_type')==1){
           	if($type == 2){//微信支付
           	    if($is_face == 0){//是否人脸支付 1
