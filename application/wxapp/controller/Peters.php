@@ -44,6 +44,7 @@ class Peters extends Base
         $res['condition']= $petersSet_model->where('type','=',2)->where('is_open','=',1)->value('content');
         $res['level']= $petersSet_model->where('type','=',3)->where('is_open','=',1)->value('content');
         $res['is_allow']=1;
+        $res['proxyLinkUrl']='https://www.baidu.com';
         return returnjson(1000,$res,'获取成功');
 
     }

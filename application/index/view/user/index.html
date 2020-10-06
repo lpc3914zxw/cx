@@ -522,7 +522,33 @@
              }
          });
      }
-
+    function authPass(id) {
+         parent.layer.open({
+             type: 2,
+             title: false,
+             closeBtn: false,
+             shade: [0],
+             area: ['400px', '255px'],
+             offset: 'rb', //右下角弹出
+             time: 50, //2秒后自动关闭
+             shift: 2,
+             content: ['/index/user/authPass_/id/' + id, 'yes'], //iframe的url，no代表不显示滚动条
+             end: function(){ //此处用于演示
+                 parent.layer.open({
+                     type: 2,
+                     title: '实名',
+                     shadeClose: true,
+                     shade: false,
+                     maxmin: true, //开启最大化最小化按钮
+                     area: ['1150px', '650px'],
+                     content: '/index/user/authPass_/id/' + id,
+                     end:function() {
+                         location.reload();
+                     }
+                 });
+             }
+         });
+     }
      function dedica(uid) {
          window.location.href="/index/user/dedica/uid/" + uid;
      }
@@ -617,7 +643,7 @@
        })
    }
 
-   function authPass(id) {
+   function authPass1(id) {
        swal({
            title:"您确定该用户实名通过",
            text:"操作后将无法恢复，请谨慎操作！",

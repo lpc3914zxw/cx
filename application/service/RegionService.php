@@ -61,7 +61,7 @@ class RegionService
      */
     public static function RegionNode($params = [])
     {
-        $field = empty($params['field']) ? 'id,name,level' : $params['field'];
+        $field = empty($params['field']) ? 'id,name,level,is_apply' : $params['field'];
         $where = empty($params['where']) ? [] : $params['where'];
         $where['is_enable'] = 1;
 

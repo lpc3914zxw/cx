@@ -390,14 +390,22 @@ class User extends AdminBase {
         $objWriter->save('php://output');
     }
 
-    public function authPass($id = 0) {
+    public function authPass($id = 0,$realname,$identityid) {
         $user_model = new \app\wxapp\model\User();
+        $userinfo_ = $user_model->field('is_auth,level')->where('identityid', $identityid)->find();
+        if($userinfo_['is_auth']==1){
+            $this->error('身份证已被占用');
+        }
         $userinfo = $user_model->field('is_auth,level')->where('id', $id)->find();
         if($userinfo['is_auth']==1){
             $this->error('您已实名认证过');
         }
+        if(empty($realname)||empty($identityid)){
+            $this->error('信息不完整');
+        }
         Db::startTrans();
-        $user_model->where('id',$id)->update(['is_auth'=>1]);
+        //var_dump($id);var_dump($realname);var_dump($identityid);exit;
+        $user_model->where('id',$id)->update(['is_auth'=>1,'realname'=>$realname,'identityid'=>$identityid]);
         $common = new \app\common\Common();
 
         $userInfo = $user_model->field('pid')->where('id',$id)->find();
@@ -415,7 +423,18 @@ class User extends AdminBase {
         Db::commit();
         $this->success('审核成功');
     }
+    public function authPass_($id = 0) {
+        $user_model = new \app\wxapp\model\User();
+        $userinfo = $user_model->field('is_auth,level,realname,identityid')->where('id', $id)->find();
+        
+        
 
+       // $userInfo = $user_model->field('pid')->where('id',$id)->find();
+        $this->assign('userinfo',$userinfo);
+        $this->assign('uid',$id);
+        
+        return $this->fetch();
+    }
     /*
      * 贡献值
      * @param int $uid
