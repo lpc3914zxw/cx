@@ -11,7 +11,7 @@
 namespace app\service;
 
 use think\Db;
-
+use think\Data;
 /**
  * 地区服务层
  * @author   Devil
@@ -61,7 +61,7 @@ class RegionService
      */
     public static function RegionNode($params = [])
     {
-        $field = empty($params['field']) ? 'id,name,level,letters' : $params['field'];
+        $field = empty($params['field']) ? 'id,name,level' : $params['field'];
         $where = empty($params['where']) ? [] : $params['where'];
         $where['is_enable'] = 1;
 

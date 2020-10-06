@@ -22,7 +22,79 @@ function check_verify($code, $id) {
 function splice_pwd($pwd,$salt){
     return md5(md5($pwd).$salt);
 }
+/**
+ * 生成url地址
+ * @author   Devil
+ * @blog    http://gong.gg/
+ * @version 1.0.0
+ * @date    2018-06-12
+ * @desc    description
+ * @param   string          $path      [路径地址]
+ * @param   array           $params    [参数]
+ */
+function MyUrl($path, $params=[])
+{
+    // 调用框架生成url
+    $url = url($path, $params, true, true);
 
+    // 是否根目录访问项目
+    if(defined('IS_ROOT_ACCESS'))
+    {
+        $url = str_replace('public/', '', $url);
+    }
+
+    // tp框架url方法是否识别到https
+    if(__MY_HTTP__ == 'https' && substr($url, 0, 5) != 'https')
+    {
+        $url = 'https'.mb_substr($url, 4, null, 'utf-8');
+    }
+
+    // 避免从后台生成url入口错误
+    $script_name = CurrentScriptName();
+    if($script_name != 'index.php' && substr($path, 0, 6) != 'admin/')
+    {
+        $url = str_replace($script_name, 'index.php', $url);
+    }
+
+    return $url;
+}
+/**
+ * 获取当前脚本名称
+ * @author  Devil
+ * @blog    http://gong.gg/
+ * @version 1.0.0
+ * @date    2019-06-20
+ * @desc    description
+ */
+function CurrentScriptName()
+{
+    $name = '';
+    if(empty($_SERVER['SCRIPT_NAME']))
+    {
+        if(empty($_SERVER['PHP_SELF']))
+        {
+            if(!empty($_SERVER['SCRIPT_FILENAME']))
+            {
+                $name = $_SERVER['SCRIPT_FILENAME'];
+            }
+        } else {
+            $name = $_SERVER['PHP_SELF'];
+        }
+    } else {
+        $name = $_SERVER['SCRIPT_NAME'];
+    }
+
+    if(!empty($name))
+    {
+        $loc = strripos($name, '/');
+        if($loc !== false)
+        {
+            $name = substr($name, $loc+1);
+        }
+    }
+
+    return $name;
+}
 function tranTime($time)
 {
     $rtime = date("m-d",$time);
@@ -555,7 +627,7 @@ function send_jpush($message) {
     $config = \think\Config::get('jPush');
     $client = new \JPush\Client($config['appKey'], $config['masterSecret']);//实例化对象，读取配置文件中的
     //$platform = array('ios', 'android');
-    
+
     $result = $client->push()
     ->setPlatform('all')
     ->addRegistrationId($regid)//绑定的id   1507bfd3f7c76f87290
@@ -567,7 +639,7 @@ function send_jpush($message) {
          'content-available' => true,
          'mutable-content' => true,
          'category' => '消息推送',
-         
+
      ))
      ->message('message content', array(
          'title' => 'hello jpush',
@@ -580,13 +652,13 @@ function send_jpush($message) {
     ->send();
     if ($result['http_code'] === 200) return true;
     return false;
-} 
+}
 
 function json_post($url, $data = NULL)
     {
- 
+
         $curl = curl_init();
- 
+
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -614,5 +686,244 @@ function json_post($url, $data = NULL)
         }
         curl_close($curl);
         return $res;
- 
+
     }
+
+
+/**
+ * [ParamsChecked 参数校验方法]
+ * @author   Devil
+ * @blog     http://gong.gg/
+ * @version  1.0.0
+ * @datetime 2017-12-12T15:26:13+0800
+ * @param    [array]                   $data   [原始数据]
+ * @param    [array]                   $params [校验数据]
+ * @return   [boolean|string]                  [成功true, 失败 错误信息]
+ */
+function ParamsChecked($data, $params)
+{
+    if(empty($params) || !is_array($data) || !is_array($params))
+    {
+        return '内部调用参数配置有误';
+    }
+
+    foreach ($params as $v)
+    {
+        if(empty($v['key_name']) || empty($v['error_msg']))
+        {
+            return '内部调用参数配置有误';
+        }
+
+        // 是否需要验证
+        $is_checked = true;
+
+        // 数据或字段存在则验证
+        // 1 数据存在则验证
+        // 2 字段存在则验证
+        if(isset($v['is_checked']))
+        {
+            if($v['is_checked'] == 1)
+            {
+                if(empty($data[$v['key_name']]))
+                {
+                    $is_checked = false;
+                }
+            } else if($v['is_checked'] == 2)
+            {
+                if(!isset($data[$v['key_name']]))
+                {
+                    $is_checked = false;
+                }
+            }
+        }
+
+        // 是否需要验证
+        if($is_checked === false)
+        {
+            continue;
+        }
+
+        // 数据类型,默认字符串类型
+        $data_type = empty($v['data_type']) ? 'string' : $v['data_type'];
+
+        // 验证规则，默认isset
+        $checked_type = isset($v['checked_type']) ? $v['checked_type'] : 'isset';
+        switch($checked_type)
+        {
+            // 是否存在
+            case 'isset' :
+                if(!isset($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 是否为空
+            case 'empty' :
+                if(empty($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 是否存在于验证数组中
+            case 'in' :
+                if(empty($v['checked_data']) || !is_array($v['checked_data']))
+                {
+                    return '内部调用参数配置有误';
+                }
+                if(!isset($data[$v['key_name']]) || !in_array($data[$v['key_name']], $v['checked_data']))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 是否为数组
+            case 'is_array' :
+                if(!isset($data[$v['key_name']]) || !is_array($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 长度
+            case 'length' :
+                if(!isset($v['checked_data']))
+                {
+                    return '长度规则值未定义';
+                }
+                if(!is_string($v['checked_data']))
+                {
+                    return '内部调用参数配置有误';
+                }
+                if(!isset($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                if($data_type == 'array')
+                {
+                    $length = count($data[$v['key_name']]);
+                } else {
+                    $length = mb_strlen($data[$v['key_name']], 'utf-8');
+                }
+                $rule = explode(',', $v['checked_data']);
+                if(count($rule) == 1)
+                {
+                    if($length > intval($rule[0]))
+                    {
+                        return $v['error_msg'];
+                    }
+                } else {
+                    if($length < intval($rule[0]) || $length > intval($rule[1]))
+                    {
+                        return $v['error_msg'];
+                    }
+                }
+                break;
+
+            // 自定义函数
+            case 'fun' :
+                if(empty($v['checked_data']) || !function_exists($v['checked_data']))
+                {
+                    return '验证函数为空或函数未定义';
+                }
+                $fun = $v['checked_data'];
+                if(!isset($data[$v['key_name']]) || !$fun($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 最小
+            case 'min' :
+                if(!isset($v['checked_data']))
+                {
+                    return '验证最小值未定义';
+                }
+                if(!isset($data[$v['key_name']]) || $data[$v['key_name']] < $v['checked_data'])
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 最大
+            case 'max' :
+                if(!isset($v['checked_data']))
+                {
+                    return '验证最大值未定义';
+                }
+                if(!isset($data[$v['key_name']]) || $data[$v['key_name']] > $v['checked_data'])
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 相等
+            case 'eq' :
+                if(!isset($v['checked_data']))
+                {
+                    return '验证相等未定义';
+                }
+                if(!isset($data[$v['key_name']]) || $data[$v['key_name']] == $v['checked_data'])
+                {
+                    return $v['error_msg'];
+                }
+                break;
+
+            // 数据库唯一
+            case 'unique' :
+                if(!isset($v['checked_data']))
+                {
+                    return '验证唯一表参数未定义';
+                }
+                if(empty($data[$v['key_name']]))
+                {
+                    return $v['error_msg'];
+                }
+                $temp = db($v['checked_data'])->where([$v['key_name']=>$data[$v['key_name']]])->find();
+                if(!empty($temp))
+                {
+                    return $v['error_msg'];
+                }
+                break;
+        }
+    }
+    return true;
+}
+/**
+ * [DataReturn 公共返回数据]
+ * @author   Devil
+ * @blog     http://gong.gg/
+ * @version  0.0.1
+ * @datetime 2016-12-07T22:03:40+0800
+ * @param    [string]       $msg  [提示信息]
+ * @param    [int]          $code [状态码]
+ * @param    [mixed]        $data [数据]
+ * @return   [json]               [json数据]
+ */
+function DataReturn($msg = '', $code = 0, $data = '')
+{
+    // ajax的时候，success和error错误由当前方法接收
+   /* if(IS_AJAX)
+    {
+        if(isset($msg['info']))
+        {
+            // success模式下code=0, error模式下code参数-1
+            $result = array('msg'=>$msg['info'], 'code'=>-1, 'data'=>'');
+        }
+    }*/
+
+    // 默认情况下，手动调用当前方法
+    if(empty($result))
+    {
+        $result = array('msg'=>$msg, 'code'=>$code, 'data'=>$data);
+    }
+
+    // 错误情况下，防止提示信息为空
+   /* if($result['code'] != 0 && empty($result['msg']))
+    {
+        $result['msg'] = '操作失败';
+    }*/
+
+    return $result;
+}

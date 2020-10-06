@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp" />
-    <title>{$current_menu.name|default=''}</title>
+    <title>老师列表</title>
 
     <meta name="keywords" content="">
     <meta name="description" content="">
@@ -44,7 +44,7 @@
             </style>
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>{$current_menu.name|default=''}</h5>
+                    <h5>堂主申请列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -59,29 +59,24 @@
                         <div class="col-sm-12  col-md-12">
                             <div class="example-wrap">
                                 <div class="example">
-                                    <div class="btn-group hidden-xs" id="bootstrapTableToolbar" role="group">
+                                    <!--<div class="btn-group hidden-xs" id="bootstrapTableToolbar" role="group">
                                         <button type="button" class="btn btn-outline btn-default" onclick="add()">
                                             <i class="fa fa-plus-square-o" aria-hidden="true">&nbsp;&nbsp;添加</i>
                                         </button>
-                                    </div>
+                                    </div>-->
                                     <table id="bootstrapTable" data-click-to-select="true">
                                         <thead>
                                         <tr>
-                                           <th data-checkbox="true" class="col-sm-1"></th>
+                                           <th data-checkbox="true"></th>
                                             <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
-                                            <th data-field="name" data-sortable="true"  class="col-sm-1" >进阶名称</th>
-                                            <th data-field="open_tj" data-sortable="true"  class="col-sm-1" >开放条件</th>
-                                            <th data-field="studying_num" data-sortable="true"  class="col-sm-1" >同时在学课程数</th>
-                                            <th data-field="value" data-sortable="true"  class="col-sm-1" >兑换所需学分/金额</th>
-                                            <th data-field="pay_type" data-sortable="true">购买方式</th>
-                                            <th data-field="chapter_count" data-sortable="true"  class="col-sm-1" >课时数量</th>
-                                            <th data-field="learn_power" data-sortable="true"  class="col-sm-1" >学习力</th>
-                                            <th data-field="difficulty" data-sortable="true"  class="col-sm-1" >难度系数</th>
-                                            <th data-field="reward" data-sortable="true"  class="col-sm-1" >学分奖励</th>
-                                            <th data-field="deadline" data-sortable="true"  class="col-sm-1" >有效天数</th>
-                                            <th data-field="sort" data-sortable="true"  class="col-sm-1" >排序</th>
-                                            <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true" class="col-sm-1">添加时间</th>
-                                            <th data-field="" data-formatter="formatOperation" class="col-sm-3">操作</th>
+                                            <th data-field="uid" data-sortable="true"  >uid</th>
+                                            <th data-field="name" data-sortable="true"  >昵称</th>
+                                            <th data-field="status" data-formatter="true"  >状态</th>
+                                            <th data-field="province" data-sortable="true"  >省</th>
+                                            <th data-field="city" data-sortable="true">市</th>
+                                            <th data-field="county" data-sortable="true"  >县</th>
+                                            <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true">申请时间</th>
+                                            <th data-field="" data-formatter="formatOperation" >操作</th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -115,40 +110,44 @@
 
 <script src="/static/hplus/js/plugins/chosen/chosen.jquery.js"></script>
 <script src="/static/hplus/js/plugins/datapicker/bootstrap-datepicker.js"></script>
-
-<link type="text/css" rel="stylesheet" href="__STATIC__/custom-popup/custom.popup-v1.2.css">
-<script src="__STATIC__/custom-popup/jquery.custom.popup-v1.2.js"></script>
-
+<!-- 弹窗-->
 <link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
 <script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
-
 <script>
 
     $(function () {
-
         $("#bootstrapTable").bootstrapTable({
-                url: "{:\\think\\Url::build('advanced/index')}",
-                idField: 'id',
-                search: false,
-                cache: false,       //是否使用缓存
-                sortStable: true,
-                sortOrder: 'desc',
-                striped: true,      //是否显示行间隔色
-                pagination: true,
-                sidePagination: 'server',
-                pageNumber: 1,
-                pageSize: 10,
-                pageList: '[10, 30, 100]',
-                showRefresh: true,
-                showToggle: false,
-                showColumns: true,
-                iconSize: "outline",
-                toolbar: "#bootstrapTableToolbar"
-            });
+            url: "{:\\think\\Url::build('peters/index')}",
+            idField: 'id',
+            search: false,
+            cache: false,       //是否使用缓存
+            sortOrder: 'desc',
+            striped: true,      //是否显示行间隔色
+            detailView: false,       //开启详细视图功能
+            pagination: true,
+            sidePagination: 'server',
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: '[5, 10, 15]',
+            showRefresh: false,
+            showToggle: false,
+            showColumns: true,
+            iconSize: "outline",
+            toolbar: "#bootstrapTableToolbar",
+        });
     });
 
 
-    //添加老师
+    function formatMax(value) {
+        if(value == '' || value == '0.0') {
+            return '无上限'
+        }else{
+            return value;
+        }
+    }
+
+
+    //
     function add(){
         parent.layer.open({
             type: 2,
@@ -159,7 +158,7 @@
             offset: 'rb', //右下角弹出
             time: 50, //2秒后自动关闭
             shift: 2,
-            content: ['/index/advanced/add', 'yes'], //iframe的url，no代表不显示滚动条
+            content: ['/index/Honor/add', 'yes'], //iframe的url，no代表不显示滚动条
             end: function(){ //此处用于演示
                 parent.layer.open({
                     type: 2,
@@ -168,7 +167,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['1150px', '650px'],
-                    content: '/index/advanced/add',
+                    content: '/index/Honor/add',
                     end:function() {
                         location.reload();
                     }
@@ -177,7 +176,6 @@
         });
     }
 
-    //修改老师
     function  edit(id){
         parent.layer.open({
             type: 2,
@@ -188,7 +186,7 @@
             offset: 'rb', //右下角弹出
             time: 50, //2秒后自动关闭
             shift: 2,
-            content: ["/index/advanced/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            content: ["/index/Honor/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
             end: function(){ //此处用于演示
                 parent.layer.open({
                     type: 2,
@@ -197,7 +195,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['1150px', '650px'],
-                    content: "/index/advanced/edit/id/" + id,
+                    content: "/index/Honor/edit/id/" + id,
                     end:function() {
                         location.reload();
                     }
@@ -211,19 +209,12 @@
     function formatOperation(value, row) {
         var html = '';
         html += '<div class="btn-group">';
-        html +=	'<button class="btn btn-info" type="button" onclick="edit(' + row.id + ')" data-target="#myModal"><i class="fa fa-paste"></i>编辑</button>';
-        html +=	'<button class="btn btn-warning" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删除</button>';
-        html +=	'<button class="btn btn-primary" type="button" onclick="courselist(' + row.id + ')" data-target="#myModal">课程管理</button>';
+        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
+        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
         html +=	'</div>';
         return html;
     }
 
-    function courselist(id) {
-            window.location.href ="/index/Xcscourse/advanced_index/advanced_id/" + id;
-    }
-
-
-    //单个删除进阶
     function del(id){
         swal({
             title:"您确定要删除这条信息吗",
@@ -237,7 +228,7 @@
         },function(isConfirm){
             if(isConfirm){
                 $.ajax({
-                    url: "{:\\think\\Url::build('advanced/del')}",
+                    url: "{:\\think\\Url::build('Honor/del')}",
                     data: {id: id},
                     dataType: "json",
                     type: "post",
