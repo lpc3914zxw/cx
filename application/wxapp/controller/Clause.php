@@ -115,6 +115,19 @@ class Clause extends Base{
         return $this->fetch();
         
     }
+    //财学堂代理条款1
+    public function peters_contert(){
+        if(file_exists('html/clause/peters_contert.html')){
+        
+           include 'html/clause/peters_contert.html';exit;
+        }
+        $about_model = new \app\wxapp\model\Clause();
+        $about = $about_model->where('id',1)->value('peters_contert');
+        $this->assign('peters_contert',$about);
+        $this->buildHtml('peters_contert', 'html/clause/', 'peters_contert');
+        return $this->fetch();
+        
+    }
     //获取全部协议
     public function get_protocol(){
         $data=array(
@@ -123,6 +136,7 @@ class Clause extends Base{
             'privacyprotocol' => 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/Clause/privacyprotocol.html',
             'cxuseprotocol' => 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/Clause/cxuseprotocol.html',
             'cxprivacyprotocol' => 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/Clause/cxprivacyprotocol.html',
+            'peters_contert' => 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/Clause/peters_contert.html',
             'TOS' => 'https://'.$_SERVER['SERVER_NAME'].'/wxapp/Clause/useprotocol.html'
             );
         return returnjson(1000,$data,'获取成功');

@@ -133,7 +133,13 @@
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
-                        
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">财学堂代理协议：</label>
+                            <div class="col-sm-8">
+                                <textarea id="peters_contert" name="peters_contert">{present name="about"}{$about.peters_contert}{/present}</textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
                                 <button class="btn btn-primary" type="submit">保存内容</button>
@@ -360,6 +366,39 @@
             tos.execCommand('lineheight', 2); //行间距
             tos.execCommand('fontsize', '18px'); //字号
         });
+        //caixuetangdaili 
+        var peters_contert = UE.getEditor('peters_contert', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+//
+        peters_contert.ready(function(){
+            peters_contert.execCommand('lineheight', 2); //行间距
+            peters_contert.execCommand('fontsize', '18px'); //字号
+        });
 
         $("#newsForm").submit(function() {
             var about = ue.getContent().replace(/\"/g,"'");
@@ -368,9 +407,10 @@
             var cxuseprotocol = cxues.getContent().replace(/\"/g,"'");
             var cxprivacyprotocol = cxpri.getContent().replace(/\"/g,"'");
             var TOS = tos.getContent().replace(/\"/g,"'");
+            var peters_contert = peters_contert.getContent().replace(/\"/g,"'");
             $.ajax({
                 url: "{:\\think\\Url::build('system/aboutus')}",
-                data: {'about':about,'useprotocol':useprotocol,'privacyprotocol':privacyprotocol,'cxuseprotocol':cxuseprotocol,'cxprivacyprotocol':cxprivacyprotocol,'TOS':TOS},
+                data: {'about':about,'useprotocol':useprotocol,'privacyprotocol':privacyprotocol,'cxuseprotocol':cxuseprotocol,'cxprivacyprotocol':cxprivacyprotocol,'TOS':TOS,'peters_contert':peters_contert},
                 dataType: "json",
                 type: "post",
                 success: function(data){

@@ -59,6 +59,36 @@
                         <div class="col-sm-12  col-md-12">
                             <div class="example-wrap">
                                 <div class="example">
+                                    <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+                                        <form role="form" class="form-inline">
+                                            <div class="form-group">
+                                                <label>昵称/手机</label>
+                                                <input type="text" name="name" placeholder="请输入信息" class="form-control" value=""  id="name">
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <label>审核状态</label>
+                                                <select class="form-control" id="status" name="status">
+                                                    <option value="" >-全部-</option>
+                                                    <option value="0">待审核</option>
+                                                    <option value="1">审核通过</option>
+                                                    <option value="2">驳回</option>
+                                                    
+                                                </select>
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                                </button>
+                                            </div>
+                                            <!--div class="form-group">
+                                                <button type="button" class="btn btn-outline btn-primary" onclick="exportes()" style="margin-bottom: 0">
+                                                    导出
+                                                </button>
+                                            </div-->
+                                        </form>
+                                    </div>
                                     <!--<div class="btn-group hidden-xs" id="bootstrapTableToolbar" role="group">
                                         <button type="button" class="btn btn-outline btn-default" onclick="add()">
                                             <i class="fa fa-plus-square-o" aria-hidden="true">&nbsp;&nbsp;添加</i>
@@ -71,11 +101,13 @@
                                             <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
                                             <th data-field="uid" data-sortable="true"  >uid</th>
                                             <th data-field="name" data-sortable="true"  >昵称</th>
-                                            <th data-field="status" data-formatter="true"  >状态</th>
+                                            <th data-field="tel" data-sortable="true"  >手机号</th>
+                                            <th data-field="status" data-formatter="formatStatus"  >状态</th>
                                             <th data-field="province" data-sortable="true"  >省</th>
                                             <th data-field="city" data-sortable="true">市</th>
                                             <th data-field="county" data-sortable="true"  >县</th>
                                             <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true">申请时间</th>
+                                            <th data-field="refuse" data-sortable="true"  >驳回原因</th>
                                             <th data-field="" data-formatter="formatOperation" >操作</th>
                                         </tr>
                                         </thead>
@@ -92,6 +124,64 @@
 
     </div>
     <!--右侧部分结束-->
+      
+
+ <div class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="edit">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">&times;</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title">驳回原因</h4>
+             </div>
+             <form class="form-horizontal" id="editForm">
+                 <div class="modal-body">
+                     <input type="hidden" name="id" value=""  id="id">
+                     <div class="form-group">
+                         <label class="col-sm-2 control-label">原因</label>
+                         <div class="col-sm-10">
+                             <textarea type="text" name="refuse" cols="30"  rows="10" class="form-control" id="refuse"></textarea>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="reset" class="btn btn-white" data-dismiss="modal">关闭</button>
+                     <button type="submit" class="btn btn-primary">提交</button>
+                 </div>
+             </form>
+         </div>
+     </div>
+ </div>
+ 
+ <div class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="edit1">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" data-dismiss="modal">
+                     <span aria-hidden="true">&times;</span>
+                     <span class="sr-only">Close</span>
+                 </button>
+                 <h4 class="modal-title">结束时间</h4>
+             </div>
+             <form class="form-horizontal" id="editForm1">
+                 <div class="modal-body">
+                     <input type="hidden" name="id" value=""  id="id1">
+                     <div class="form-group">
+                            <label>结束时间&nbsp;&nbsp;</label>
+                            <input type="text" class="time1" name="time1" placeholder="请选择时间" class="form-control" value="" id="scoretime">
+                     </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="reset" class="btn btn-white" data-dismiss="modal">关闭</button>
+                     <button type="submit" class="btn btn-primary">提交</button>
+                 </div>
+             </form>
+         </div>
+     </div>
+ </div>
+ <script src="/static/web/js/laydate.js"></script>
 <script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
 <script src="/static/hplus/js/bootstrap.min.js?v=3.3.6"></script>
 <script src="/static/hplus/js/plugins/metisMenu/jquery.metisMenu.js"></script>
@@ -114,7 +204,7 @@
 <link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
 <script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
 <script>
-
+    
     $(function () {
         $("#bootstrapTable").bootstrapTable({
             url: "{:\\think\\Url::build('peters/index')}",
@@ -129,15 +219,68 @@
             pageNumber: 1,
             pageSize: 10,
             pageList: '[5, 10, 15]',
-            showRefresh: false,
+            showRefresh: true,
             showToggle: false,
             showColumns: true,
             iconSize: "outline",
             toolbar: "#bootstrapTableToolbar",
         });
     });
-
-
+    function search() {
+        var status = $('#status').val();
+        var name = $('#name').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {name: name, status:status};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+    laydate.render({
+      elem: '#scoretime'
+      ,type: 'datetime'
+      ,range: false
+    }); 
+     function formatStatus(value, row, index) {
+        var text = '';
+        if(value==0) {
+            text += '<span >待审核</span>';
+        }else if(value == 1){
+            text += '<span style="">审核通过</span>';
+        }else if(value == 2){
+            text += '<span style="">审核驳回</span>';
+        }
+        return text;
+    }
+    //格式化操作
+    function formatOperation1(value, row) {
+        var html = '';
+        html += '<div class="btn-group">';
+        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
+        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
+        html +=	'</div>';
+        return html;
+    }
+    //格式化操作
+    function formatOperation(value, row) {
+        var html = '<div class="btn-group">';
+        if(row.status == 0) {
+            html += '<button type="button" class="btn btn-w-m btn-white" onclick="check(' + row.id + ')">通过</button>';
+            html += '<button type="button" class="btn btn-w-m btn-primary" onclick="refuse(' + row.id + ')">驳回</button>';
+        }else if(row.status == 1) {
+            html += '<button type="button" class="btn btn-w-m btn-primary" >已通过</button>';
+        }else if(row.status == 2) {
+            html += '<button type="button" class="btn btn-w-m btn-primary" >已驳回</button>';
+        }
+        html +=	'</div>';
+        return html;
+    }
+     function refuse(id) {
+        $('#id').val(id)
+        $("#edit").modal();
+    }
+    
     function formatMax(value) {
         if(value == '' || value == '0.0') {
             return '无上限'
@@ -205,15 +348,7 @@
     }
 
 
-    //格式化操作
-    function formatOperation(value, row) {
-        var html = '';
-        html += '<div class="btn-group">';
-        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
-        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
-        html +=	'</div>';
-        return html;
-    }
+    
 
     function del(id){
         swal({
@@ -249,6 +384,96 @@
             }
         })
     }
+    function check(id) {
+        $('#id1').val(id)
+        $("#edit1").modal();
+    }
+    $("#editForm1").submit(function () {
+        var id = $('#id1').val();
+        var time1 = $('.time1').val()
+        
+        $.ajax({
+            url: "{:\\think\\Url::build('peters/checkPeters')}",
+            type: "post",
+            data: {id: id,status:1,time1:time1},
+            dataType: "json",
+            success: function (data) {
+                if (data.code === 1) {
+                    swal(data.msg, "操作成功", "success");
+                    $("#edit").modal('hide');
+                    $('#time1').val('')
+                    $("#bootstrapTable").bootstrapTable('refresh');
+                } else {
+                    swal(data.msg,"操作失败","error")
+                }
+            },
+            error: function (e) {
+                swal(data.msg,"操作失败","error")
+
+            }
+        });
+        return false;
+    });
+    function check1(id) {
+        var msg = '通过';
+        
+        swal({
+            title:"您确定要"+ msg +"吗",
+            text:msg +"请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:'是的，'+ msg +'！',
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('peters/checkPeters')}",
+                    data: {id: id,status:1},
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "操作成功。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了该操作！","error")
+            }
+        })
+    }
+    $("#editForm").submit(function () {
+        var id = $('#id').val();
+        var refuse = $('#refuse').val()
+        $.ajax({
+            url: "{:\\think\\Url::build('peters/checkPeters')}",
+            type: "post",
+            data: {id: id,status:2,refuse:refuse},
+            dataType: "json",
+            success: function (data) {
+                if (data.code === 1) {
+                    swal(data.msg, "操作成功", "success");
+                    $("#edit").modal('hide');
+                    $('#refuse').val('')
+                    $("#bootstrapTable").bootstrapTable('refresh');
+                } else {
+                    swal(data.msg,"操作失败","error")
+                }
+            },
+            error: function (e) {
+                swal(data.msg,"操作失败","error")
+
+            }
+        });
+        return false;
+    });
 </script>
 
 </body>

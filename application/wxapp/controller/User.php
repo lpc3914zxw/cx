@@ -1341,6 +1341,9 @@ class User extends Base{
         $where = ['addtime'=>['between',[$startTime,$endTime]],'status'=>1];
         if(isset($search['type'])) {
             if($search['type']) {
+                if($search['type']==6){
+                    $search['type'] =10;
+                }
                 $where['type'] = $search['type'];
             }
         }
@@ -1770,13 +1773,19 @@ class User extends Base{
             $sameGrade = $res['other'];
             $otherGrade = $res['pnum'];
         }
-
-        //$sameGrade = '1103';
-        //$otherGrade = '100';
+        $pid  = $myinfo['pid'];
+        if($pid){
+            $puserInfo = $user_model->where('id',$pid)->field('id,name,headimg')->find();
+            $noAuthNum = $user_model->where('pid',$this->uid)->where('is_auth',0)->count();
+            
+        }else{
+            $puserInfo =array();
+            
+        }
         $level = new level();
         $mylevel = $level->where('value',$level1)->value('name');
-        //echo $level->getLastsql();exit;
-        $data = ['level'=>$mylevel,'childCount'=>$res['direct'],'sameGrade'=>$sameGrade,'otherGrade'=>$otherGrade,'sumContribution'=>$myinfo['dedication_value'],'comContribution'=>$res['minshequnD'],'alumnusSum'=>$res['total_num'],'authenticatedNumber'=>$res1['total_num']];
+        $invite_class_content = Db::name('system')->where('id',1)->value('invite_class_content');
+        $data = ['level'=>$mylevel,'childCount'=>$res['direct'],'sameGrade'=>$sameGrade,'otherGrade'=>$otherGrade,'sumContribution'=>$myinfo['dedication_value'],'comContribution'=>$res['minshequnD'],'alumnusSum'=>$res['total_num'],'authenticatedNumber'=>$res1['total_num'],'puserInfo'=>$puserInfo,'invite_class_content'=>$invite_class_content,'authNum'=>$childCount,'noAuthNum'=>$noAuthNum];
         return returnjson(1000,$data,'获取成功');
     }
 

@@ -26,7 +26,8 @@ class Region
         // 获取地区
         $params = [
             'where' => [
-                'pid'   => intval(input('pid', 0)),
+                'pid'   => intval(input('pid', 0))
+                
             ],
         ];
         $data = RegionService::RegionNode($params);

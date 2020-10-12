@@ -44,7 +44,7 @@
             </style>
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>堂主申请列表</h5>
+                    <h5>堂主权益列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -60,9 +60,9 @@
                             <div class="example-wrap">
                                 <div class="example">
                                     <div class="btn-group hidden-xs" id="bootstrapTableToolbar" role="group">
-                                        <button type="button" class="btn btn-outline btn-default" onclick="add()">
+                                        <!--button type="button" class="btn btn-outline btn-default" onclick="add()">
                                             <i class="fa fa-plus-square-o" aria-hidden="true">&nbsp;&nbsp;添加</i>
-                                        </button>
+                                        </button-->
                                     </div>
                                     <table id="bootstrapTable" data-click-to-select="true">
                                         <thead>
@@ -74,7 +74,7 @@
                                             <th data-field="is_open" data-formatter="formatOpen" >是否开启</th>
                                             <th data-field="content" data-sortable="true"  >条件</th>
                                             <th data-field="addtime" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
-                                            <th data-field="" data-formatter="formatOperation" >操作</th>
+                                            <!--th data-field="" data-formatter="formatOperation" >操作</th-->
                                         </tr>
                                         </thead>
                                     </table>
@@ -207,12 +207,12 @@
     function formatOperation(value, row) {
         var html = '';
         html += '<div class="btn-group">';
-        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
-        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
+        //html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
+       // html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
         if(row.is_open == 0) {
-            html += '<button type="button" class="btn btn-success" onclick="openPeters(' + row.id + ',1)">开启</button>';
+            //html += '<button type="button" class="btn btn-success" onclick="openPeters(' + row.id + ',1)">开启</button>';
         }else{
-            html += '<button type="button" class="btn btn-success" onclick="openPeters(' + row.id + ',0)">关闭</button>';
+           // html += '<button type="button" class="btn btn-success" onclick="openPeters(' + row.id + ',0)">关闭</button>';
         }
         html +=	'</div>';
         return html;

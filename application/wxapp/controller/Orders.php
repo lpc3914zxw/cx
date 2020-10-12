@@ -390,6 +390,8 @@ class Orders extends Base {
 
             }elseif($type == 1){
           	    if($is_face == 0){
+          	        $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+file_put_contents($documentRoot.'/log_1010.txt',print_r($res,true),FILE_APPEND);
                     if(!empty($res['alipay_trade_app_pay_response'])){
 
                         if($res['alipay_trade_app_pay_response']['code'] == '10000'){
