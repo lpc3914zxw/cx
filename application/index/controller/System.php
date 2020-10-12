@@ -73,15 +73,16 @@ class System extends AdminBase {
         return $this->fetch();
     }
 
-    /*
+   /*
      * 关于我们
      */
     public function about_us() {
-        $about = Db::name('system')->where('id',1)->field('about,useprotocol,privacyprotocol,cxuseprotocol,cxprivacyprotocol,TOS')->find();
+        $about = Db::name('system')->where('id',1)->field('about,useprotocol,privacyprotocol,cxuseprotocol,cxprivacyprotocol,TOS,peters_contert')->find();
         if($this->request->isPost()) {
             $post = $this->request->post();
-          	
-            if(Db::name('system')->update($post) !== false) {
+          	$post['tos'] = $post['TOS'];
+          unset($post['TOS']);
+            if(Db::name('system')->where('id',1)->update($post) !== false) {
                 $this->success('更新成功');
             }
             $this->error('更新失败');
@@ -98,6 +99,7 @@ class System extends AdminBase {
             $post = $this->request->post();
           $post['tos'] = $post['TOS'];
           unset($post['TOS']);
+          
             if(Db::name('system')->where('id',1)->update($post) !== false) {
                 if(file_exists('html/clause/tos.html')){
                     unlink('html/clause/tos.html');
@@ -117,6 +119,10 @@ class System extends AdminBase {
                 if(file_exists('html/clause/about.html')){
                     unlink('html/clause/about.html');
                 }
+                if(file_exists('html/clause/peters_contert.html')){
+                    unlink('html/clause/peters_contert.html');
+                }
+                
                 $this->success('更新成功');
             }
             $this->error('更新失败');

@@ -12,13 +12,18 @@ use think\Model;
 class PetersLog extends Model {
     protected $table = 'peters_log';
     public function getList($map = []) {
-        $total = $this::where($map)->count(1);
-        $list = $this::all(function($query) use($map) {
-            $query->where($map)->limit(page());
+        $join = [
+           ['user u','u.id=d.uid','left']
+        ];
+        $total = $this::alias('d')->join($join)->where($map)->count(1);
+       // $total = $this::where($map)->count(1);
+        
+        $list = $this::all(function($query) use($map,$join) {
+            $query->alias('d')->join($join)->where($map)->order('d.status','asc')->order('d.id','desc')->field('d.*,u.name,u.tel')->limit(page());
         });
-        foreach ($list as $k=>$val) {
-            $list[$k]['status'] = self::getStatusName($val['status']);
-        }
+        //foreach ($list as $k=>$val) {
+            //$list[$k]['status'] = self::getStatusName($val['status']);
+        //}
         foreach ($list as $k=>$val) {
             $list[$k]['province'] = self::getProvince($val['province']);
         }
@@ -28,10 +33,10 @@ class PetersLog extends Model {
         foreach ($list as $k=>$val) {
             $list[$k]['county'] = self::getCounty($val['county']);
         }
-        foreach ($list as $k=>$val) {
-            $list[$k]['name'] = self::getUserName($val['uid']);
-        }
-
+        //foreach ($list as $k=>$val) {
+            //$list[$k]['name'] = self::getUserName($val['uid']);
+        //}
+        //var_dump($list);exit;
         return page_data($total, $list);
     }
 

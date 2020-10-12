@@ -927,3 +927,22 @@ function DataReturn($msg = '', $code = 0, $data = '')
 
     return $result;
 }
+/**
+ * 返回本周开始和结束的时间戳
+ *
+ * @return array
+ */
+function week()
+{
+    $timestamp = time();
+    //$beginWeek = mktime(0,0,0,date("m"),date("d")-date("w")+1,date("Y"));
+    $beginWeek=strtotime(date('Y-m-d', strtotime("this week Monday", $timestamp)));
+
+    #$endWeek = mktime(23,59,59,date("m"),date("d")-date("w")+7,date("Y"));
+
+    $endWeek=   strtotime(date('Y-m-d', strtotime("this week Sunday", $timestamp))) + 24 * 3600 - 1 ;
+    return [
+        $beginWeek,
+        $endWeek
+    ];
+}

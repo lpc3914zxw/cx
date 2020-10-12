@@ -161,18 +161,25 @@ class Datacensus extends Base
 
             Db::name('statistical')->where(['start_time'=>['between',[$beginToday,$endToday]]])->select();
         //1今日注册用户
-        $user_today_new =  Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('user_new');
+        $user_today_new =  Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('user_new');
         //2今日认证用户
-        $face_today_user=    Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('user_face');
+        $face_today_user=    Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('user_face');
         // 3本日访问量
-        $todayBrowse = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('browse');
+        $todayBrowse = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('browse');
         //4今日系统学分产出
-        $credit_today= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit');
+        $credit_today= round(Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit'),4);
         //6今日打赏学分产出
-        $credit_d_today=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_d');
+        $credit_d_today=Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_d');
         //7 今日收入
-        $todayMoney = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('money_c');    // 8今日学分收入
-        $todayCredit = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_c');    // 8今日学分收入
+        $todayMoney = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('money_c');    // 8今日学分收入
+        $todayCredit = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_c');    // 8今日学分收入
             $arr[0] = time() - ((date('H') == 0 ? 24 : date('H')) - 1)  * 3600;
             $arr[1] = time() - ((date('H') == 0 ? 24 : date('H')) - 2)  * 3600;
             $arr[2] = time() - ((date('H') == 0 ? 24 : date('H')) - 3)  * 3600;
@@ -215,10 +222,10 @@ class Datacensus extends Base
             }
 
             foreach ($new as $k => $v) {
-                $honorlog_sum_pv[$k] = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor');
+                $honorlog_sum_pv[$k] = round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),4);
                 $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication');
-                $credit_sum[$k]=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit');
+                $dedicationLog_sum[$k]=  round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),4);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),4);
             }
 
 
@@ -261,24 +268,31 @@ class Datacensus extends Base
 
         }elseif ($type=='weeks'){
         //1本周注册用户
-        $user_weeks_new = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('user_new');
+        $user_weeks_new = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('user_new');
 
             //3本周访问量
-        $weekBrowse = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('browse');
-
+        $weekBrowse = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('browse');
+            //echo Db::name('statistical')->getLastSql();exit;
             //4本周认证用户
-        $face_weeks_user= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('user_face');
+        $face_weeks_user= Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('user_face');
 
             //5本周系统学分产出
-        $credit_weeks=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('credit');
+        $credit_weeks=round(Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('credit'),4);
 
             //6本周打赏学分产出
-        $credit_d_weeks=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('credit_d');
+        $credit_d_weeks=Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('credit_d');
 
             //7本周收入
-        $weekMoney = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('money_c');    // 8今日学分收入
+        $weekMoney = Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginWeek,$endWeek]]])->sum('money_c');    // 8今日学分收入
             //8本周学分收入
-        $weekCredit =  Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_c');
+        $weekCredit =  Db::name('statistical')
+            ->where('type','=',1)->where(['start_time'=>['between',[$beginToday,$endToday]]])->sum('credit_c');
             $arr[0] = time() - ((date('w') == 0 ? 7 : date('w')) - 1) * 24 * 3600;
             $arr[1] = time() - ((date('w') == 0 ? 7 : date('w')) - 2) * 24 * 3600;
             $arr[2] = time() - ((date('w') == 0 ? 7 : date('w')) - 3) * 24 * 3600;
@@ -307,10 +321,10 @@ class Datacensus extends Base
 
             }
             foreach ($new as $k => $v) {
-                $honorlog_sum_pv[$k] = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor');
+                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),4);
                 $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication');
-                $credit_sum[$k]=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit');
+                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),4);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),4);
 
             }
 
@@ -359,7 +373,7 @@ class Datacensus extends Base
             $face_month_user =  Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginMonth,$endMonth]]])->sum('user_face');
 
             //本月系统学分产出
-            $credit_month = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginMonth,$endMonth]]])->sum('credit');
+            $credit_month =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginMonth,$endMonth]]])->sum('credit'),4);
 
             //本月打赏学分产出
             $credit_d_month = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$beginMonth,$endMonth]]])->sum('credit_d');
@@ -395,14 +409,12 @@ class Datacensus extends Base
             }
 
             foreach ($new as $k => $v) {
-                $honorlog_sum_pv[$k] = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor');
+                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),4);
                 $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication');
-                $credit_sum[$k]=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit');
+                $dedicationLog_sum[$k]=round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),4);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),4);
 
             }
-
-
 
             $advanced_all=$advanced_model->order('id desc')->column('id');
 
@@ -447,7 +459,7 @@ class Datacensus extends Base
             //获取累计认证用户
             $face_user =Db::name('statistical')->sum('user_face');
             //累计系统学分产出
-            $credit_total =Db::name('statistical')->sum('credit');
+            $credit_total =round(Db::name('statistical')->sum('credit'),4);
             //累计打赏学分产出
             $credit_d_total =Db::name('statistical')->sum('credit_d');
             // 累计收入
@@ -492,14 +504,12 @@ class Datacensus extends Base
             $honorlog_model=new \app\index\model\HonorLog();
             $learningpowerlog_model=new \app\index\model\LearningPowerLog();
             foreach ($newMonth as $k => $v) {
-                $honorlog_sum_pv[$k] = Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('honor');
+                $honorlog_sum_pv[$k] = round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('honor'),4);
                 $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('dedication');
-                $credit_sum[$k]=Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('credit');
+                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('dedication'),4);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('credit'),4);
 
             }
-
-
 
             $order_model = new \app\index\model\Orders();
             $advanced_model = new \app\index\model\Advanced();

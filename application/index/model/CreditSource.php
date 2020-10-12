@@ -34,6 +34,12 @@ class CreditSource extends Model {
 
         return $sum;
     }
+    public function get_score_sum_min($status,$contrast,$beginMonth) {
+
+        $sum = $this::where('status','=',1)->where(['type'=>['in',("$status")]])->where('score',$contrast,0)->where('addtime','<',$beginMonth)->sum('score');
+
+        return $sum;
+    }
 }
 
 

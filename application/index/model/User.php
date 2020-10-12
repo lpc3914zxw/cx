@@ -51,5 +51,15 @@ class User extends Model {
 
         return $count;
     }
+    public function get_face_count_min($beginMonth) {
+
+        // $total = $this::alias('u')->where($u)->whereOr($s)->count(1);
+        $join = [
+            ['face_order f','f.uid=u.id','left']
+        ];
+        $count = $this::alias('u')->join($join)->where('f.status','=','1')->where('f.paytime','<',$beginMonth)->count();
+
+        return $count;
+    }
 
 }

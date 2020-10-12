@@ -9,6 +9,7 @@
 namespace app\index\model;
 use app\wxapp\model\KnowledgeArticleBehav;
 use app\wxapp\model\TutorFollow;
+use app\wxapp\model\Tutor;
 use think\Model;
 /**
  * 涨知识-文章
@@ -42,13 +43,17 @@ class Knowledge extends Model{
             $res[$k]['tutorImg'] = $tutor->where('uid',$val['uid'])->value('imgurl');
             $res[$k]['addtime'] = tranTime($val['check_time']);
             $advCount = floor(($start + $k + 1) / $adv_step);
+            
             if((($page - 1) * $num + $k + 1) % $adv_step == 0) {
                 if($adv->where('kind',2)->limit($advCount,1)->find()){
                     $advInfo = $adv->field('id')->where('kind',2)->limit($advCount,1)->find();
                     $advlist = $advChild->where('adv_id',$advInfo['id'])->select();
+                    $adv_num = ((($page - 1) * $num + $k + 1))/$adv_step;
+                    $res[$k]['labelCount'] = intval($adv_num);
                     $res[$k]['advlist'] = $advlist;
                 }
             }else{
+                $res[$k]['labelCount'] = 0;
                 $res[$k]['advlist'] = [];
             }
         }
