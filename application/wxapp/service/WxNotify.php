@@ -30,6 +30,7 @@ class WxNotify extends \WxPayNotify
     public function NotifyProcess($data, &$msg)
     {
 //        $data = $this->data;
+        new \WxPayApi();
         if ($data['result_code'] == 'SUCCESS') {
             $orderNo = $data['out_trade_no'];
             Db::startTrans();

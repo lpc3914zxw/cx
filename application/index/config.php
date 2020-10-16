@@ -16,7 +16,7 @@ return [
     'regex_phone' => '/^1[3|4|5|7|8][0-9]{9}$/',
     //登录cookie保存时间
     'login_time' => 7*24*3600,
-    
+
     //阿里云OSS
     'oss' => [
         'accessKeyId' => 'LTAI4G8FpLy191oBhNyd3Vss',

@@ -4,6 +4,8 @@ namespace app\wxapp\controller;
 use app\wxapp\controller\Base;
 use app\index\model\KnowledgeCate;
 use think\Db;
+use think\Request;
+
 /*
  * 导师专栏
  */
@@ -11,10 +13,15 @@ class Tutor extends Base{
     /*
      * 导师申请入住
      */
-    public function applyTutor() {
+    public function applyTutor($RequestId='') {
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
+        }
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
         }
         if($this->uid == 0) {
             return returnjson('1100','','该设备在其他地方登录');
@@ -110,8 +117,8 @@ class Tutor extends Base{
             Db::name('tutor_follow')->where(['uid'=>$this->uid,'tutor_id'=>$tutor_id])->delete();
             return returnjson(1000,'','已取消关注');
         }
-        
-        
+
+
      }
     /*
      * 导师类别

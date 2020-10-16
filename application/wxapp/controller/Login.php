@@ -2,10 +2,21 @@
 namespace app\wxapp\controller;
 
 use app\wxapp\model\Orders;
+use TencentCloud\Captcha\V20190722\CaptchaClient;
+use TencentCloud\Captcha\V20190722\Models\DescribeCaptchaResultRequest;
+use TencentCloud\Common\Credential;
+use TencentCloud\Common\Exception\TencentCloudSDKException;
+use TencentCloud\Common\Profile\ClientProfile;
+use TencentCloud\Common\Profile\HttpProfile;
+use TencentCloud\Sms\V20190711\Models\SendSmsRequest;
+use TencentCloud\Sms\V20190711\SmsClient;
 use think\Controller;
 use app\wxapp\model\User;
 use think\Db;
 use app\common\Common;
+use think\Request;
+
+
 class Login extends Controller
 {
     /*
@@ -57,6 +68,14 @@ class Login extends Controller
             return returnjson(1001, $is_reg, $response['Message']);
         }
     }
+    /***
+     * @param $tel
+     * @param $code
+     * @return false|string
+     */
+    public function sendwxcode($tel = '',$type="login"){
+
+    }
     /*
      * 忘记密码校验接口
      * @param string $tel
@@ -96,7 +115,7 @@ class Login extends Controller
         }
 
         $salt = get_rand_char(4);
-      $pay_salt = get_rand_char(4);
+        $pay_salt = get_rand_char(4);
         $student_no = $this->studentMake();
         $where = ['tel' => $tel];
         $info = $user_model->where($where)->find();
@@ -109,7 +128,7 @@ class Login extends Controller
                 'tel'=>$tel,
                 'name'=>$name,
                 'salt'=>$salt,
-              'pay_salt'=>$pay_salt,
+                 'pay_salt'=>$pay_salt,
                 'student_no'=>$student_no,
                 'regetime'=>time(),
               	'pid'=>$info1['id']
@@ -177,13 +196,18 @@ class Login extends Controller
     }
 
     /*
-     * 账号密码登陆
+     * 账号密码登陆--添加滑动验证
      * @param string $tel
      * @param string $password
      * @return \type
      */
-    public function dologin($tel = '',$password = '') {
+    public function dologin($tel = '',$password = '',$RequestId='') {
         $data = input();
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         if ($tel == '' || $password == '') {
             return returnjson(1001, '', '账号或密码不能为空!');
         }
@@ -210,13 +234,17 @@ class Login extends Controller
     }
 
     /*
-     * 设置密码
+     * 设置密码--添加验证
      * @param int $uid  用户id
      * @param string $password  密码
      * @param string $rpwd 重复密码
      */
-    public function setPassword($uid = 0,$password = '',$rpwd = '',$tel='') {
-
+    public function setPassword($uid = 0,$password = '',$rpwd = '',$tel='',$RequestId='') {
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         if($tel == '' || $password == '' || $rpwd == '') {
             return returnjson(1001,'','参数缺失');
         }
@@ -335,5 +363,69 @@ class Login extends Controller
         $this->assign('p_id',$params['p_id']);
         return $this->fetch();
     }
+
+    /* 验证码
+    * @author staitc7
+    */
+    public function verify() {
+        $request = Request::instance();
+        $ip = $request->ip();
+        $ticket=input('ticket');
+        if(empty($ticket)){
+            return returnjson(1001,'','缺少ticket参数');
+        }
+        $randstr=input('randstr');
+        if(empty($randstr)){
+            return returnjson(1001,'','缺少randstr参数');
+        }
+        try {
+
+            $cred = new Credential("AKIDTgd4HE9xGKQF0YjtAxVmmgLjAJeip3KQ ", "D9x5xYXE5gbIjtnRc6KH0T1JJ90bROTK");
+            $httpProfile = new HttpProfile();
+            $httpProfile->setEndpoint("captcha.tencentcloudapi.com");
+
+            $clientProfile = new ClientProfile();
+            $clientProfile->setHttpProfile($httpProfile);
+            $client = new CaptchaClient($cred, "", $clientProfile);
+
+            $req = new DescribeCaptchaResultRequest();
+            $params = array(
+                "CaptchaType" => 9,
+                "Ticket" => $ticket,
+                "UserIp" => $ip,
+                "Randstr" => $randstr,
+                "CaptchaAppId" => 2014545547,
+                "AppSecretKey" => "03gqjxAD1kra6qcVE2MnSeg**"
+            );
+            //var_dump(json_encode($params));exit;
+            $req->fromJsonString(json_encode($params));
+            $resp = $client->DescribeCaptchaResult($req);
+            $res=object2array($resp);
+            if($res['CaptchaCode']==1){
+                cache($ip,$res['RequestId'],1800);
+                return returnjson(1000,$resp,'验证成功');
+            }else{
+                cache($ip,$res['RequestId'],1800);
+                return returnjson(1001,$resp,'验证失败');
+            }
+
+        }
+        catch(TencentCloudSDKException $e) {
+            //echo $e;
+            return returnjson(1001,'','参数错误');
+        }
+    }
+
+    /**
+     * 测试
+     */
+    public  function ca(){
+        $request = Request::instance();
+        $ip = $request->ip();
+        $res=cache($ip);
+        var_dump($res);
+
+    }
+
 
 }
