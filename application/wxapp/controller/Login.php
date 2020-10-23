@@ -1,15 +1,8 @@
 <?php
 namespace app\wxapp\controller;
 
+use app\service\SmsService;
 use app\wxapp\model\Orders;
-use TencentCloud\Captcha\V20190722\CaptchaClient;
-use TencentCloud\Captcha\V20190722\Models\DescribeCaptchaResultRequest;
-use TencentCloud\Common\Credential;
-use TencentCloud\Common\Exception\TencentCloudSDKException;
-use TencentCloud\Common\Profile\ClientProfile;
-use TencentCloud\Common\Profile\HttpProfile;
-use TencentCloud\Sms\V20190711\Models\SendSmsRequest;
-use TencentCloud\Sms\V20190711\SmsClient;
 use think\Controller;
 use app\wxapp\model\User;
 use think\Db;
@@ -23,7 +16,63 @@ class Login extends Controller
     * 发送短信
     */
     public function sendcode($tel = '',$type="login") {
+        $response = new SmsService();
+
+
         $user_model = new User();
+        if (!preg_match("/^1[3456789]\d{9}$/", $tel)) {
+            return returnjson(1001, '', '手机号码有误!');
+        }
+        $info = $user_model->where(['tel'=>$tel])->find();
+        if(!empty($info)){
+            $is_reg = 1;
+        }else{
+            $is_reg = 0;
+        }
+        $type = trim($type);
+        $data = input();
+        if(isset($data['pid'])&& empty($data['pid'])){
+
+        }else{
+            if($type =='login' || $type == 'findpwd'){
+                if(empty($info)){
+                    // return returnjson(1001, $is_reg, '此号码未注册');
+                }
+            }else{
+                $student_no = input('student_no');
+                $info1 = $user_model->where(['student_no'=>$student_no])->find();
+                if(empty($info1)){
+                    return returnjson(1001, $is_reg, '邀请码无效');
+                }
+                if(!empty($info)){
+                    return returnjson(1001, $is_reg, '此号码已被注册');
+                }
+            }
+        }
+        if($type=='login'){
+            $ty=0;
+        } elseif($type== 'register'){
+            $ty=1;
+        }elseif($type== 'findpwd'){
+            $ty=2;
+        }else{
+            return returnjson(1001, $is_reg, '无效参数');
+        }
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
+
+        $res=$response->sendSms($tel,$code,$ty);
+
+        $res = object_to_array($res);
+        //var_dump($res);exit;
+        if ($res['SendStatusSet'][0]['Code'] == 'Ok') {
+            cache($tel,$code,1800);
+            return returnjson(1000, $is_reg, '发送成功');
+        } else {
+            return returnjson(1001, $is_reg,$res['SendStatusSet'][0]['Message']);
+        }
+       /* $user_model = new User();
         if (!preg_match("/^1[3456789]\d{9}$/", $tel)) {
             return returnjson(1001, '', '手机号码有误!');
         }
@@ -66,7 +115,7 @@ class Login extends Controller
             return returnjson(1000, $is_reg, '发送成功');
         } else {
             return returnjson(1001, $is_reg, $response['Message']);
-        }
+        }*/
     }
     /***
      * @param $tel
@@ -75,6 +124,62 @@ class Login extends Controller
      */
     public function sendwxcode($tel = '',$type="login"){
 
+        $response = new SmsService();
+
+
+        $user_model = new User();
+        if (!preg_match("/^1[3456789]\d{9}$/", $tel)) {
+            return returnjson(1001, '', '手机号码有误!');
+        }
+        $info = $user_model->where(['tel'=>$tel])->find();
+        if(!empty($info)){
+            $is_reg = 1;
+        }else{
+            $is_reg = 0;
+        }
+        $type = trim($type);
+        $data = input();
+        if(isset($data['pid'])&& empty($data['pid'])){
+
+        }else{
+            if($type =='login' || $type == 'findpwd'){
+                if(empty($info)){
+                    // return returnjson(1001, $is_reg, '此号码未注册');
+                }
+            }else{
+                $student_no = input('student_no');
+                $info1 = $user_model->where(['student_no'=>$student_no])->find();
+                if(empty($info1)){
+                    return returnjson(1001, $is_reg, '邀请码无效');
+                }
+                if(!empty($info)){
+                    return returnjson(1001, $is_reg, '此号码已被注册');
+                }
+            }
+        }
+        if($type=='login'){
+            $ty=0;
+        } elseif($type== 'register'){
+            $ty=1;
+        }elseif($type== 'findpwd'){
+            $ty=2;
+        }else{
+            return returnjson(1001, $is_reg, '无效参数');
+        }
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
+
+        $res=$response->sendSms($tel,$code,$ty);
+
+        $res = object_to_array($res);
+        //var_dump($res);exit;
+        if ($res['SendStatusSet'][0]['Code'] == 'Ok') {
+            cache($tel,$code,1800);
+            return returnjson(1000, $is_reg, '发送成功');
+        } else {
+            return returnjson(1001, $is_reg,$res['SendStatusSet'][0]['Message']);
+        }
     }
     /*
      * 忘记密码校验接口
@@ -86,7 +191,7 @@ class Login extends Controller
              return returnjson(1001, '', '参数缺失');
          }
          $ycode = cache($tel);
-       $ycode = 9999;
+         $ycode = 9999;
          if($ycode == $code){
              return returnjson(1000, '', '验证通过');
          }else{
@@ -378,28 +483,8 @@ class Login extends Controller
         if(empty($randstr)){
             return returnjson(1001,'','缺少randstr参数');
         }
-        try {
-
-            $cred = new Credential("AKIDTgd4HE9xGKQF0YjtAxVmmgLjAJeip3KQ ", "D9x5xYXE5gbIjtnRc6KH0T1JJ90bROTK");
-            $httpProfile = new HttpProfile();
-            $httpProfile->setEndpoint("captcha.tencentcloudapi.com");
-
-            $clientProfile = new ClientProfile();
-            $clientProfile->setHttpProfile($httpProfile);
-            $client = new CaptchaClient($cred, "", $clientProfile);
-
-            $req = new DescribeCaptchaResultRequest();
-            $params = array(
-                "CaptchaType" => 9,
-                "Ticket" => $ticket,
-                "UserIp" => $ip,
-                "Randstr" => $randstr,
-                "CaptchaAppId" => 2014545547,
-                "AppSecretKey" => "03gqjxAD1kra6qcVE2MnSeg**"
-            );
-            //var_dump(json_encode($params));exit;
-            $req->fromJsonString(json_encode($params));
-            $resp = $client->DescribeCaptchaResult($req);
+        $sms=new SmsService();
+        $resp=$sms->verify($ticket,$ip,$randstr);
             $res=object2array($resp);
             if($res['CaptchaCode']==1){
                 cache($ip,$res['RequestId'],1800);
@@ -409,11 +494,6 @@ class Login extends Controller
                 return returnjson(1001,$resp,'验证失败');
             }
 
-        }
-        catch(TencentCloudSDKException $e) {
-            //echo $e;
-            return returnjson(1001,'','参数错误');
-        }
     }
 
     /**

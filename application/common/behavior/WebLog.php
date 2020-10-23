@@ -45,7 +45,7 @@ class WebLog
         /**
          * data字段存储最大数据长度，0不受限制，避免因文章等数据导致字段超长，数据存储被截断而报错
          */
-        'max_data_length'       => 200,
+        'max_data_length'       => 2,
         /**
          * 表名前缀，如果为null则为框架配置文件所设表前缀
          */
@@ -85,7 +85,7 @@ class WebLog
     public function __construct()
     {
         // 加载配置文件
-        self::$config = array_merge(self::$config, Config::get('weblog') ?: []);
+        self::$config = array_merge(self::$config, Config::get('logweb') ?: []);
     }
 
 
@@ -225,9 +225,9 @@ class WebLog
         // 请求数据
         self::$data = $request->param();
         // 其他用户信息数据
-        $ip = $request->ip();
+        $ip = $request->ip();//ip
         $locationArr = \Ip::find($ip);
-        $location = is_array($locationArr) ? implode(' ', $locationArr) : $locationArr;
+        $location = is_array($locationArr) ? implode(' ', $locationArr) : $locationArr;//地址
 
         if(Session::get('memberinfo.uid')!==null){
             $uid=Session::get('memberinfo.uid');

@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | 功能：
 // +----------------------------------------------------------------------
-// | 作者: 
+// | 作者:
 // +----------------------------------------------------------------------
 // | 日期：
 // +----------------------------------------------------------------------
@@ -18,7 +18,10 @@ class Member extends Model{
         });
         return page_data($total, $list);
     }
-
+    public static function getUsername($uid) {
+        $username = Member::where('uid','=',$uid)->value('username');
+        return $username;
+    }
     public function getUserList($map = []) {
         $total = Db::table('auth_group_access')
             ->alias('aga')

@@ -988,3 +988,14 @@ function object2array(&$object) {
     return  $object;
 }
 
+function delete_fxg(&$array) {
+    while(list($k,$v) = each($array)) {
+        if (is_string($v)) {
+            $array[$k] = stripslashes($v);//去掉反斜杠字符
+        }
+        if (is_array($v))  {
+            $array[$k] = delete_fxg($v);//调用本身，递归作用
+        }
+    }
+    return $array;
+}

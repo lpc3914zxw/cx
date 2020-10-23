@@ -58,7 +58,7 @@ class Login extends Controller {
         // 生成密码
         $salt_pwd = splice_pwd($pwd, $member ['salt']);
         if ($salt_pwd != $member ['password']) {
-            //$this->error ( '密码错误' );
+            $this->error ( '密码错误' );
         }
 		return $member;
 	}
