@@ -11,6 +11,7 @@ use app\wxapp\model\KnowledgeArticleBehav;
 use app\wxapp\model\TutorFollow;
 use app\wxapp\model\Tutor;
 use think\Model;
+use think\Db;
 /**
  * 涨知识-文章
  * Class Advanced
@@ -35,10 +36,13 @@ class Knowledge extends Model{
     public function getApiList($where,$page,$num,$adv_step) {
         $start = ($page - 1) * $num;
         $allCount = $this::where($where)->count();
-        $res = $this::field('id,title,readnum,imgurl,check_time,uid')->where($where)->order('check_time desc')->limit($start,$num)->select();
+        $res = Db::name('knowledge_articel')->field('id,title,readnum,imgurl,check_time,uid')->where($where)->order('check_time desc')->limit($start,$num)->select();
         $adv = new KnowledgeAdver();
         $advChild = new AdverChild();
         $tutor = new Tutor();
+        $count= count($res);
+        
+        $i = 1;
         foreach ($res as $k=>$val) {
             $res[$k]['tutorImg'] = $tutor->where('uid',$val['uid'])->value('imgurl');
             $res[$k]['addtime'] = tranTime($val['check_time']);
@@ -49,14 +53,22 @@ class Knowledge extends Model{
                     $advInfo = $adv->field('id')->where('kind',2)->limit($advCount,1)->find();
                     $advlist = $advChild->where('adv_id',$advInfo['id'])->select();
                     $adv_num = ((($page - 1) * $num + $k + 1))/$adv_step;
+                    
+                    
+                    $ki = $count + $i-1;
+                    $val1 = $val;
+                    $res[$ki] = $val1;
                     $res[$k]['labelCount'] = intval($adv_num);
                     $res[$k]['advlist'] = $advlist;
+                    
+                    $i++;
                 }
             }else{
                 $res[$k]['labelCount'] = 0;
                 $res[$k]['advlist'] = [];
             }
         }
+        
         return $res;
     }
 

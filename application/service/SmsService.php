@@ -67,6 +67,8 @@ class SmsService
                 $template='744965';
             }elseif ($ty==2){
                 $template='744966';
+            }elseif ($ty==3){
+                $template='744966';
             }else{
                 return returnjson(1001, '', '无效参数');
             }

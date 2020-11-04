@@ -34,7 +34,7 @@ use app\index\model\Course;
 use think\helper\Time;
 use app\index\model\Advanced;
 use Think\Exception;
-
+use app\service\SmsService;
 use think\Db;
 class User extends Base{
 
@@ -177,7 +177,7 @@ class User extends Base{
         $randStr = str_shuffle($str); //打乱字符串
         $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
         vendor('aliyun-dysms-php-sdk.api_demo.SmsDemo');
-        $content = ['code' => $code];
+        //$content = ['code' => $code];
         switch ($type) {
             case "up_password":
                 //$teltype =
@@ -205,14 +205,17 @@ class User extends Base{
                 return returnjson(1001, '', '验证码类型错误!');
         }
         //echo $post['type'].$tel;exit;
-        $response = \SmsDemo::sendSms($tel, $content);
-        $response = object_to_array($response);
-        if ($response['Message'] == 'OK') {
-            //cache($post['type'].$tel,$code,1800);
+        $response = new SmsService();
+        //echo $post['type'].$tel;exit;
+        $res=$response->sendSms($tel,$code,3);
+
+        $res = object_to_array($res);
+        //var_dump($res);exit;
+        if ($res['SendStatusSet'][0]['Code'] == 'Ok') {
             Cache::set($type.$tel,$code,1800);
             return returnjson(1000, '', '发送成功');
         } else {
-            return returnjson(1001, '', $response['Message']);
+            return returnjson(1001, '',$res['SendStatusSet'][0]['Message']);
         }
     }
     //修改手机时验证老号码验证码
@@ -242,6 +245,7 @@ class User extends Base{
 
     //修改登录密码时验证验证码
     public function checkTelCodePass(){
+
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -306,7 +310,17 @@ class User extends Base{
         $res = $user->where('id',$this->uid)->update(['registrationid'=>$code]);
         return returnjson(1000,'','修改成功');
     }
-    public function updateInfo() {
+
+    /***
+     * 修改头像，昵称，签名，密码，手机号等信息--滑块验证
+     *
+     */
+    public function updateInfo($RequestId='') {
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -395,12 +409,16 @@ class User extends Base{
         }
         $user_model = new \app\wxapp\model\User;
         $userinfo = $user_model->where('id', $this->uid)->field('identityid,realname,is_auth')->find();
+        $userinfo['text1'] = '请认真填写资料，以保证资料正确，错误将无法通过用户真实性对比。';
+        $userinfo['text2'] = '为确保用户真实性，我们将调用第三方公司的认证系统进行实名认证，认证费用随机1.90～2.10元间（重阳节活动期间暂不收取，活动时间2020/10/23-2020/11/3）认证过程只做用户真实性比对，不做其他用途。';
+        $userinfo['text3'] = '活动期间每个人每天只有2次认证机会，超出则需要第二天认证，请仔细核对填写正确，必须人、证、脸一致方可通过。';
         if($userinfo['is_auth'] ==1){
             $userinfo['is_auth'] =1;
             return returnjson(1000,$userinfo,'您已实名认证！');
         }else{
             $userinfo['is_auth'] = 0;
         }
+
         return returnjson(1000,$userinfo,'');
     }
 
@@ -1777,10 +1795,10 @@ class User extends Base{
         if($pid){
             $puserInfo = $user_model->where('id',$pid)->field('id,name,headimg')->find();
             $noAuthNum = $user_model->where('pid',$this->uid)->where('is_auth',0)->count();
-            
+
         }else{
             $puserInfo =array();
-            
+
         }
         $level = new level();
         $mylevel = $level->where('value',$level1)->value('name');
@@ -1805,7 +1823,14 @@ class User extends Base{
         $limit = $start.','.$this->num;
         $user_model = new \app\wxapp\model\User();
         $level = new level();
-        $userList = $user_model->field('id,name,headimg,score,is_auth,level')->where('pid',$this->uid)->limit($limit)->select();
+        if(!empty(input('keyword'))){
+            $keyword = input('keyword');
+
+            $userList = $user_model->field('id,name,headimg,score,is_auth,level')->where('name|student_no|tel','=',$keyword)->where('pid',$this->uid)->limit($limit)->select();
+        }else{
+            $userList = $user_model->field('id,name,headimg,score,is_auth,level')->where('pid',$this->uid)->limit($limit)->select();
+        }
+
       $common_model = new common();
 
         if($userList) {
@@ -2110,7 +2135,7 @@ class User extends Base{
         $page = empty($post['page'])?1:$post['page'];
         $type = empty(input('type')) ? 1 : input('type');
         $order_model = new Orders();
-        
+
         $start = ($page - 1) * 10;
         $limit = $start . ',' . 10;
         if($post['is_hidden_finish']==1){
@@ -2118,7 +2143,7 @@ class User extends Base{
         }else{
             $orderInfo = $order_model->where(['uid'=>$this->uid])->where(['status'=>['in',[4,5,6]]])->where('course_type',1)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
         }
-        
+
         $list = array();
         if(!empty($orderInfo)){
             $course_model = new Course();
@@ -2127,13 +2152,13 @@ class User extends Base{
                 if(empty($cour['imgurl'])){
                     $cour['imgurl'] = '';
                 }
-                
+
                 $list[$okey] = $cour;
                 $list[$okey]['teacher_name'] = Db::name('teacher')->where('id',$cour['teacher_id'])->value('name');
                 //
                 $coursecount = Db::name('section')->where('c_id',$oval['course_id'])->where('is_delete',0)->count();
                 $studuscount = Db::name('studus_section')->where('uid',$this->uid)->where('cid',$oval['course_id'])->count();
-                
+
                 if($studuscount==0){
                     $list[$okey]['status'] = '未学习';
                 }
@@ -2146,7 +2171,7 @@ class User extends Base{
                     $ratio = $studuscount/$coursecount;
                     $ratio = round($ratio,2)*100;
                 }
-                
+
                 $list[$okey]['ratio'] = $ratio;
                 $list[$okey]['time'] = date('Y.m.d',$oval['paytime']);
             }
@@ -2551,7 +2576,54 @@ class User extends Base{
 
         //return returnjson(1000,$res,'成功');
     }
+    //获取贡献值二级
+    public function get_dedication_two(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if(empty($this->uid)) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        $user = new \app\wxapp\model\User();
+        $startLevel = new StartLevel();
+        $userInfo = $user->where('id',$this->uid)->field('id,dedication_value')->find();
+        $userInfo['time'] = date('Y.m.d',time());
+        if($userInfo){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
+            $userInfo['task'] = Db::name('dedication_log')->where('uid',$this->uid)->where(['type'=>['in','1,2,3,4,5,6,7,8,13,14,15,16,20,21']])->sum('value');
+            $userInfo['team'] = Db::name('dedication_log')->where('uid',$this->uid)->where('type',17)->sum('value');
+            return returnjson(1000,$userInfo,'获取成功');
+        }
+        return returnjson(1001,'','获取失败');
+    }
+    //我的学分，学分二级
+    public function get_score_two(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if(empty($this->uid)) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        $user = new \app\wxapp\model\User();
+        $startLevel = new StartLevel();
+        $userInfo = $user->where('id',$this->uid)->field('id,score')->find();
 
+        if($userInfo){
+            $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
+            $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
+
+            $where['addtime'] = ['between',$beginToday.','.$endToday];
+            $userInfo['income'] = Db::name('creditSource')->where('uid',$this->uid)->where('score','>',0)->sum('score');
+            $userInfo['expend'] = Db::name('creditSource')->where('uid',$this->uid)->where('score','<',0)->sum('score');
+            $userInfo['today'] = Db::name('creditSource')->where('uid',$this->uid)->where($where)->sum('score');
+            $userInfo['study'] = Db::name('creditSource')->where('uid',$this->uid)->where('type',1)->sum('score');
+            $userInfo['expert'] = 0;
+            $userInfo['peters'] = Db::name('creditSource')->where('uid',$this->uid)->where(['type'=>['in','12,13']])->sum('score');;
+            return returnjson(1000,$userInfo,'获取成功');
+        }
+        return returnjson(1001,'','获取失败');
+    }
     //获取学分接口
     public function getSource(){
         $res = $this->detype();
@@ -2839,7 +2911,7 @@ class User extends Base{
             return false;
         }
         $encrypted = input('post.data');
-        
+
         if(empty($encrypted)){
             return false;
         }
@@ -2849,10 +2921,10 @@ class User extends Base{
 
         //获取公钥
         $pu_key = file_get_contents('test.cer');
-        
+
         //私钥加密的内容通过公钥可用解密出来
         openssl_public_decrypt(base64_decode($encrypted),$decrypted,$pu_key);
-        
+
         $api = $system['tlt_public'];
         $domain  =  strstr ($decrypted ,  '&sign');
         if(empty($domain)){
@@ -2877,12 +2949,12 @@ class User extends Base{
         //var_dump($return);exit;
         return $return;
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     /**
      * 生成公钥和私钥并保存
      */
@@ -2893,12 +2965,12 @@ class User extends Base{
             "private_key_type" => OPENSSL_KEYTYPE_RSA,//加密类型
         );
         $res = openssl_pkey_new($config);//创建公钥和私钥
-    
+
         //获取私钥
         openssl_pkey_export($res, $privateKey);
         //保存密钥到文件
         file_put_contents('./Uploads/test.pfx',$privateKey);
-    
+
         //获取公钥
         $pubblic = openssl_pkey_get_details($res);
         $pubblicKey = $pubblic['key'];

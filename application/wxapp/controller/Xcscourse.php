@@ -341,6 +341,7 @@ class Xcscourse extends Base
         }
         $colliers = new Colliers();
         $colliers_note = $this->systeminfo['colliers_note'];
+        //$colliers_note['userId'] = $this->uid;
         return $colliers->getList($this->uid,$colliers_note);
     }
 

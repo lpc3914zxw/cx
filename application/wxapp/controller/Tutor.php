@@ -16,10 +16,12 @@ class Tutor extends Base{
     public function applyTutor($RequestId='') {
         $token = input('token');
         if(!empty($token)) {
+
             $this->getUserInfo($token);
         }
         $request = Request::instance();
         $ip = $request->ip();
+
         if($RequestId!==cache($ip)){
             return returnjson(1001,'','验证码错误');
         }
@@ -84,7 +86,7 @@ class Tutor extends Base{
         if($this->uid == 0) {
             return returnjson('1100','','该设备在其他地方登录');
         }
-        $tutor = new \app\index\model\Tutor();
+        $tutor = new \app\wxapp\model\Tutor();
         $where = ['status'=>2,'type'=>$type];
         $start = ($page - 1) * $this->num;
         $limit = $start.','.$this->num;

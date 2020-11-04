@@ -565,7 +565,7 @@ class Section extends Base
         return returnjson(1000,'','恭喜你完成本节课时');
     }
 
-
+    
     public function plusLearnPower($uid = 0) {
         $common = new Common();
         $learnPowerLog = new LearningPowerLog();

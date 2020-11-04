@@ -1,5 +1,6 @@
 <?php
 namespace app\index\model;
+use think\Db;
 use think\Model;
 
 /**
@@ -21,6 +22,9 @@ class Logweb extends Model {
         foreach ($list as $k=>$val) {
             $list[$k]['data'] =self::getunserialize($val['data']);
         }
+        foreach ($list as $k=>$val) {
+            $list[$k]['note'] =self::note($val['module'],$val['controller'],$val['action'],$val['method']);
+        }
 
         return page_data($total, $list);
     }
@@ -32,8 +36,18 @@ class Logweb extends Model {
     }
     public static function getunserialize($data = '')
     {
+
         return stripslashes(json_encode(unserialize($data)));
-
-
+        //return json_encode(unserialize($data)));
     }
+    public static function note($module,$controller,$action,$method)
+    {
+        $res=Db::name('node_map')->where('module',$module)->where('controller',$controller)->where('action',$action)->where('method',$method)->value('comment');
+        if($res){
+            return $res;
+        }else{
+            return '未知';
+        }
+    }
+
 }

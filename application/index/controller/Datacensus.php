@@ -321,10 +321,10 @@ class Datacensus extends Base
 
             }
             foreach ($new as $k => $v) {
-                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),4);
-                $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),4);
-                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),4);
+                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),2);
+                $learningpowerlog_sum_uv[$k]=round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower'),2);
+                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),2);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),2);
 
             }
 
@@ -409,10 +409,10 @@ class Datacensus extends Base
             }
 
             foreach ($new as $k => $v) {
-                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),4);
-                $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]=round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),4);
-                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),4);
+                $honorlog_sum_pv[$k] =round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('honor'),2);
+                $learningpowerlog_sum_uv[$k]=round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('learningpower'),2);
+                $dedicationLog_sum[$k]=round( Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('dedication'),2);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['begin_date'],$v['end_date']]]])->sum('credit'),2);
 
             }
 
@@ -504,10 +504,10 @@ class Datacensus extends Base
             $honorlog_model=new \app\index\model\HonorLog();
             $learningpowerlog_model=new \app\index\model\LearningPowerLog();
             foreach ($newMonth as $k => $v) {
-                $honorlog_sum_pv[$k] = round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('honor'),4);
-                $learningpowerlog_sum_uv[$k]= Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('learningpower');
-                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('dedication'),4);
-                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('credit'),4);
+                $honorlog_sum_pv[$k] = round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('honor'),2);
+                $learningpowerlog_sum_uv[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('learningpower'),2);
+                $dedicationLog_sum[$k]= round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('dedication'),2);
+                $credit_sum[$k]=round(Db::name('statistical')->where('type','=',1)->where(['start_time'=>['between',[$v['month_begin_date'],$v['month_end_date']]]])->sum('credit'),2);
 
             }
 

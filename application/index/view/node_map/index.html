@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp" />
-    <title>老师列表</title>
+    <title>{$current_menu.name|default=''}</title>
 
     <meta name="keywords" content="">
     <meta name="description" content="">
@@ -44,7 +44,7 @@
             </style>
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>荣誉值设置</h5>
+                    <h5>{$current_menu.name|default=''}</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -68,18 +68,13 @@
                                         <thead>
                                         <tr>
                                            <th data-checkbox="true"></th>
-                                            <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
-                                            <th data-field="username" data-sortable="true"  >管理员名称</th>
-                                            <th data-field="ip" data-sortable="true"  >ip</th>
-                                            <th data-field="location" data-sortable="true"  >地址</th>
+                                            <th data-field="id" data-sortable="true" >ID</th>
                                             <th data-field="module" data-sortable="true"  >模块</th>
                                             <th data-field="controller" data-sortable="true"  >控制器</th>
-                                            <th data-field="action" data-sortable="true"  >方法</th>
-                                            <th data-field="method" data-sortable="true"  >传参方式</th>
-                                            <th data-field="os" data-sortable="true">系统</th>
-                                            <th data-field="browser" data-sortable="true"  >浏览器</th>
-                                            <th data-field="note" data-sortable="true"  >备注</th>
-                                            <th data-field="create_at" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
+                                            <th data-field="action" data-sortable="true"   >方法</th>
+                                            <th data-field="method" data-sortable="true" >请求方法</th>
+                                            <th data-field="comment" data-sortable="true"   >备注</th>
+                                            <th data-field="" data-formatter="formatOperation">操作</th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -113,52 +108,45 @@
 
 <script src="/static/hplus/js/plugins/chosen/chosen.jquery.js"></script>
 <script src="/static/hplus/js/plugins/datapicker/bootstrap-datepicker.js"></script>
-<!-- 弹窗-->
 <link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
 <script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
 <script>
 
     $(function () {
         $("#bootstrapTable").bootstrapTable({
-            url: "{:\\think\\Url::build('Logweb/index')}",
-            idField: 'id',
-            search: false,
-            cache: false,       //是否使用缓存
-            sortStable: true,
-            sortOrder: 'desc',
-            striped: true,      //是否显示行间隔色
-            pagination: true,
-            detailView: true,       //开启详细视图功能
-            detailFormatter: 'detailFormat',
-            sidePagination: 'server',
-            pageNumber: 1,
-            pageSize: 10,
-            pageList: '[10, 30, 100]',
-            showRefresh: true,
-            showToggle: false,
-            showColumns: true,
-            iconSize: "outline",
-            toolbar: "#bootstrapTableToolbar"
-        });
+                url: "{:\\think\\Url::build('NodeMap/index')}",
+                idField: 'id',
+                search: false,
+                cache: false,       //是否使用缓存
+                sortStable: true,
+                sortOrder: 'desc',
+                striped: true,      //是否显示行间隔色
+                pagination: true,
+                sidePagination: 'server',
+                pageNumber: 1,
+                pageSize: 10,
+                pageList: '[10, 30, 100]',
+                showRefresh: true,
+                showToggle: false,
+                showColumns: true,
+                iconSize: "outline",
+                toolbar: "#bootstrapTableToolbar"
+            });
     });
 
-    function detailFormat(index, row) {
-        var html = '';
-        html += '<div class="col-sm-6">'+row.data+'</div>';
-        return html;
-    }
-    function formatMax(value) {
-        if(value == '' || value == '0.0') {
-            return '无上限'
-        }else{
-            return value;
+    function formatType(value) {
+        if(value == 0) {
+            return '未实名';
+        }else if(value == 1) {
+            return '实名认证';
+        }else if(value == 2) {
+            return '实名并邀请人'
         }
     }
 
 
-
-
-    function  info(id){
+    //添加老师
+    function add(){
         parent.layer.open({
             type: 2,
             title: false,
@@ -168,16 +156,16 @@
             offset: 'rb', //右下角弹出
             time: 50, //2秒后自动关闭
             shift: 2,
-            content: ["/index/Logweb/info/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            content: ["/index/NodeMap/add", 'yes'], //iframe的url，no代表不显示滚动条
             end: function(){ //此处用于演示
                 parent.layer.open({
                     type: 2,
-                    title: '详情',
+                    title: '编辑',
                     shadeClose: true,
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['1150px', '650px'],
-                    content: "/index/Logweb/info/id/" + id,
+                    content: "/index/NodeMap/add",
                     end:function() {
                         location.reload();
                     }
@@ -186,15 +174,79 @@
         });
     }
 
+    //修改老师
+    function  edit(id){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/NodeMap/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: "/index/NodeMap/edit/id/" + id,
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+    //单个删除进阶
+    function del(id){
+        swal({
+            title:"您确定要删除这条信息吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('NodeMap/del')}",
+                    data: {id: id},
+                    dataType: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这条信息。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
 
     //格式化操作
     function formatOperation(value, row) {
         var html = '';
         html += '<div class="btn-group">';
+        html +=	'<button class="btn btn-primary" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编辑</button>';
+         html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删除</button>';
         html +=	'</div>';
         return html;
     }
-
 
 </script>
 

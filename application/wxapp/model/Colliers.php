@@ -59,14 +59,14 @@ class Colliers extends Model {
             $is_get = 1;
         }
       	$dayGetDedication = round($dayGetDedication,2);
-        $data = ['dayGetDedication'=>$dayGetDedication,'percent'=>$percent,'list'=>$data,'colliers_note'=>$colliers_note,'is_get'=>$is_get];
+        $data = ['dayGetDedication'=>$dayGetDedication,'percent'=>$percent,'userId'=>$uid,'list'=>$data,'colliers_note'=>$colliers_note,'is_get'=>$is_get];
         return returnjson('1000',$data,'获取成功');
     }
 
     public function getStatus($type = 1) {
         $arr = [
             '1'=>'去加成','2'=>'去阅读','3'=>'去点赞','4'=>'去分享','5'=>'去反馈','6'=>'去邀请','7'=>'去购买',
-            '14'=>'去阅读','15'=>'去点赞','16'=>'去分享'
+            '14'=>'去阅读','15'=>'去点赞','16'=>'去分享','22'=>'观看视频广告'
         ];
         return $arr[$type];
     }

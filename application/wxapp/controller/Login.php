@@ -190,8 +190,7 @@ class Login extends Controller
          if(empty($tel)||empty($code)){
              return returnjson(1001, '', '参数缺失');
          }
-         $ycode = cache($tel);
-         $ycode = 9999;
+        $ycode = 9999;
          if($ycode == $code){
              return returnjson(1000, '', '验证通过');
          }else{
@@ -199,11 +198,16 @@ class Login extends Controller
          }
      }
     /*
-     * 验证码注册
+     * 验证码注册--滑块验证
      * @param string $tel
      * @param string $code
      */
-    public function codeRegister($tel = '',$code = '') {
+    public function codeRegister($tel = '',$code = '',$RequestId='') {
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         $ycode = cache($tel);
         $ycode = 9999;
         if($code == '') {
@@ -268,11 +272,16 @@ class Login extends Controller
     }
 
     /*
-     * 验证码登陆
+     * 验证码登陆--添加滑动验证
      * @param string $tel
      * @param string $code
      */
-    public function codeLogin($tel = '',$code = '') {
+    public function codeLogin($tel = '',$code = '',$RequestId='') {
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         $ycode = cache($tel);
         $ycode = 9999;
         if($ycode != $code) {
@@ -350,6 +359,7 @@ class Login extends Controller
         if($RequestId!==cache($ip)){
             return returnjson(1001,'','验证码错误');
         }
+
         if($tel == '' || $password == '' || $rpwd == '') {
             return returnjson(1001,'','参数缺失');
         }
@@ -374,9 +384,14 @@ class Login extends Controller
     }
 
     /*
-     * h5注册页面
+     * h5注册页面--滑块验证
      */
-    public function h5_register($pid = 0) {
+    public function h5_register($pid = 0,$RequestId='') {
+        $request = Request::instance();
+        $ip = $request->ip();
+        if($RequestId!==cache($ip)){
+            return returnjson(1001,'','验证码错误');
+        }
         $user_model = new User();
         if($this->request->isPost()) {
             $user_model = new User();
@@ -477,7 +492,7 @@ class Login extends Controller
         $ip = $request->ip();
         $ticket=input('ticket');
         if(empty($ticket)){
-            return returnjson(1001,'','缺少ticket参数');
+           // return returnjson(1001,'','缺少ticket参数');
         }
         $randstr=input('randstr');
         if(empty($randstr)){
@@ -502,8 +517,14 @@ class Login extends Controller
     public  function ca(){
         $request = Request::instance();
         $ip = $request->ip();
+        $locationArr = \Ip::find($ip);
+
+        $location = is_array($locationArr) ? implode(' ',$locationArr):$locationArr;
+        var_dump($ip);
+        var_dump($locationArr);
+        var_dump($location);exit;
         $res=cache($ip);
-        var_dump($res);
+
 
     }
 

@@ -21,6 +21,7 @@ use app\wxapp\model\Orders;
 use app\index\model\Course;
 use think\helper\Time;
 use think\Db;
+use app\service\SmsService;
 class User extends Base{
 
     /*
@@ -54,7 +55,7 @@ class User extends Base{
     * 发送短信
     */
     public function sendcode() {
-       
+
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -77,21 +78,21 @@ class User extends Base{
         $randStr = str_shuffle($str); //打乱字符串
         $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
         vendor('aliyun-dysms-php-sdk.api_demo.SmsDemo');
-        $content = ['code' => $code];
+        //$content = ['code' => $code];
         switch ($type) {
            case "up_password":
-             //$teltype = 
+             //$teltype =
              break;
            case "set_pay_password":
-             
+
              break;
            case "up_tel":
-             
+
              break;
            case "new_tel":
               if($tel == $myuserinfo['tel']){
                   return returnjson(1001, '', '更改的手机号不能相同!');
-              } 
+              }
               $userinfo = $user_model->where(['tel' => $tel])->find();
              // $oldtelcode = cache('up_tel'.$userinfo['tel']);
               //if(empty($oldtelcode)){
@@ -104,15 +105,17 @@ class User extends Base{
            default:
              return returnjson(1001, '', '验证码类型错误!');
         }
+        $response = new SmsService();
         //echo $post['type'].$tel;exit;
-        $response = \SmsDemo::sendSms($tel, $content);
-        $response = object_to_array($response);
-        if ($response['Message'] == 'OK') {
-            //cache($post['type'].$tel,$code,1800);
-            Cache::set($type.$tel,$code,1800);
+        $res=$response->sendSms($tel,$code,3);
+
+        $res = object_to_array($res);
+        //var_dump($res);exit;
+        if ($res['SendStatusSet'][0]['Code'] == 'Ok') {
+            cache($tel,$code,1800);
             return returnjson(1000, '', '发送成功');
         } else {
-            return returnjson(1001, '', $response['Message']);
+            return returnjson(1001, '',$res['SendStatusSet'][0]['Message']);
         }
     }
     //修改手机时验证老号码验证码
@@ -188,7 +191,7 @@ class User extends Base{
              return returnjson(1001,'','验证码错误');
         }
         return returnjson(1000,'','验证通过');
-        
+
     }
 
     public function updateInfo() {
@@ -249,7 +252,7 @@ class User extends Base{
         }
         return returnjson(1001,'','修改失败');
     }
-    
+
     /*
      * 上传头像
      */
@@ -283,7 +286,7 @@ class User extends Base{
         }
         return returnjson(1000,$userinfo,'');
     }
-    
+
     //保存实名信息（姓名，身份证号）
     public function saveIdentity(){
         $token = input('token');
@@ -313,12 +316,12 @@ class User extends Base{
         $post_data['client_id']      = '2dfgWGhO6t8BGuoc68c5ccs5';
         $post_data['client_secret'] = '9dXylI1q4aqF3l5RiQTjWEHOj1Ds7siS';
         $o = "";
-        foreach ( $post_data as $k => $v ) 
+        foreach ( $post_data as $k => $v )
         {
             $o.= "$k=" . urlencode( $v ). "&" ;
         }
         $post_data = substr($o,0,-1);
-        
+
         $res = $this->request_post($url, $post_data);
         $data = json_decode($res,true);
         $data['updatetime'] = time();
@@ -326,7 +329,7 @@ class User extends Base{
         return $data['access_token'];
         //return returnjson(1000,json_decode($res),'已提交');
         //var_dump($res);
-            
+
     }
     //公安验证活体检测api
     function faceverify(){
@@ -335,7 +338,7 @@ class User extends Base{
             $this->getUserInfo($token);
         }
         $post = Request::instance()->post();//
-        
+
         if($this->uid == 0) {
             return returnjson(1100,'该用户已在其他设备登陆');
         }
@@ -346,13 +349,13 @@ class User extends Base{
         return ($res);
         var_dump($res);
     }
-    
-    
+
+
     function request_post($url = '', $param = '') {
         if (empty($url) || empty($param)) {
             return false;
         }
-        
+
         $postUrl = $url;
         $curlPost = $param;
         $curl = curl_init();//初始化curl
@@ -360,16 +363,16 @@ class User extends Base{
         curl_setopt($curl, CURLOPT_HEADER, 0);//设置header
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//要求结果为字符串且输出到屏幕上
         curl_setopt($curl, CURLOPT_POST, 1);//post提交方式
-        
+
         curl_setopt($curl, CURLOPT_POSTFIELDS, $curlPost);
         $data = curl_exec($curl);//运行curl
         curl_close($curl);
-        
+
         return $data;
     }
 
-    
-    
+
+
 
     //退出登录
     public function outlogin(){
@@ -910,7 +913,7 @@ class User extends Base{
         }
         $page = empty($post['page'])?1:$post['page'];
         $order_model = new Orders();
-        
+
         $start = ($page - 1) * 10;
         $limit = $start . ',' . 10;
         $orderInfo = $order_model->where(['uid'=>$this->uid])->where('status!=0')->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();

@@ -58,7 +58,36 @@ class Index extends Base {
         return returnjson('1001','','分享失败');
 
     }
+    /*
+     * 分享 4 文章  16 课程分享  1 每日才学  17 海报分享
+     */
+    public function see_advertising($type = 22,$obj_id = '') {
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if($this->uid == 0) {
+            return returnjson('1100','','该设备在其他地方登录');
+        }
+        Db::startTrans();
+        $common = new Common();
+        $content = '';
+         $content = '观看广告视频';
+        $res = $common->dedicationLog($this->uid,$type,$obj_id,$content);
+        $msg = '成功';
+        if(false !== $res) {
+            if($res == 0) {
+                $msg = "今日".$content."贡献值获取已达上线";
+            }else{
+                $msg = "今日".$content.'获得'.$res.'贡献值';
+            }
+            Db::commit();
+            return returnjson('1000','',$msg);
+        }
+        Db::rollback();
+        return returnjson('1001','','失败');
 
+    }
     public function test($str = '') {
         if(preg_match("/(\\d\\d)\\1+$/", $str)){  // AABBCCDD模式  12121212
             echo  'AABBCCDD模式';
@@ -153,7 +182,7 @@ class Index extends Base {
         $advanced_id = $advanced_model->where(['type'=>3,'is_delete'=>0])->value('id');
         $courseInfo = $cscCourse_model->field('value,id,teacher_id,chapter_count,people_num')->where(['advanced_id'=>$advanced_id,'is_delete'=>0])->find();
         $order_model = new Orders();
-      	
+
         if($courseInfo) {
             $teacherInfo = $teacher_model->field('name,introduction')->where('id',$courseInfo['teacher_id'])->find();
             $courseInfo['teacher_name'] = '';

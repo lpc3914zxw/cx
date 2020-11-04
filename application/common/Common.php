@@ -1238,5 +1238,30 @@ class Common
         return true;
     }
     
+    /*
+     * 本地区同学学习力1%的加成
+     * @param int $uid 当前用户id
+     */
+    public function region_class_share($uid = 0,$course_id) {
+      
+        $user_model = new User();
+        $advanced_model = new Advanced();
+        $course_model = new Course();
+        
+        if(false === $this->sendAdvanceCourse($uid,$course_id,3,$course_id)) {
+                Db::rollback();
+                return false;
+        }
+        
+        // 学习力
+        if(false === $this->learnPowerLog($uid,6,$course_id)) {
+            Db::rollback();
+            return false;
+        }
+      
+        return true;
+    }
+    
+    
     
 }

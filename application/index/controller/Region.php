@@ -3,9 +3,11 @@
 
 namespace app\index\controller;
 
+use app\index\model\Menu;
 use app\index\model\PetersLog;
 use app\index\model\PetersSet;
 use app\service\RegionService;
+use think\Request;
 
 /**
  * 地区管理
@@ -29,6 +31,7 @@ class Region extends Base
     public function rule_list(){
         $auth = new \think\Auth();
         $request = Request::instance();
+
         $m = $request->module();
         $c = $request->controller();
         $a = $request->action();
