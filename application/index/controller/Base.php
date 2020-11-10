@@ -29,6 +29,7 @@ class Base extends Controller {
 		// 加载菜单
 		$this->get_menu();
 		$this->getSystemInfo();
+		//var_dump($this->is_login);exit;
 	}
 
 	public function _empty(){
@@ -67,9 +68,10 @@ class Base extends Controller {
 		$member_model = new Member();
       	$member = $member_model->where('username',$partner['username'])->find();
 
-        if ($partner['password']!= $member ['password']||$member['error_num']>=3) {
+        if ($partner['password']!= $member ['password']||$member['error_num']>=10) {
            $this->redirect ( '/index/index/empty_page' );
         }
+
 		$this->partner = $partner;
 		$this->assign ( 'member', $partner );
 	}

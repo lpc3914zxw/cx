@@ -15,6 +15,13 @@ use app\index\model\PulsLearnPowerLog;
 use app\index\model\Faceorder;
 use app\index\model\Course;
 use app\index\model\CreditSource;
+use app\service\CreditSoureService;
+use app\service\DedicationLogService;
+use app\service\HonorLogService;
+use app\service\LearnPowerLogService;
+use app\service\LogMemberService;
+use app\service\MemberService;
+use app\service\UserService;
 use app\wxapp\model\LearnPowerLog;
 use think\Db;
 use think\Session;
@@ -92,19 +99,30 @@ class User extends AdminBase {
     /*
      * 编辑等级
      */
-    public function editLevel($id = 0,$level ='') {
-        $user_model = new \app\index\model\User();
-        false !== $user_model->where('id',$id)->update(['level'=>$level]) && $this->success('更改成功');
-        $this->error('更改失败');
+    public function editLevel($id = 0,$level =0) {
+        $partner = Session::get('memberinfo');
+       if(false !== UserService::userUpdateOneById('level',$id,$level)){
+           $original_level=UserService::userByLevel($id);
+           LogMemberService::MemberLogAdd($id,$original_level,$level,0,$partner['uid'],5);
+           $this->success('更改成功');
+        }else{
+           $this->error('更改失败');
+       }
+
     }
 
     /*
      * 编辑等级
      */
-    public function editStartLevel($id = 0,$level ='') {
-        $user_model = new \app\index\model\User();
-        false !== $user_model->where('id',$id)->update(['start_level'=>$level]) && $this->success('更改成功');
-        $this->error('更改失败');
+    public function editStartLevel($id = 0,$level =0) {
+        $partner = Session::get('memberinfo');
+       if(false !== UserService::userUpdateOneById('start_level',$id,$level)){
+           $original_level=UserService::userByLevel($id);
+           LogMemberService::MemberLogAdd($id,$original_level,$level,0,$partner['uid'],6);
+           $this->success('更改成功');
+       }else{
+           $this->error('更改失败');
+       }
     }
 
     /*
@@ -164,52 +182,45 @@ class User extends AdminBase {
     }
 
     /*
+     * 增加减少学分学习力荣誉贡献
      * 充值学分/学习力/荣誉值/贡献值
      */
     public function editOption($uid = 0) {
-        $user_model = new \app\index\model\User();
         if($this->request->isPost()) {
             $params = $this->request->param();
             $type = $params['type'];
             $changeType = $params['changeType'];
             $number = $params['number'];
-          $pay_passwordr = $params['pay_password'];
+            $pay_passwordr = $params['pay_password'];
             $note = $params['note'];
             $uid = $params['uid'];
-            $user_model = new \app\wxapp\model\User();
-            $score_model = new \app\wxapp\model\CreditSource();
-            $dedication = new \app\wxapp\model\DedicationLog();
-            $learnPower = new LearnPowerLog();
-            $honor = new HonorLog();
 
           $partner = Session::get('memberinfo');
           if(empty($pay_passwordr)){
           	$this->error('充值密码不能为空');
           }
-         // echo "<pre>";
-         // print_r($partner);exit;
-          $num = 0;
-          	$member = Db::name('member')->where('uid',$partner['uid'])->find();
-          $new_pwd = splice_pwd ($pay_passwordr, $member ['pay_salt'] );
-          //echo $new_pwd;exit;
-          	if($member['pay_password']!=$new_pwd){
+            $member=MemberService::byMemberOne('uid',$partner['uid']);
+            $new_pwd = splice_pwd ($pay_passwordr, $member ['pay_salt'] );
+          /*	if($member['pay_password']!=$new_pwd){
               $num = (int)$member['error_num']+1;
-
-              	$res = Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>$num]);
+              	MemberService::updateMemberPasswordNum($partner['uid'],$num);
              if($num>=3){
               	$this->redirect ( '/index/index/empty_page');
               }
             	$this->error('充值密码错误');
 
             }else{
-            	Db::name('member')->where('uid',$partner['uid'])->update(['error_num'=>0]);
-            }
-          Db::startTrans();
-            $userinfo = $user_model->field('score,dedication_value,learning_power,honor_value')->where('id',$uid)->find();
+            	MemberService::updateMemberPasswordNum($partner['uid'],0);
+            }*/
+            Db::startTrans();
+          	//score学分 dedication贡献 learning_power学习力 honer_value荣誉值
+
+
+            $userinfo = UserService::userEveryValue($uid);
             if($type == 'score') {
                 $data = ['uid'=>$uid,'status'=>1,'addtime'=>time()];
                 if($changeType == 1) {
-                    if(false === $user_model->where('id',$uid)->setInc('score',$number)) {
+                    if(false === UserService::userSetincValue($uid,'score',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 7;
@@ -219,21 +230,24 @@ class User extends AdminBase {
                     if(floatval($userinfo['score']) < floatval($number)) {
                         $this->error('当前学分没有这么多');
                     }
-                    if(false === $user_model->where('id',$uid)->setDec('score',$number)) {
+                    if(false ===  UserService::userSetdecValue($uid,'score',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 8;
                     $data['score'] = "-".$number;
                     $data['note'] = $note;
                 }
-                if(!$score_model->insert($data)) {
+                if(!CreditSoureService::addCreditSource($data)) {
                     Db::rollback();
                     $this->error('充值失败');
+                }else{
+                    LogMemberService::MemberLogAdd($uid,$userinfo['score'],$number,$changeType,$partner['uid'],1);
                 }
             }else if($type == 'dedication') {
                 $data = ['uid'=>$uid,'addtime'=>time()];
                 if($changeType == 1) {
-                    if(false === $user_model->where('id',$uid)->setInc('dedication_value',$number)) {
+                    if(false === UserService::userSetincValue($uid,'dedication_value',$number))
+                    {
                         $this->error('充值失败');
                     }
                     $data['type'] = 18;
@@ -243,21 +257,23 @@ class User extends AdminBase {
                     if(floatval($userinfo['dedication_value']) < floatval($number)) {
                         $this->error('当前贡献值没有这么多');
                     }
-                    if(false === $user_model->where('id',$uid)->setDec('dedication_value',$number)) {
+                    if(false === UserService::userSetdecValue($uid,'dedication_value',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 19;
                     $data['value'] = "-".$number;
                     $data['content'] = $note;
                 }
-                if(!$dedication->insert($data)) {
+                if(!DedicationLogService::addDedicationLog($data)) {
                     Db::rollback();
                     $this->error('充值失败');
+                }else{
+                    LogMemberService::MemberLogAdd($uid,$userinfo['dedication_value'],$number,$changeType,$partner['uid'],2);
                 }
             }else if($type == 'learning_power') {
                 $data = ['uid'=>$uid,'status'=>1,'addtime'=>time()];
                 if($changeType == 1) {
-                    if(false === $user_model->where('id',$uid)->setInc('learning_power',$number)) {
+                    if(false === UserService::userSetincValue($uid,'learning_power',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 4;
@@ -267,21 +283,23 @@ class User extends AdminBase {
                     if(floatval($userinfo['learning_power']) < floatval($number)) {
                         $this->error('当前学习力没有这么多');
                     }
-                    if(false === $user_model->where('id',$uid)->setDec('learning_power',$number)) {
+                    if(false === UserService::userSetdecValue($uid,'learning_power',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 5;
                     $data['value'] = "-".$number;
                     $data['content'] = $note;
                 }
-                if(!$learnPower->insert($data)) {
+                if(!LearnPowerLogService::addLearnPowerLog($data)) {
                     Db::rollback();
                     $this->error('充值失败');
+                }else{
+                    LogMemberService::MemberLogAdd($uid,$userinfo['learning_power'],$number,$changeType,$partner['uid'],4);
                 }
             }else if($type == 'honor') {
                 $data = ['uid'=>$uid,'addtime'=>time()];
                 if($changeType == 1) {
-                    if(false === $user_model->where('id',$uid)->setInc('honor_value',$number)) {
+                    if(false === UserService::userSetincValue($uid,'honor_value',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 7;
@@ -291,22 +309,24 @@ class User extends AdminBase {
                     if(floatval($userinfo['honor_value']) < floatval($number)) {
                         $this->error('当前荣誉值没有这么多');
                     }
-                    if(false === $user_model->where('id',$uid)->setDec('honor_value',$number)) {
+                    if(false === UserService::userSetdecValue($uid,'honor_value',$number)) {
                         $this->error('充值失败');
                     }
                     $data['type'] = 8;
                     $data['value'] = "-".$number;
                     $data['content'] = $note;
                 }
-                if(!$honor->insert($data)) {
+                if(!HonorLogService::addHonorLog($data)) {
                     Db::rollback();
                     $this->error('充值失败');
+                }else{
+                    LogMemberService::MemberLogAdd($uid,$userinfo['honor_value'],$number,$changeType,$partner['uid'],3);
                 }
             }
             Db::commit();
             $this->success('充值成功');
         }
-        $userInfo = $user_model->field('score,learning_power,honor_value,dedication_value')->where('id',$uid)->find();
+        $userInfo=UserService::userFieldsOne('score,learning_power,honor_value,dedication_value',$uid);
         $this->assign('userinfo',$userInfo);
         $this->assign('uid',$uid);
         return $this->fetch('editoption');
@@ -426,13 +446,13 @@ class User extends AdminBase {
     public function authPass_($id = 0) {
         $user_model = new \app\wxapp\model\User();
         $userinfo = $user_model->field('is_auth,level,realname,identityid')->where('id', $id)->find();
-        
-        
+
+
 
        // $userInfo = $user_model->field('pid')->where('id',$id)->find();
         $this->assign('userinfo',$userinfo);
         $this->assign('uid',$id);
-        
+
         return $this->fetch();
     }
     /*

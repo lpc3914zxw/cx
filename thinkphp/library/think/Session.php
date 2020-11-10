@@ -44,6 +44,7 @@ class Session
         if (empty($config)) {
             $config = Config::get('session');
         }
+
         // 记录初始化信息
         App::$debug && Log::record('[ SESSION ] INIT ' . var_export($config, true), 'info');
         $isDoStart = false;
@@ -102,6 +103,7 @@ class Session
                 throw new ClassNotFoundException('error session handler:' . $class, $class);
             }
         }
+        //var_dump($isDoStart);exit;
         if ($isDoStart) {
             session_start();
             self::$init = true;

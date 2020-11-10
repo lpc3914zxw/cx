@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 use app\index\model\Member;
+use think\Cache;
 use think\Controller;
 use think\Cookie;
 use think\Session;
@@ -52,6 +53,7 @@ class Login extends Controller {
 	private function login_oper($username, $pwd) {
 		$member_model = new Member();
 		$member = $member_model->where(['username' => $username])->find ();
+
         if (empty ($member)) {
             $this->error ( '不存在该用户' );
         }
@@ -62,7 +64,7 @@ class Login extends Controller {
                 $this->error ( '密码错误' );
             }
         }
-        
+
 		return $member;
 	}
 
@@ -108,4 +110,16 @@ class Login extends Controller {
 		Session::set ( 'memberinfo', '' );
 		$this->success('退出成功');
 	}
+
+    public function ss() {
+        // echo phpinfo();
+        // exit;
+        $menberId = 1;
+        $value = [1,2,3,4];
+//这里的参数我就不多说了，多看手册。
+        cache('redis_value'.$menberId, $value);
+        $menberId = 2;
+        $value = [5,6,7,8];
+        cache('redis_value'.$menberId, $value);
+    }
 }

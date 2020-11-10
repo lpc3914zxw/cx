@@ -10,7 +10,7 @@ use app\index\controller\Base;
 class Advertisement extends Base
 {
     /*
-     * 进阶列表
+     * 广告列表
      */
     public function index() {
         $adver_model = new \app\index\model\Advertisment();
@@ -22,7 +22,7 @@ class Advertisement extends Base
     }
 
     /*
-     * 添加进阶
+     * 添加广告
      */
     public function add($id = 0){
         $adver_model = new \app\index\model\Advertisment();

@@ -66,4 +66,10 @@ class NodeMap extends Base
         //var_dump($params);exit;
         return NodeMapService::nodemapAdd($params);
     }
+    public function del() {
+        // 开始处理
+        $params = input();
+        //var_dump($params);exit;
+        return NodeMapService::nodemapAdd($params);
+    }
 }

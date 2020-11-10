@@ -30,7 +30,27 @@ return [
         'masterSecret' => '31878b44c0ee41fca8aaa0b5'
     ],
 
+    // +----------------------------------------------------------------------
+    // | 会话设置
+    // +----------------------------------------------------------------------
 
+    'session'                => [
+        'id'             => '',
+        // SESSION_ID的提交变量,解决flash上传跨域
+        'var_session_id' => '',
+        // SESSION 前缀
+        'prefix'         => 'think',
+        // 驱动方式 支持redis memcache memcached
+        'type'           => 'redis',
+        // 是否自动开启 SESSION
+        'auto_start'     => true,
+
+        'host' => '39.98.78.57',
+
+        'port' => 6379,
+
+        'password' => '',
+    ],
     /*'cache'                  => [
        // 驱动方式
        'type'   => 'File',

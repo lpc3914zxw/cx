@@ -294,7 +294,7 @@
                 type: "post",
                 success: function(data){
                     if (data.code === 1) {
-                        layer.msg(data.msg, {icon: 1, time: 1500});
+                        layer.msg(data.msg, {icon: 1, time: 3500});
                         var index = parent.layer.getFrameIndex(window.name);
                         parent.layer.close(index);
                     } else {

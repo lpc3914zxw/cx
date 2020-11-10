@@ -60,7 +60,8 @@ class System extends AdminBase {
             $memberinfo = $member_model->field('salt,password')->where('uid',$this->partner['uid'])->find();
             $salt_pwd = splice_pwd($oldpwd, $memberinfo ['salt']);
             if($memberinfo['password'] != $salt_pwd){
-                $this->error('原密码错误');
+                //$this->error('原密码错误');
+                return DataReturn('原密码错误', 1000);
             }
             $new_pwd = splice_pwd($newpwd, $memberinfo ['salt']);
             if($member_model->where('uid',$this->partner['uid'])->update(['password'=>$new_pwd]) !== false) {
@@ -99,7 +100,7 @@ class System extends AdminBase {
             $post = $this->request->post();
           $post['tos'] = $post['TOS'];
           unset($post['TOS']);
-          
+
             if(Db::name('system')->where('id',1)->update($post) !== false) {
                 if(file_exists('html/clause/tos.html')){
                     unlink('html/clause/tos.html');
@@ -122,7 +123,7 @@ class System extends AdminBase {
                 if(file_exists('html/clause/peters_contert.html')){
                     unlink('html/clause/peters_contert.html');
                 }
-                
+
                 $this->success('更新成功');
             }
             $this->error('更新失败');
@@ -218,7 +219,7 @@ class System extends AdminBase {
     }
 
     public function appSet() {
-      
+
         $system_model = new \app\index\model\System();
         if($this->request->isPost()) {
             $params = $this->request->param();
@@ -251,7 +252,7 @@ class System extends AdminBase {
             // return $system_model->getLastSql();exit;
             	$this->error('编辑失败');
             }
-              
+
         }
         $info = $system_model->find();
         //var_dump($info);exit;
@@ -307,5 +308,5 @@ class System extends AdminBase {
         $Notice_model->where('id',$id)->delete() && $this->success('删除成功');
         $this->error('删除失败');
     }
-    
+
 }

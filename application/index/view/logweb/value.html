@@ -64,16 +64,19 @@
                                         <form role="form" class="form-inline">
                                             <div class="form-group">
                                                 <label>用户</label>
-                                                <input type="text" name="name" id="name" placeholder="用户名称" class="form-control" value="">
+                                                <input type="text" name="name" id="name" placeholder="用户名称/ID/手机号" class="form-control" value="">
                                             </div>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <div class="form-group">
                                                 <label>来源&nbsp;&nbsp;</label>
                                                 <select class="form-control" id="type" name="type">
-                                                    <option value="" >-传参方式-</option>
+                                                    <option value="" >-请选择来源-</option>
 
-                                                    <option value="POST">POST</option>
-                                                    <option value="GET">GET</option>
+                                                    <option value="1">购买课程</option>
+                                                    <option value="2">加成学习</option>
+                                                    <option value="3">直推实名好友</option>
+                                                    <option value="4">分享每日金句</option>
+                                                    <option value="5">转发文章</option>
 
 
                                                 </select>
@@ -103,17 +106,14 @@
                                         <tr>
                                            <th data-checkbox="true"></th>
                                             <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
-                                            <th data-field="username" data-sortable="true"  >管理员名称</th>
-                                            <th data-field="ip" data-sortable="true"  >ip</th>
-                                            <th data-field="location" data-sortable="true"  >地址</th>
-                                            <th data-field="module" data-sortable="true"  >模块</th>
-                                            <th data-field="controller" data-sortable="true"  >控制器</th>
-                                            <th data-field="action" data-sortable="true"  >方法</th>
-                                            <th data-field="method" data-sortable="true"  >传参方式</th>
-                                            <th data-field="os" data-sortable="true">系统</th>
-                                            <th data-field="browser" data-sortable="true"  >浏览器</th>
-                                            <th data-field="note" data-sortable="true"  >备注</th>
-                                            <th data-field="create_at" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
+                                            <th data-field="name" data-sortable="true"  >用户</th>
+                                            <th data-field="field" data-sortable="true"  >类型</th>
+                                            <th data-field="new_value" data-sortable="true"  >结果值</th>
+                                            <th data-field="operation_value" data-sortable="true"  >操作值</th>
+                                            <th data-field="original_value" data-sortable="true"  >原值</th>
+                                            <th data-field="type" data-sortable="true"  >增加减少</th>
+                                            <th data-field="operation_name" data-sortable="true"  >操作人员</th>
+                                            <th data-field="add_time" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -128,6 +128,7 @@
         </div>
 
     </div>
+    <!--右侧部分结束-->
     <script src="/static/web/js/laydate.js"></script>
     <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
     <script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
@@ -156,7 +157,7 @@
 
     $(function () {
         $("#bootstrapTable").bootstrapTable({
-            url: "{:\\think\\Url::build('Logweb/index')}",
+            url: "{:\\think\\Url::build('Logweb/value')}",
             idField: 'id',
             search: false,
             cache: false,       //是否使用缓存
@@ -164,7 +165,7 @@
             sortOrder: 'desc',
             striped: true,      //是否显示行间隔色
             pagination: true,
-            detailView: true,       //开启详细视图功能
+            detailView: false,       //开启详细视图功能
             detailFormatter: 'detailFormat',
             sidePagination: 'server',
             pageNumber: 1,
@@ -192,11 +193,7 @@
     }
 
 
-    laydate.render({
-        elem: '#scoretime'
-        ,type: 'datetime'
-        ,range: true
-    });
+
 
     function  info(id){
         parent.layer.open({
@@ -226,18 +223,7 @@
         });
     }
 
-    function search() {
-        var name = $("input[name='name']").val();
-        var scoretime = $('#scoretime').val();
-        var type = $('#type').val();
-        $('#bootstrapTable').bootstrapTable("refreshOptions",{
-            queryParams:function(params){
-                var data = {name: name, scoretime:scoretime,type:type};
-                var query = $.extend( true, params, data);
-                return query;
-            }
-        });
-    }
+
     //格式化操作
     function formatOperation(value, row) {
         var html = '';

@@ -1262,6 +1262,49 @@ class Common
         return true;
     }
     
-    
+     //获取社群人数
+    public function getShequnNum($uid,$linshi=0){
+         $user_model = new User();
+        $myinfo = $user_model->where('id',$uid)->field('pid,parentids,invate_num')->find();
+        if($linshi == 1){
+          $total_pnum1 = 0;
+            if($myinfo['pid'] == 0){
+                $total_pnum1 = $user_model->where('pid',$uid)->field('id')->count();
+                $total_ = $user_model->where('pid',$uid)->field('id')->select();
+
+                foreach($total_ as $tokey=>$toval){
+                    $t_id = "%,".$toval['id'].",%";
+                    $total_pnum1 += $user_model->where('parentids','like',$t_id)->field('id')->count();
+                }
+
+            }
+            $vid = '%,'.$uid.',%';
+            $total_pnum2 = $user_model->where('parentids','like',$vid)->field('id')->count();
+
+
+          $total_pnum = $total_pnum1 + $total_pnum2;
+        //$direct = $user_model->where(['pid'=>$uid])->field('pid,parentids,invate_num')->count();
+      }else{
+            $total_pnum1 = 0;
+            if($myinfo['pid'] == 0){
+                $total_pnum1 = $user_model->where('pid',$uid)->where(['is_auth'=>1])->field('id')->count();
+                $total_ = $user_model->where('pid',$uid)->where(['is_auth'=>1])->field('id')->select();
+
+                foreach($total_ as $tokey=>$toval){
+                    $t_id = "%,".$toval['id'].",%";
+                    $total_pnum1 += $user_model->where('parentids','like',$t_id)->where(['is_auth'=>1])->field('id')->count();
+                }
+
+            }
+            $vid = '%,'.$uid.',%';
+            $total_pnum2 = $user_model->where('parentids','like',$vid)->where(['is_auth'=>1])->where(['level'=>['neq',0]])->field('id')->count();
+
+
+          $total_pnum = $total_pnum1 + $total_pnum2;
+        //$direct = $user_model->where(['pid'=>$uid,'is_auth'=>1])->field('pid,parentids,invate_num')->count();
+      }
+      
+      return $total_pnum;
+    }
     
 }
