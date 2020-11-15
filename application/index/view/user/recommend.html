@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>老师列表</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1" style="overflow: auto;">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <style>
+                .table th, .table td {
+                    text-align: center;
+                }
+                #page-wrapper {
+                    padding: 0 15px;
+                    position: inherit;
+                    margin: 0 0 0 60px;
+                }
+
+            </style>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>荣誉值设置</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row row-lg">
+                        <div class="col-sm-12  col-md-12">
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+
+                                        <form role="form" class="form-inline">
+                                            <div class="form-group">
+                                                <label>用户</label>
+                                                <input type="text" name="name" id="name" placeholder="用户名称" class="form-control" value="">
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <label>来源&nbsp;&nbsp;</label>
+                                                <select class="form-control" id="type" name="type">
+                                                    <option value="" >-传参方式-</option>
+
+                                                    <option value="POST">POST</option>
+                                                    <option value="GET">GET</option>
+
+
+                                                </select>
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+
+                                            <div class="form-group">
+                                                <label>时间&nbsp;&nbsp;</label>
+                                                <input type="text" name="time" placeholder="请选择时间" class="form-control" value="" id="scoretime">
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                                </button>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-outline btn-primary" onclick="exportes()" style="margin-bottom: 0">
+                                                    导出
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <table id="bootstrapTable" data-click-to-select="true">
+                                        <thead>
+                                        <tr>
+                                           <th data-checkbox="true"></th>
+                                            <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
+                                            <th data-field="order_no" data-sortable="true"  >订单编号</th>
+                                            <th data-field="username" data-sortable="true"  >购买人</th>
+                                            <th data-field="type" data-sortable="true"  >推荐类型</th>
+                                            <th data-field="pname" data-sortable="true"  >推荐人</th>
+                                            <th data-field="recommend_price" data-sortable="true"  >推荐佣金</th>
+                                            <th data-field="recommend_scale" data-sortable="true"  >推荐比例</th>
+                                            <th data-field="subject" data-sortable="true"  >支付标题</th>
+                                            <th data-field="pay_type" data-sortable="true"  >支付方式</th>
+                                            <th data-field="add_time" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <script src="/static/web/js/laydate.js"></script>
+    <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <script src="__STATIC__/js/ajaxfileupload.js"></script>
+    <script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+    <script src="__UEDITOR__/ueditor.all.js"></script>
+    <script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="__STATIC__/js/plugins/layer/layer.js"></script>
+    <script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+    <script src="__STATIC__/js/contabs.min.js"></script>
+    <script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+    <script src="__STATIC__/js/content.min.js"></script>
+    <script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <script src="__STATIC__/js/common.js"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/hplus/js/plugins/sweetalert/xlsx.core.min.js"></script>
+    <script src="https://cdn.bootcss.com/xlsx/0.11.9/xlsx.core.min.js"></script>
+    <script>
+
+    $(function () {
+        $("#bootstrapTable").bootstrapTable({
+            url: "{:\\think\\Url::build('User/recommend')}",
+            idField: 'id',
+            search: false,
+            cache: false,       //是否使用缓存
+            sortStable: true,
+            sortOrder: 'desc',
+            striped: true,      //是否显示行间隔色
+            pagination: true,
+            detailView: true,       //开启详细视图功能
+            detailFormatter: 'detailFormat',
+            sidePagination: 'server',
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: '[10, 30, 100]',
+            showRefresh: true,
+            showToggle: false,
+            showColumns: true,
+            iconSize: "outline",
+            toolbar: "#bootstrapTableToolbar"
+        });
+    });
+
+    function detailFormat(index, row) {
+        var html = '';
+        html += '<div class="col-sm-6">'+row.data+'</div>';
+        return html;
+    }
+    function formatMax(value) {
+        if(value == '' || value == '0.0') {
+            return '无上限'
+        }else{
+            return value;
+        }
+    }
+
+
+    laydate.render({
+        elem: '#scoretime'
+        ,type: 'datetime'
+        ,range: true
+    });
+
+    function  info(id){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/Logweb/info/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '详情',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: "/index/Logweb/info/id/" + id,
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+    function search() {
+        var name = $("input[name='name']").val();
+        var scoretime = $('#scoretime').val();
+        var type = $('#type').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {name: name, scoretime:scoretime,type:type};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+    //格式化操作
+    function formatOperation(value, row) {
+        var html = '';
+        html += '<div class="btn-group">';
+        html +=	'</div>';
+        return html;
+    }
+
+
+</script>
+
+</body>
+</html>

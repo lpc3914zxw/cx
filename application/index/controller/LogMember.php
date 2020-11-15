@@ -12,8 +12,8 @@ use app\index\model\HonorSet;
  */
 class LogMember extends Base
 {
-    /*
-         * 荣誉值
+        /*
+         *学分学习力等操作记录
          */
     public function index() {
         $logweb =new  \app\index\model\Logweb();
@@ -23,9 +23,4 @@ class LogMember extends Base
         }
         return $this->fetch('index');
     }
-
-
-
-
-
 }

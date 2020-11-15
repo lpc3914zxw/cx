@@ -21,6 +21,7 @@ use app\service\HonorLogService;
 use app\service\LearnPowerLogService;
 use app\service\LogMemberService;
 use app\service\MemberService;
+use app\service\RecommendService;
 use app\service\UserService;
 use app\wxapp\model\LearnPowerLog;
 use think\Db;
@@ -1357,6 +1358,13 @@ class User extends AdminBase {
 
         }
         //unlink($file_url); //删除excel文件
+    }
+    public function recommend(){
+        if($this->request->isAjax()){
+            $where = [];
+            return RecommendService::getList($where);
+        }
+        return $this->fetch('recommend');
     }
      /*
      * 生成学号

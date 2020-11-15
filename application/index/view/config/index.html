@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>才学APP - {$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+        #page-wrapper {
+            padding: 0 15px;
+            position: inherit;
+            margin: 0 0 0 60px;
+        }
+
+    </style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div >
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name|default="配置设置"}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <form method="post" class="form-horizontal" id="newsForm">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.one_course_scale.name}</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control link" name="{$data.one_course_scale.only_tag}" placeholder="{$data.one_course_scale.name}"  {if !empty($data)}value="{$data.one_course_scale.value}"{/if}>
+
+                            </div>
+                            <span class=" control-label" style="float:left">%  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   {$data.one_course_scale.describe}</span>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.two_course_scale.name}</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control link" name="{$data.two_course_scale.only_tag}" placeholder="{$data.two_course_scale.name}"  {if !empty($data)}value="{$data.two_course_scale.value}"{/if}>
+                            </div>
+
+                            <span class=" control-label" style="float:left">%  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {$data.one_course_scale.describe}</span>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.course_scale_min.name}</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control link" name="{$data.course_scale_min.only_tag}" placeholder="{$data.course_scale_min.name}"  {if !empty($data)}value="{$data.course_scale_min.value}"{/if}>
+                            </div>
+
+                            <span class=" control-label" style="float:left">元 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {$data.course_scale_min.describe}</span>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.course_scale_fee.name}</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control link" name="{$data.course_scale_fee.only_tag}" placeholder="{$data.course_scale_fee.name}"  {if !empty($data)}value="{$data.course_scale_fee.value}"{/if}>
+                            </div>
+
+                            <span class=" control-label" style="float:left">%  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {$data.course_scale_fee.describe}</span>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.course_scale_time.name}</label>
+                            <div class="col-sm-9">
+                                {foreach $common_weeks_list as $v}
+                                <label class="checkbox-inline" >
+                                    <input type="checkbox" name="course_scale_time{$v.id}"    {if isset($data['course_scale_time']['value']) and in_array($v['value'], explode(',', $data['course_scale_time']['value']))}checked{/if} value="{$v.value}" >{$v.name}</label>
+                                {/foreach}
+
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-primary" type="submit" id="save">保存内容</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+<script src="__UEDITOR__/ueditor.all.js"></script>
+<script src="__STATIC__/js/ajaxfileupload.js"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+
+<script>
+    $(function () {
+        var ue = UE.getEditor('colliers_note', {
+            toolbars: [
+                [
+                    'bold', //加粗
+                    'indent', //首行缩进
+                    'italic', //斜体
+                    'underline', //下划线
+                    'strikethrough', //删除线
+                    'subscript', //下标
+                    'removeformat', //清除格式
+                    'time', //时间
+                    'date', //日期
+                    'fontfamily', //字体
+                    'fontsize', //字号
+                    'simpleupload', //单图上传
+                    'insertimage', //多图上传
+                    'justifyleft', //居左对齐
+                    'justifyright', //居右对齐
+                    'justifycenter', //居中对齐
+                    'justifyjustify', //两端对齐
+                    'forecolor', //字体颜色
+                    'imagecenter', //居中
+                ]
+            ],
+            autoHeightEnabled: true,
+            autoFloatEnabled: true
+        });
+        ue.ready(function(){
+            ue.execCommand('lineheight', 2); //行间距
+            ue.execCommand('fontsize', '18px'); //字号
+        });
+
+
+        $("input[type='file']").prettyFile();
+        $("#newsForm").submit(function() {
+            $.ajax({
+                url: "{:\\think\\Url::build('Config/index')}",
+                data: $(this).serialize(),
+                dataType: "json",
+                type: "post",
+                success: function(data){
+                    if (data.code === 1) {
+                        layer.msg(data.msg, {icon: 1, time: 1500});
+                        window.location.href = '/index/config/index';
+                    } else {
+                        layer.msg(data.msg, {icon: 2, shift: 6});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    function uploadRankimg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadImgurl",
+            secureuri : false,// 一般设置为false
+            fileElementId : "imgurl",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                if(data.code == 0){
+                    $('#rankimg').val(data.data)
+                    $('.yrankimg').attr('src',data.data)
+                    $('.yyrankimg').attr('src',data.data)
+                    $('.yrankname').text("今日排行榜图片")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/System/uploadPostImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "logo",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#poster_temp').val(data.data)
+                    $('.ylogo').attr('src',data.data)
+                    $('.yylogo').attr('src',data.data)
+                    $('.yname').text("邀请海报模板")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadInviteImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadInviteImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "inviteimg",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#inviteimgurl').val(data.data)
+                    $('.yinviteimg').attr('src',data.data)
+                    $('.yyinviteimg').attr('src',data.data)
+                    $('.yinvitename').text("邀请好友背景图")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+
+    function uploadClassImg(obj) {
+        $.ajaxfileupload({
+            url : "/index/Upload/uploadClassImg",
+            secureuri : false,// 一般设置为false
+            fileElementId : "classimg",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+                console.log(data)
+                if(data.code == 0){
+                    $('#classimgurl').val(data.data)
+                    $('.yclassimg').attr('src',data.data)
+                    $('.yyclassimg').attr('src',data.data)
+                    $('.yclassimgname').text("班级顶部图")
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }
+            }
+        });
+        return false;
+    }
+  function showWaiting(){
+        var node=document.createElement("div");  //创建一个div元素节点，作为整个背景的容器
+        var nodeClass=document.createAttribute("class"); //创建class元素属性
+        var nodeStyle = document.createAttribute("style"); //创建style元素属性
+        var nodeName = document.createAttribute("name"); //创建name元素属性
+        nodeName.value = "divWaiting"; //给元素节点命名
+        nodeClass.value = "div-waiting"; //元素属性赋值
+        nodeStyle.value = "height:"+window.innerHeight + "px; width:"+window.innerWidth+"px;";
+        node.setAttributeNode(nodeClass); //设置元素节点的属性及值
+        node.setAttributeNode(nodeStyle);
+        node.setAttributeNode(nodeName);
+        var iconNode = document.createElement("div");  //创建一个div元素节点，作为旋转图标的容器
+        var iconClass = document.createAttribute("class");
+        iconClass.value = "icon-waiting";
+        //iconClass.value = "fa fa-spinner fa-pulse icon-position";
+        iconNode.setAttributeNode(iconClass);
+        node.appendChild(iconNode);  //将图标节点放到整个背景的元素节点
+        document.body.appendChild(node); //将整个背景div插入到body中
+    }
+
+    function closeWaiting() {
+        var wait = document.getElementsByName("divWaiting"); //获取name为divWaiting的元素节点
+        console.log(wait);
+        //遍历所有的节点，将body中的所有等待旋转效果去掉
+        for (var i = wait.length - 1; i >= 0; i--) {
+            document.body.removeChild(wait[i]);
+        }
+    }
+  function uploadApk(obj) {
+        showWaiting();
+        $.ajaxfileupload({
+            url : "/index/upload/uploadApk",
+            secureuri : false,// 一般设置为false
+            fileElementId : "apk",// 文件上传表单的id <input type="file" id="fileUpload" name="file" />
+            dataType : 'json',// 返回值类型 一般设置为json
+            data: {},
+            success : function(data){  // 服务器成功响应处理函数
+
+                if(data.code == 0){
+                    closeWaiting()
+                    $('#yaudiourl').text(data.data)
+                    $('#audiourl').val(data.data)
+                    layer.msg(data.msg, {icon: 1, time: 1500});
+                }else{
+
+                }
+            }
+        });
+        return false;
+    }
+
+
+</script>
+</body>
+</html>
