@@ -35,37 +35,62 @@ class Cxorders extends Base {
         $order_model = new \app\wxapp\model\Orders();
         $course_model = new Course();
         $advanced_model = new Advanced();
-        
+        $card_order = Db::name('cards_order')->where('uid',$this->uid)->where('endtime','>',time())->where('status',1)->find();
+        $ismember = 0;
+        if(!empty($card_order)){
+            $ismember = 1;
+        }
         // 查询当前所学进阶
         $advanced_id = $course_model->where('id',$course_id)->value('advanced_id');
         $advancedInfo = $advanced_model->field('type,studying_num,reward,value,deadline,pay_type,learn_power')->where(['id'=>$advanced_id])->find();
         $courseInfo = $course_model->field('imgurl,name,advanced_id')->where('id',$course_id)->find();
 
-        
+
             $status = '4,5,6';
             if($order_model->where(['course_id'=>$course_id,'uid'=>$this->uid,'status'=>['in',($status)]])->find()){
                 return returnjson(1001,'','已购买过，请勿重复购买');
             }
-        
+
 
 
 
 
 
         $order_id = time().rand(1000,9999);
-        $data = [
-            'order_id'=>$order_id,
-            'course_id'=>$course_id,
-            'uid'=>$this->uid,
-            'status'=>0,
-            'value'=>$advancedInfo['value'],
-            'effective'=>$advancedInfo['deadline'],
-            'score'=>$advancedInfo['reward'],
-            'advanced_id'=>$courseInfo['advanced_id'],
-            'addtime'=>time(),
-            'paytime'=>time(),
-            'course_type'=>1
-        ];
+        if($ismember==1){
+            $advancedInfo['value'] = 0;
+            $data = [
+                'order_id'=>$order_id,
+                'course_id'=>$course_id,
+                'uid'=>$this->uid,
+                'status'=>4,
+                'value'=>$advancedInfo['value'],
+                'effective'=>$advancedInfo['deadline'],
+                'score'=>$advancedInfo['reward'],
+                'advanced_id'=>$courseInfo['advanced_id'],
+                'addtime'=>time(),
+                'paytime'=>time(),
+                'pay_type'=>7,
+                'course_type'=>1
+            ];
+            $order_model->insert($data);
+            return returnjson(1000,'','下单成功');
+        }else{
+            $data = [
+                'order_id'=>$order_id,
+                'course_id'=>$course_id,
+                'uid'=>$this->uid,
+                'status'=>0,
+                'value'=>$advancedInfo['value'],
+                'effective'=>$advancedInfo['deadline'],
+                'score'=>$advancedInfo['reward'],
+                'advanced_id'=>$courseInfo['advanced_id'],
+                'addtime'=>time(),
+                'paytime'=>time(),
+                'course_type'=>1
+            ];
+        }
+
         //var_dump($data);exit;
         if(!$order_model->insert($data)) {
             return returnjson(1001,'','下单失败');
@@ -101,6 +126,7 @@ class Cxorders extends Base {
      */
     public function submitPayData($order_id = '',$pay_type = 3) {
         $token = input('token');
+
         if(!empty($token)) {
             $this->getUserInfo($token);
         }
@@ -122,6 +148,11 @@ class Cxorders extends Base {
         $course_id = $order_model->where('order_id',$order_id)->value('course_id');
         $advanced_id = $course_model->where('id',$course_id)->value('advanced_id');
         $advanced_name = $advanced_model->where('id',$advanced_id)->value('name');
+         $card_order = Db::name('cards_order')->where('uid',$this->uid)->where('endtime','>',time())->where('status',1)->find();
+        $ismember = 0;
+        if(!empty($card_order)){
+            $ismember = 1;
+        }
         if($pay_type == 1) {   // 学分兑换
             Db::startTrans();
             if(false === $order_model->where('order_id',$order_id)->update(['pay_type'=>$pay_type,'status'=>1])) {//更新支付状态
@@ -155,6 +186,9 @@ class Cxorders extends Base {
             $order_number = $out_trade_no;
             // 获取金额
             $money = '0.1';
+            if($ismember==1){
+                $money = 0;
+            }
             // 名称
             $body='order';
             // 异步回调地址，这个后面不能带参数的

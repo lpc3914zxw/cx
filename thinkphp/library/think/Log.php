@@ -214,7 +214,6 @@ class Log
         if ($result = self::$driver->save($log)) {
             self::$log = [];
         }
-
         return $result;
     }
 

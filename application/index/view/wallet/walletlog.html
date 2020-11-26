@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>老师列表</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1" style="overflow: auto;">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <style>
+                .table th, .table td {
+                    text-align: center;
+                }
+                #page-wrapper {
+                    padding: 0 15px;
+                    position: inherit;
+                    margin: 0 0 0 60px;
+                }
+
+            </style>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>钱包列表</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row row-lg">
+                        <div class="col-sm-12  col-md-12">
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <div class="btn-group hidden-xs" id="bootstrapTableToolbar">
+                                        <form role="form" class="form-inline">
+                                            <div class="form-group">
+                                                <label>昵称/手机</label>
+                                                <input type="text" name="name" placeholder="请输入信息" class="form-control" value=""  id="name">
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <label>业务类型</label>
+                                                <select class="form-control" id="status" name="status">
+                                                    <option value="" >-全部-</option>
+                                                    <option value="0">系统</option>
+                                                    <option value="1">分销</option>
+                                                    <option value="2">提现</option>
+
+                                                </select>
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-outline btn-primary" onclick="search()" style="margin-bottom: 0">
+                                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <table id="bootstrapTable" data-click-to-select="true">
+                                        <thead>
+                                        <tr>
+                                           <th data-checkbox="true"></th>
+                                            <th data-field="name" data-sortable="true"  >昵称</th>
+                                            <th data-field="headimg" data-formatter="formatImage" align="center">头像</th>
+                                            <th data-field="tel" data-sortable="true"  >手机号</th>
+                                            <th data-field="business_type_name" data-sortable="true"  >业务</th>
+                                            <th data-field="operation_type_name" data-sortable="true"  >类型</th>
+                                            <th data-field="operation_money" data-sortable="true"  >操作金额(元)</th>
+                                            <th data-field="original_money" data-sortable="true"  >原始金额(元)</th>
+                                            <th data-field="latest_money" data-sortable="true"  >最新金额(元)</th>
+                                            <th data-field="msg" data-sortable="true"  >变更说明</th>
+                                            <th data-field="add_time" data-formatter="formatTime" align="center" data-sortable="true">添加时间</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <!--右侧部分结束-->
+
+    <script src="/static/web/js/laydate.js"></script>
+    <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <script src="__STATIC__/js/ajaxfileupload.js"></script>
+    <script src="__UEDITOR__/ueditor.config.js?v=20161018"></script>
+    <script src="__UEDITOR__/ueditor.all.js"></script>
+    <script src="__STATIC__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="__STATIC__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="__STATIC__/js/plugins/layer/layer.js"></script>
+    <script src="__STATIC__/js/hplus.min.js?v=4.1.0"></script>
+    <script src="__STATIC__/js/contabs.min.js"></script>
+    <script src="__STATIC__/js/plugins/pace/pace.min.js"></script>
+    <script src="__STATIC__/js/content.min.js"></script>
+    <script src="__STATIC__/js/plugins/toastr/toastr.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+    <script src="__STATIC__/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <script src="__STATIC__/js/common.js"></script>
+    <script src="__STATIC__/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+    <link href="/static/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <script src="/static/hplus/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/hplus/js/plugins/sweetalert/xlsx.core.min.js"></script>
+    <script src="https://cdn.bootcss.com/xlsx/0.11.9/xlsx.core.min.js"></script>
+    <script>
+
+    $(function () {
+        $("#bootstrapTable").bootstrapTable({
+            url: "{:\\think\\Url::build('wallet/walletlog')}",
+            idField: 'id',
+            search: false,
+            cache: false,       //是否使用缓存
+            sortOrder: 'desc',
+            striped: true,      //是否显示行间隔色
+            detailView: false,       //开启详细视图功能
+            pagination: true,
+            sidePagination: 'server',
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: '[5, 10, 15]',
+            showRefresh: true,
+            showToggle: false,
+            showColumns: true,
+            iconSize: "outline",
+            toolbar: "#bootstrapTableToolbar",
+        });
+    });
+    function formatImage(value, row, index) {
+        return '<a><img src="' + value + '" height="50px"/></a>';
+    }
+    function search() {
+        var status = $('#status').val();
+        var name = $('#name').val();
+        $('#bootstrapTable').bootstrapTable("refreshOptions",{
+            queryParams:function(params){
+                var data = {name: name, status:status};
+                var query = $.extend( true, params, data);
+                return query;
+            }
+        });
+    }
+    laydate.render({
+      elem: '#scoretime'
+      ,type: 'datetime'
+      ,range: false
+    });
+     function formatStatus(value, row, index) {
+        var text = '';
+        if(value==0) {
+            text += '<span >待审核</span>';
+        }else if(value == 1){
+            text += '<span style="">审核通过</span>';
+        }else if(value == 2){
+            text += '<span style="">审核驳回</span>';
+        }
+        return text;
+    }
+    //格式化操作
+    function formatOperation1(value, row) {
+        var html = '';
+        html += '<div class="btn-group">';
+        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
+        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
+        html +=	'</div>';
+        return html;
+    }
+     function refuse(id) {
+        $('#id').val(id)
+        $("#edit").modal();
+    }
+
+    function formatMax(value) {
+        if(value == '' || value == '0.0') {
+            return '无上限'
+        }else{
+            return value;
+        }
+    }
+
+
+    //
+    function add(){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ['/index/Honor/add', 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '新增',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: '/index/Honor/add',
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+    function  edit(id){
+        parent.layer.open({
+            type: 2,
+            title: false,
+            closeBtn: false,
+            shade: [0],
+            area: ['400px', '255px'],
+            offset: 'rb', //右下角弹出
+            time: 50, //2秒后自动关闭
+            shift: 2,
+            content: ["/index/Honor/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
+            end: function(){ //此处用于演示
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: true, //开启最大化最小化按钮
+                    area: ['1150px', '650px'],
+                    content: "/index/Honor/edit/id/" + id,
+                    end:function() {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+
+
+
+    function del(id){
+        swal({
+            title:"您确定要删除这条信息吗",
+            text:"删除后将无法恢复，请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:"是的，我要删除！",
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('Honor/del')}",
+                    data: {id: id},
+                    dataType: "json",
+                    type: "post",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "您已经永久删除了这条信息。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了删除操作！","error")
+            }
+        })
+    }
+    function check(id) {
+        $('#id1').val(id)
+        $("#edit1").modal();
+    }
+    $("#editForm1").submit(function () {
+        var id = $('#id1').val();
+        var time1 = $('.time1').val()
+
+        $.ajax({
+            url: "{:\\think\\Url::build('peters/checkPeters')}",
+            type: "post",
+            data: {id: id,status:1,time1:time1},
+            dataType: "json",
+            success: function (data) {
+                if (data.code === 1) {
+                    swal(data.msg, "操作成功", "success");
+                    $("#edit").modal('hide');
+                    $('#time1').val('')
+                    $("#bootstrapTable").bootstrapTable('refresh');
+                } else {
+                    swal(data.msg,"操作失败","error")
+                }
+            },
+            error: function (e) {
+                swal(data.msg,"操作失败","error")
+
+            }
+        });
+        return false;
+    });
+    function check1(id) {
+        var msg = '通过';
+
+        swal({
+            title:"您确定要"+ msg +"吗",
+            text:msg +"请谨慎操作！",
+            type:"warning",
+            showCancelButton:true,
+            confirmButtonColor:"#DD6B55",
+            confirmButtonText:'是的，'+ msg +'！',
+            cancelButtonText:"让我再考虑一下…",
+            closeOnConfirm:false,closeOnCancel:false
+        },function(isConfirm){
+            if(isConfirm){
+                $.ajax({
+                    url: "{:\\think\\Url::build('peters/checkPeters')}",
+                    data: {id: id,status:1},
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.code === 1) {
+                            swal(data.msg, "操作成功。", "success");
+                            $("#bootstrapTable").bootstrapTable('refresh');
+                        } else {
+                            swal("错误",data.msg,"error")
+                        }
+                    },
+                    error: function(e) {
+                        swal("操作错误","服务器错误，请重试！","error")
+                    }
+                });
+            }else{
+                swal("已取消","您取消了该操作！","error")
+            }
+        })
+    }
+    $("#editForm").submit(function () {
+        var id = $('#id').val();
+        var refuse = $('#refuse').val()
+        $.ajax({
+            url: "{:\\think\\Url::build('peters/checkPeters')}",
+            type: "post",
+            data: {id: id,status:2,refuse:refuse},
+            dataType: "json",
+            success: function (data) {
+                if (data.code === 1) {
+                    swal(data.msg, "操作成功", "success");
+                    $("#edit").modal('hide');
+                    $('#refuse').val('')
+                    $("#bootstrapTable").bootstrapTable('refresh');
+                } else {
+                    swal(data.msg,"操作失败","error")
+                }
+            },
+            error: function (e) {
+                swal(data.msg,"操作失败","error")
+
+            }
+        });
+        return false;
+    });
+</script>
+
+</body>
+</html>

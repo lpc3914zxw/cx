@@ -201,6 +201,9 @@ class User extends Base{
                     return returnjson(1001, '', '此手机号已被注册!');
                 }
                 break;
+            case "write_off":
+                //$teltype =
+                break;     
             default:
                 return returnjson(1001, '', '验证码类型错误!');
         }
@@ -2623,6 +2626,36 @@ class User extends Base{
             return returnjson(1000,$userInfo,'获取成功');
         }
         return returnjson(1001,'','获取失败');
+    }
+     /*
+    注销账户
+    
+    
+    */
+    public function writeOff(){
+        $token = input('token');
+        if(!empty($token)) {
+            
+            $this->getUserInfo($token);
+        }
+        
+        if(empty($this->uid)) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        
+        $user = new \app\wxapp\model\User();
+        
+        $userInfo = $user->where('id',$this->uid)->field('id,tel,identityid')->find();
+        if (!Cache::has('write_off'.$userInfo['tel'])){
+            return returnjson(1001,'','验证码错误!');
+        }
+        if (Cache::get('write_off'.$userInfo['tel']) != input('code')) {
+            return returnjson(1001,'','验证码错误');
+        }
+        $tel = $userInfo['tel'].'_1';
+        $identityid = $userInfo['identityid'].'_1';
+        Db::name('user')->where('id',$this->uid)->update(['tel'=>$tel,'identityid'=>$identityid,'status'=>4]);
+        return returnjson(1000,'','已注销');
     }
     //获取学分接口
     public function getSource(){

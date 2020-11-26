@@ -94,4 +94,119 @@ class UserService
 
         return $user;
     }
+    /**
+     * 获取用户登录信息
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-02-27
+     * @desc    description
+     */
+    public static function LoginUserInfo()
+    {
+        // 参数
+        $params = input();
+        //var_dump($params);exit;
+        // 用户数据处理
+        $user = null;
+
+
+            if(!empty($params['token']))
+            {
+                $user = self::UserTokenData($params['token']);
+            }
+
+
+        return $user;
+    }
+    /**
+     * 获取用户token用户数据
+     * @author   Devil
+     * @blog     http://gong.gg/
+     * @version  1.0.0
+     * @datetime 2019-08-18T19:01:59+0800
+     * @desc     description
+     * @param    [string]                   $token [用户token]
+     */
+    private static function UserTokenData($token)
+    {
+        $user = cache(config('cx.cache_user_info').$token);
+        if($user !== null && isset($user['id']))
+        {
+            return $user;
+        }
+
+        // 数据库校验
+        return self::AppUserInfoHandle(null, 'token', $token);
+    }
+    /**
+     * app用户信息
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2018-11-06
+     * @desc    description
+     * @param   [int]             $user_id          [指定用户id]
+     * @param   [string]          $where_field      [字段名称]
+     * @param   [string]          $where_value      [字段值]
+     * @param   [array]           $user             [用户信息]
+     */
+    public static function AppUserInfoHandle($user_id = null, $where_field = null, $where_value = null, $user = [])
+    {
+        // 获取用户信息
+        $field = 'id,name,tel,headimg,level';
+        if(!empty($user_id))
+        {
+            $user = self::UserInfo('id', $user_id, $field);
+        } elseif(!empty($where_field) && !empty($where_value) && empty($user))
+        {
+            $user = self::UserInfo($where_field, $where_value, $field);
+        }
+
+        if(!empty($user))
+        {
+            // 用户信息处理
+            $user = self::GetUserViewInfo(0, $user);
+
+            // 基础处理
+            if(isset($user['id']))
+            {
+                // token生成并存储缓存
+                if(!empty($user['tel']))
+                {
+                    //$user['token'] =  md5(time() . rand(111111, 999999));
+                    cache(config('cx.cache_user_info').$where_value, $user);
+
+                    // 非token数据库校验，则重新生成token更新到数据库
+                    if($where_field != 'token')
+                    {
+                        Db::name('User')->where(['id'=>$user['id']])->update(['token'=>$user['token']]);
+                    }
+                }
+
+            }
+        }
+
+        return $user;
+    }
+    /**
+     * 根据字段获取用户信息
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-01-25
+     * @desc    description
+     * @param   [string]          $where_field      [字段名称]
+     * @param   [string]          $where_value      [字段值]
+     * @param   [string]          $field            [指定字段]
+     */
+    public static function UserInfo($where_field, $where_value, $field = '*')
+    {
+        if(empty($where_field) || empty($where_value))
+        {
+            return '';
+        }
+
+        return Db::name('User')->where([$where_field=>$where_value])->field($field)->find();
+    }
 }

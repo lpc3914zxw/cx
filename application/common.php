@@ -1063,3 +1063,47 @@ function MyC($key, $default = null, $mandatory = false)
     }
     return isset($data[$key]) ? $data[$key] : $default;
 }
+/**
+ * 金额格式化
+ * @author   Devil
+ * @blog    http://gong.gg/
+ * @version 1.0.0
+ * @date    2019-02-20
+ * @desc    description
+ * @param   [float]         $value     [金额]
+ * @param   [int]           $decimals  [保留的位数]
+ * @param   [string]        $dec_point [保留小数分隔符]
+ */
+function PriceNumberFormat($value, $decimals = 2, $dec_point = '.')
+{
+    if(!empty($value))
+    {
+        return number_format($value, $decimals, $dec_point, '');
+    }
+    return 0.00;
+}
+/**
+ * [GetNumberCode 随机数生成生成]
+ * @author   Devil
+ * @blog     http://gong.gg/
+ * @version  0.0.1
+ * @datetime 2016-12-03T21:58:54+0800
+ * @param    [int] $length [生成位数]
+ * @return   [int]         [生成的随机数]
+ */
+function GetNumberCode($length = 6)
+{
+    $code = '';
+    for($i=0; $i<intval($length); $i++) $code .= rand(0, 9);
+    return $code;
+}
+function sale_log($basename=null,$num=null,$msg=null)
+{
+    //$msg = [2018-04-11 09:22:56]文件名：wxpay，第29行，[info]：日志信息
+    $msg = '['.date("Y-m-d H:i:s").']'.'错误表：'.$basename.'，uesr_id为'.$num.'，'.'[info]：'.$msg;
+
+    // 日志文件名：日期.txt
+    $path = ROOT_PATH.DS.'runtime'. DS .'logs'. DS .date("Ymd").'.txt';
+
+    file_put_contents($path, $msg.PHP_EOL,FILE_APPEND);
+}

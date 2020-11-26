@@ -103,7 +103,17 @@ class Course extends Base{
             unset($advancedList[$k]['chapter_count']);
             $advancedList[$k]['courselist'] = $courseList;
         }
-        $data = ['adverData'=>$adverData,'advancedData'=>$advancedData,'tjCourseData'=>$tjCourseData,'dayCourse'=>$dayCourse,'advancedList'=>$advancedList];
+        $order1 = Db::name('cards_order')->where('uid',$this->uid)->where('endtime','>',time())->where('status',1)->where('cardid',1)->find();
+        $order2 = Db::name('cards_order')->where('uid',$this->uid)->where('endtime','>',time())->where('status',1)->where('cardid',2)->find();
+        $isbutcard1 = 0;
+        $isbutcard2 = 0;
+        if($order1){
+            $isbutcard1 = 1;
+        }
+        if($order2){
+            $isbutcard2 = 1;
+        }
+        $data = ['adverData'=>$adverData,'advancedData'=>$advancedData,'tjCourseData'=>$tjCourseData,'dayCourse'=>$dayCourse,'advancedList'=>$advancedList,'buyGoldCard'=>$isbutcard1,'buyBlackCard'=>$isbutcard2];
         return returnjson(1000,$data,'获取成功');
     }
 

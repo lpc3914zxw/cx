@@ -13,9 +13,9 @@ use think\Request;
 class Login extends Controller
 {
     /*
-    * 发送短信
+    * 发送短信//
     */
-    public function sendcode($tel = '',$type="login") {
+    public function sendcode($tel = '',$type="login",$RequestId='') {
         $response = new SmsService();
 
 
@@ -61,8 +61,17 @@ class Login extends Controller
         $str = '1234567890';
         $randStr = str_shuffle($str); //打乱字符串
         $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
-
-        $res=$response->sendSms($tel,$code,$ty);
+        vendor('aliyun-dysms-php-sdk.api_demo.SmsDemo');
+        $content = ['code' => $code];
+        $response = \SmsDemo::sendSms($tel, $content);
+        $response = object_to_array($response);
+        if ($response['Message'] == 'OK') {
+            cache($tel,$code,1800);
+            return returnjson(1000, $is_reg, '发送成功');
+        } else {
+            return returnjson(1001, $is_reg, $response['Message']);
+        }
+        /*$res=$response->sendSms($tel,$code,$ty);
 
         $res = object_to_array($res);
         //var_dump($res);exit;
@@ -71,7 +80,7 @@ class Login extends Controller
             return returnjson(1000, $is_reg, '发送成功');
         } else {
             return returnjson(1001, $is_reg,$res['SendStatusSet'][0]['Message']);
-        }
+        }*/
        /* $user_model = new User();
         if (!preg_match("/^1[3456789]\d{9}$/", $tel)) {
             return returnjson(1001, '', '手机号码有误!');
@@ -203,11 +212,11 @@ class Login extends Controller
      * @param string $code
      */
     public function codeRegister($tel = '',$code = '',$RequestId='') {
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+            //return returnjson(1001,'','验证码错误');
+        //}
         $ycode = cache($tel);
         $ycode = 9999;
         if($code == '') {
@@ -277,11 +286,11 @@ class Login extends Controller
      * @param string $code
      */
     public function codeLogin($tel = '',$code = '',$RequestId='') {
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+            //return returnjson(1001,'','验证码错误');
+        //}
         $ycode = cache($tel);
         $ycode = 9999;
         if($ycode != $code) {
@@ -317,11 +326,11 @@ class Login extends Controller
      */
     public function dologin($tel = '',$password = '',$RequestId='') {
         $data = input();
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+       // $request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+            //return returnjson(1001,'','验证码错误');
+        //}
         if ($tel == '' || $password == '') {
             return returnjson(1001, '', '账号或密码不能为空!');
         }
@@ -354,11 +363,11 @@ class Login extends Controller
      * @param string $rpwd 重复密码
      */
     public function setPassword($uid = 0,$password = '',$rpwd = '',$tel='',$RequestId='') {
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+       // $request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+            //return returnjson(1001,'','验证码错误');
+        //}
 
         if($tel == '' || $password == '' || $rpwd == '') {
             return returnjson(1001,'','参数缺失');
@@ -387,11 +396,11 @@ class Login extends Controller
      * h5注册页面--滑块验证
      */
     public function h5_register($pid = 0,$RequestId='') {
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+            //return returnjson(1001,'','验证码错误');
+        //}
         $user_model = new User();
         if($this->request->isPost()) {
             $user_model = new User();
@@ -488,8 +497,8 @@ class Login extends Controller
     * @author staitc7
     */
     public function verify() {
-        $request = Request::instance();
-        $ip = $request->ip();
+        //$request = Request::instance();
+       // $ip = $request->ip();
         $ticket=input('ticket');
         if(empty($ticket)){
            // return returnjson(1001,'','缺少ticket参数');

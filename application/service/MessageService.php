@@ -48,7 +48,7 @@ class MessageService
             'is_read'           => 0,
             'add_time'          => time(),
         );
-        return Db::name('Message')->insertGetId($data) > 0;
+        return Db::name('walletMessage')->insertGetId($data) > 0;
     }
 
     /**
@@ -78,7 +78,7 @@ class MessageService
         {
             $where[] = ['user_id', '=', $params['user']['id']];
         }
-        
+
         // 关键字
         if(!empty($params['keywords']))
         {
@@ -307,7 +307,7 @@ class MessageService
         $where = [
             ['m.is_delete_time', '=', 0],
         ];
-        
+
         // 关键字
         if(!empty($params['keywords']))
         {

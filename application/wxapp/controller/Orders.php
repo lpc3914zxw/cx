@@ -120,6 +120,7 @@ class Orders extends Base {
      */
     public function submitPayData($order_id = '',$pay_type = 1) {
         $token = input('token');
+
         if(!empty($token)) {
             $this->getUserInfo($token);
         }
@@ -356,7 +357,7 @@ class Orders extends Base {
         $res = json_decode($result,true);
         $type = input('type');
         $is_face = input('is_face');
-        
+
         if(!isset($is_face)){
             $is_face=1;
         }else{

@@ -13,6 +13,8 @@ use app\index\model\HonorLog;
 use app\index\model\LearningPowerLog;
 use app\index\model\PulsLearnPowerLog;
 use app\index\model\Faceorder;
+use app\index\model\Cardorder;
+
 use app\index\model\Course;
 use app\index\model\CreditSource;
 use app\service\CreditSoureService;
@@ -810,7 +812,36 @@ class User extends AdminBase {
         header("Content-Transfer-Encoding:binary");
         $objWriter->save('php://output');
     }
-
+     /*
+     * 会员卡购买明细
+     * @param int $uid
+     */
+    public function cardorder($uid = 0) {
+        if($this->request->isAjax()){
+            $params = input('param.');
+            $where['f.status'] = 1;
+            if(!empty($uid)){
+                $where['c.uid'] = $uid;
+            }
+            if(!empty($params['paytype'])){
+                $where['f.paytype'] = $params['paytype'];
+            }
+            if(isset($params['scoretime'])&&$params['scoretime']!=''){
+                $time = explode(' - ',$params['scoretime']);
+                $time1 = strtotime($time[0]);
+                $time2 = strtotime($time[1]);
+                $where['f.paytime'] = array('between',$time1.','.$time2);
+            }
+            if(!empty($params['name'])){
+                $where['f.uid|u.name|u.tel'] = ['like','%'.$params['name'].'%'];
+            }
+            $cardorder = new Cardorder();
+            $is_export = 0;
+            return $cardorder->getList($where,$is_export);
+        }
+        $this->assign('uid',$uid);
+        return $this->fetch();
+    }
     /*
      * 荣誉值明细
      * @param int $uid

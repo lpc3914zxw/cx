@@ -14,6 +14,7 @@ use think\Db;
 use app\service\MessageService;
 use app\service\BaseService;
 use app\service\WalletService;
+use think\helper\Time;
 
 /**
  * 提现服务层
@@ -274,46 +275,77 @@ class CashService
                 'error_msg'         => '开户人姓名格式 1~30 个字符之间',
             ],
             [
+                'checked_type'      => 'in',
+                'key_name'          => 'type',
+                'checked_data'      => [0,1],
+                'error_msg'         => '提现类型 0和1 ',
+            ],
+            [
                 'checked_type'      => 'empty',
                 'key_name'          => 'user',
                 'error_msg'         => '用户信息有误',
             ],
         ];
         $ret = ParamsChecked($params, $p);
+        //
         if($ret !== true)
         {
             return DataReturn($ret, -1);
+
         }
-
-        // 基础配置
-        $base = BaseService::BaseConfig();
-
-        // 是否开启提现申请
-        if(!empty($base['data']) && isset($base['data']['is_enable_cash']) && $base['data']['is_enable_cash'] == 0)
-        {
-            return DataReturn('暂时关闭了提现申请', -1);
+        if($params['type']==1){
+            return DataReturn('团队提现还没开放', -1);
         }
-
         // 用户钱包
         $user_wallet = WalletService::UserWallet($params['user']['id']);
         if($user_wallet['code'] != 0)
         {
             return $user_wallet;
         }
+        $weeks_num=MyC('course_scale_num');
+        $today_week=date("D");
+        $weeks_alist=MyC('course_scale_time');
+        //查看本周提现次数
+        if(!$weeks_num==-1){
+            list($start,$end)=Time::week();
+            $cash_count=Db::name('wallet_log')->where('user_id','=',$params['user']['id'])->where('add_time','>',$start)->where('add_time','<',$end)->count();
+            if($weeks_num<=$cash_count){
+
+                return DataReturn('本周提现次数已用完', -1);
+            }
+        }elseif($weeks_num==-1){
+            $weeks_num="次数不限";
+        }
+        if(!in_array($today_week, $weeks_alist)){
+            $com=lang('common_weeks_list');
+            $str='';
+            foreach ($com as $v){
+                if(in_array($v['value'],$weeks_alist)){
+                    $str.=$v['name']."、 ";
+                }
+            }
+            $str= substr($str,0,strlen($str)-1);
+            //var_dump($str);exit;
+            return DataReturn("每周".$str."提现".$weeks_num."次", -1);
+        }
+
+
+
 
         // 提现金额
         $money = PriceNumberFormat($params['money']);
+        $money_min = PriceNumberFormat(MyC('course_scale_min'));
         if($money > $user_wallet['data']['normal_money'])
         {
             return DataReturn('提现金额不能大于有效金额', -1);
         }
-
-        // 赠送金额是否可以提现、默认赠送金额不可提现
-        $can_cach_max_money = self::CanCashMaxMoney($user_wallet['data']);
-        if($money > $can_cach_max_money)
+        //var_dump($user_wallet['data']['normal_money']);exit;
+        if($money_min > $money)
         {
-            return DataReturn('赠送金额不可提现', -1);
+            return DataReturn('提现金额不能小于最小提现金额', -1);
         }
+
+
 
         // 开始处理
         Db::startTrans();
@@ -329,8 +361,9 @@ class CashService
             'bank_accounts'     => $params['bank_accounts'],
             'bank_username'     => $params['bank_username'],
             'add_time'          => time(),
+            'type'              =>0
         ];
-        $cash_id = Db::name('PluginsWalletCash')->insertGetId($data);
+        $cash_id = Db::name('walletCash')->insertGetId($data);
         if($cash_id <= 0)
         {
             Db::rollback();
@@ -343,7 +376,7 @@ class CashService
             'frozen_money'  => PriceNumberFormat($user_wallet['data']['frozen_money']+$money),
             'upd_time'      => time(),
         ];
-        if(!Db::name('PluginsWallet')->where(['id'=>$user_wallet['data']['id']])->update($wallet_data))
+        if(!Db::name('wallet')->where(['id'=>$user_wallet['data']['id']])->update($wallet_data))
         {
             Db::rollback();
             return DataReturn('钱包操作失败', -100);
@@ -352,7 +385,7 @@ class CashService
         // 日志
         $money_field = [
             ['field' => 'normal_money', 'money_type' => 0, 'msg' => ' [ 有效金额减少'.$money.'元 ]'],
-            ['field' => 'frozen_money', 'money_type' => 1, 'msg' => ' [ 冻结金额增加'.$money.'元 ]'],
+          //  ['field' => 'frozen_money', 'money_type' => 1, 'msg' => ' [ 冻结金额增加'.$money.'元 ]'],
         ];
         foreach($money_field as $v)
         {
@@ -368,7 +401,8 @@ class CashService
                     'operation_money'   => ($user_wallet['data'][$v['field']] < $wallet_data[$v['field']]) ? PriceNumberFormat($wallet_data[$v['field']]-$user_wallet['data'][$v['field']]) : PriceNumberFormat($user_wallet['data'][$v['field']]-$wallet_data[$v['field']]),
                     'original_money'    => $user_wallet['data'][$v['field']],
                     'latest_money'      => $wallet_data[$v['field']],
-                    'msg'               => '用户提现申请 '.$v['msg'],
+                    'msg'               => '用户提现申请个人余额 '.$v['msg'],
+                    'status'            =>1
                 ];
                 if(!WalletService::WalletLogInsert($log_data))
                 {
@@ -383,7 +417,7 @@ class CashService
 
         // 提交事务
         Db::commit();
-        return DataReturn('操作成功', 0);
+        return DataReturn('申请成功', 0);
     }
 
     /**
@@ -465,7 +499,7 @@ class CashService
         }
 
         // 获取提现数据
-        $cash = Db::name('PluginsWalletCash')->find(intval($params['id']));
+        $cash = Db::name('walletCash')->find(intval($params['id']));
         if(empty($cash))
         {
             return DataReturn('提现数据不存在或已删除', -10);
@@ -485,7 +519,7 @@ class CashService
         }
 
         // 获取用户钱包
-        $wallet = Db::name('PluginsWallet')->find(intval($cash['wallet_id']));
+        $wallet = Db::name('wallet')->find(intval($cash['wallet_id']));
         if(empty($wallet))
         {
             return DataReturn('用户钱包不存在或已删除', -20);
@@ -545,14 +579,14 @@ class CashService
         // 提现更新
         $cash_upd_data['msg'] = empty($params['msg']) ? '' : $params['msg'];
         $cash_upd_data['upd_time'] = time();
-        if(!Db::name('PluginsWalletCash')->where(['id'=>$cash['id']])->update($cash_upd_data))
+        if(!Db::name('walletCash')->where(['id'=>$cash['id']])->update($cash_upd_data))
         {
             Db::rollback();
             return DataReturn('提现申请操作失败', -100);
         }
 
         // 钱包更新
-        if(!Db::name('PluginsWallet')->where(['id'=>$wallet['id']])->update($wallet_upd_data))
+        if(!Db::name('wallet')->where(['id'=>$wallet['id']])->update($wallet_upd_data))
         {
             Db::rollback();
             return DataReturn('钱包操作失败', -101);
@@ -663,6 +697,42 @@ class CashService
 
         // 返回数据
         return DataReturn('验证成功', 0, $status);
+    }
+    /**
+     *
+     */
+    public static  function CashHint(){
+            $weeks_alist=MyC('course_scale_time');
+            $weeks_num=MyC('course_scale_num');
+            if(count($weeks_alist)==7 or count($weeks_alist)==0){
+                if($weeks_num==-1){
+                    $weeks_num="";
+                }else{
+                    $weeks_num= $weeks_num."次";
+                }
+                $cash_hint_week_num='随时可以提现'.$weeks_num;
+            }else{
+                $com=lang('common_weeks_list');
+                $str='';
+                foreach ($com as $v){
+                    if(in_array($v['value'],$weeks_alist)){
+                        $str.=$v['name']."、 ";
+                    }
+                }
+                if($weeks_num==-1){
+                    $weeks_num="次数不限";
+                }else{
+                    $weeks_num= $weeks_num."次";
+                }
+                $cash_hint_week_num= substr($str,0,strlen($str)-1);
+                $cash_hint_week_num= "每周".$cash_hint_week_num."提现".$weeks_num;
+
+            }
+            $course_scale_fee=MyC('course_scale_fee');
+            $res=['cash_hint_week_num'=>$cash_hint_week_num,'scale_fee'=>$course_scale_fee];
+
+            return DataReturn('获取成功', 0, $res);
+
     }
 }
 ?>

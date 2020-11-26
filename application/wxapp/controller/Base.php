@@ -21,7 +21,12 @@ class Base extends Controller {
 	protected $uid = 0 ;
 	protected $num = 8;
 	protected $token = '';
-
+    // 输入参数 post
+    protected $data_post;
+    // 输入参数 get
+    protected $data_get;
+    // 输入参数 request
+    protected $data_request;
 	public function __construct() {
 	    //echo json_encode(['code' => 1110, 'data' => '改时间是停服时间', 'msg' => '停服时间']);exit;
         parent::__construct ();
@@ -32,7 +37,9 @@ class Base extends Controller {
             $this->getUserInfo($token);
             $this->browseLog($this->uid);
         }
-
+        $this->data_post = input('post.');
+        $this->data_get = input('get.');
+        $this->data_request = input();
 		$this->getSystemInfo();
 	}
 

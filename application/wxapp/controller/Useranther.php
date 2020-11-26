@@ -436,13 +436,9 @@ class Useranther extends Base{
 
     //测试接口
     public function test(){
-        $user_model = new \app\wxapp\model\User();
-        //获取邀请人最多的两个社群
-       // $max_invate_nums = $user_model->field('id')->where(['parentids'=>'0,'])->order('invate_num desc')->limit(2)->select();
-        //获取小社群的全部id
-
-        //获取我的全部上级
-        /*$parentids = $user_model -> where(['id'=>$this->uid])->field('parentids,pid');
+       /* $user_model = new \app\wxapp\model\User();
+        $max_invate_nums = $user_model->field('id')->where(['parentids'=>'0,'])->order('invate_num desc')->limit(2)->select();
+        $parentids = $user_model -> where(['id'=>$this->uid])->field('parentids,pid');
         if(!empty($parentids)){
             if($parentids['parentids']){
                 $parentids_ = explode(',',$parentids['parentids']);
@@ -454,10 +450,9 @@ class Useranther extends Base{
                     }
                 }
             }
+        }
 
-        }*/
-
-        return returnjson(1000,$max_invate_nums,'获取成功');
+        return returnjson(1000,$max_invate_nums,'获取成功');*/
     }
 
       //校验学分支付密码
@@ -520,20 +515,19 @@ class Useranther extends Base{
         }
        /* $ustr = Db::name('text')->where('id',1)->find();
       	$ustr = explode(',',$ustr['text']);
-     // echo "<pre>";
+      //echo "<pre>";
       //print_r($ustr);exit;
       foreach($ustr as $k => $v){
-
       	 Db::startTrans();
           $common = new Common();
       	//$documentRoot = $_SERVER['DOCUMENT_ROOT'];
-//file_put_contents($documentRoot.'/log_0806__1.txt',print_r(date('Y-m-d H:i:s',time()),true),FILE_APPEND);
+        //file_put_contents($documentRoot.'/log_0806__1.txt',print_r(date('Y-m-d H:i:s',time()),true),FILE_APPEND);
           if(false === $common->userChangeLevel($v)){
                     Db::rollback();
                     echo '失败'.$v."<br>";
-           }
-          Db::commit();
-      }
+            }
+            Db::commit();
+        }
       echo 'chengg';exit;
       exit;*/
         $users = Db::name('user')->alias('ua')->join('face_order fo','ua.id=fo.uid','left')->where('ua.is_auth',1)->where('fo.status',1)->field('ua.id')->select();

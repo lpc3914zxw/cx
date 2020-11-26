@@ -63,23 +63,46 @@ class SmsService
             $req = new SendSmsRequest();
             if($ty==0){
                 $template='744962';
+                $params = array(
+                    "PhoneNumberSet" => array( "86".$phone ),
+                    "TemplateID" => $template,
+                    "Sign" => "财学帮",
+                    "TemplateParamSet" => array($content ),
+                    "SmsSdkAppid" => "1400436054"
+                );
             }elseif ($ty==1){
                 $template='744965';
+                $params = array(
+                    "PhoneNumberSet" => array( "86".$phone ),
+                    "TemplateID" => $template,
+                    "Sign" => "财学帮",
+                    "TemplateParamSet" => array($content,'5'),
+                    "SmsSdkAppid" => "1400436054"
+                );
             }elseif ($ty==2){
                 $template='744966';
+                $params = array(
+                    "PhoneNumberSet" => array( "86".$phone ),
+                    "TemplateID" => $template,
+                    "Sign" => "财学帮",
+                    "TemplateParamSet" => array($content ),
+                    "SmsSdkAppid" => "1400436054"
+                );
             }elseif ($ty==3){
-                $template='744966';
+                $template='758632';
+                $params = array(
+                    "PhoneNumberSet" => array( "86".$phone ),
+                    "TemplateID" => $template,
+                    "Sign" => "财学帮",
+                    "TemplateParamSet" => array($content ),
+                    "SmsSdkAppid" => "1400436054"
+                );
             }else{
                 return returnjson(1001, '', '无效参数');
             }
 
-        $params = array(
-            "PhoneNumberSet" => array( "86".$phone ),
-            "TemplateID" => $template,
-            "Sign" => "财学帮",
-            "TemplateParamSet" => array($content ),
-            "SmsSdkAppid" => "1400436054"
-        );
+
+            //var_dump($params);exit;
             $req->fromJsonString(json_encode($params));
 
             $resp = $client->SendSms($req);

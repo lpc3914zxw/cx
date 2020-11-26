@@ -15,6 +15,7 @@ use app\service\PluginsService;
 use app\service\ResourcesService;
 use app\service\PaymentService;
 use app\service\MessageService;
+use think\Log;
 
 /**
  * 钱包服务层
@@ -35,9 +36,8 @@ class WalletService
     // 业务类型
     public static $business_type_list = [
         0 => ['value' => 0, 'name' => '系统', 'checked' => true],
-        1 => ['value' => 1, 'name' => '充值'],
+        1 => ['value' => 1, 'name' => '分销'],
         2 => ['value' => 2, 'name' => '提现'],
-        3 => ['value' => 3, 'name' => '消费'],
     ];
 
     // 操作类型
@@ -71,7 +71,7 @@ class WalletService
         }
 
         // 获取钱包, 不存在则创建
-        $wallet = Db::name('PluginsWallet')->where(['user_id' => $user_id])->find();
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money')->find();
         if(empty($wallet))
         {
             $data = [
@@ -79,10 +79,10 @@ class WalletService
                 'status'        => 0,
                 'add_time'      => time(),
             ];
-            $wallet_id = Db::name('PluginsWallet')->insertGetId($data);
+            $wallet_id = Db::name('wallet')->insertGetId($data);
             if($wallet_id > 0)
             {
-                return DataReturn('操作成功', 0, Db::name('PluginsWallet')->find($wallet_id));
+                return DataReturn('操作成功', 0, Db::name('wallet')->find($wallet_id));
             } else {
                 return DataReturn('钱包添加失败', -100);
             }
@@ -90,7 +90,112 @@ class WalletService
             return self::UserWalletStatusCheck($wallet);
         }
     }
+    /**
+     * 用户钱包
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-04-30
+     * @desc    description
+     * @param   [int]          $user_id [用户id]
+     */
+    public static function UserWalletsale($user_id)
+    {
+        // 请求参数
+        if(empty($user_id))
+        {
+            return DataReturn('用户id有误', -1);
+        }
 
+        // 获取钱包, 不存在则创建
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money,frozen_team_money,normal_team_money')->find();
+        if(empty($wallet))
+        {
+            $data = [
+                'user_id'       => $user_id,
+                'status'        => 0,
+                'add_time'      => time(),
+            ];
+            $wallet_id = Db::name('wallet')->insertGetId($data);
+            if($wallet_id > 0)
+            {
+                return DataReturn('操作成功', 0, Db::name('wallet')->find($wallet_id));
+            } else {
+                return DataReturn('钱包添加失败', -100);
+            }
+        } else {
+            return self::UserWalletStatusCheck($wallet);
+        }
+    }
+    /**
+     * 用户钱包
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-04-30
+     * @desc    description
+     * @param   [int]          $user_id [用户id]
+     */
+    public static function UserWalletteam($user_id)
+    {
+        // 请求参数
+        if(empty($user_id))
+        {
+            return DataReturn('用户id有误', -1);
+        }
+
+        // 获取钱包, 不存在则创建
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,frozen_team_money,normal_team_money')->find();
+        if(empty($wallet))
+        {
+            $data = [
+                'user_id'       => $user_id,
+                'status'        => 0,
+                'add_time'      => time(),
+            ];
+            $wallet_id = Db::name('wallet')->insertGetId($data);
+            if($wallet_id > 0)
+            {
+                return DataReturn('操作成功', 0, Db::name('wallet')->find($wallet_id));
+            } else {
+                return DataReturn('钱包添加失败', -100);
+            }
+        } else {
+            return self::UserWalletStatusCheck($wallet);
+        }
+    }
+    /**
+     * 用户钱包
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-04-30
+     * @desc    description
+     * @param   [int]          $user_id [用户id]
+     */
+    public static function AddUserWallet($user_id)
+    {
+        // 请求参数
+        if(empty($user_id))
+        {
+            return DataReturn('用户id有误', -1);
+        }
+
+        // 获取钱包, 不存在则创建
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->find();
+        if(empty($wallet))
+        {
+            $data = [
+                'user_id'       => $user_id,
+                'status'        => 0,
+                'add_time'      => time(),
+            ];
+            $id=Db::name('wallet')->insertGetId($data);
+            return $id;
+
+        }
+        return $wallet['id'];
+    }
     /**
      * 用户钱包状态校验
      * @author   Devil
@@ -144,7 +249,8 @@ class WalletService
             'msg'               => empty($params['msg']) ? '系统' : $params['msg'],
             'add_time'          => time(),
         ];
-        return Db::name('PluginsWalletLog')->insertGetId($data) > 0;
+
+        return Db::name('WalletLog')->insertGetId($data) > 0;
     }
 
     /**
@@ -200,7 +306,7 @@ class WalletService
         }
 
         // 获取钱包
-        $wallet = Db::name('PluginsWallet')->find(intval($params['id']));
+        $wallet = Db::name('wallet')->find(intval($params['id']));
         if(empty($wallet))
         {
             return DataReturn('钱包不存在或已删除', -10);
@@ -283,11 +389,16 @@ class WalletService
      * @param   [float]        $money           [操作金额]
      * @param   [int]          $type            [类型（0减少, 1增加）]
      * @param   [string]       $field           [金额字段, 默认normal_money有效金额, frozen_money冻结金额, give_money赠送金额]
-     * @param   [int]          $business_type   [业务类型（0系统, 1充值, 2提现, 3消费）]
+     * @param   [int]          $business_type   [业务类型（0系统, 1分销, 2提现, 3消费）]
      * @param   [string]       $msg_title       [附加描述标题]
      */
-    public static function UserWalletMoneyUpdate($user_id, $money, $type, $field = 'normal_money', $business_type = 0, $msg_title = '钱包变更')
+    public static function UserWalletMoneyUpdate($res,$one_course_scale,$type_sale,$user_id, $money, $type, $field = 'normal_money', $business_type = 0, $msg_title = '钱包变更')
     {
+        $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id])->find();
+           if($sale){
+               sale_log('分销',$user_id,'已添加');
+               return DataReturn('已添加', -10);
+           }
         // 获取用户钱包
         $wallet = self::UserWallet($user_id);
         if($wallet['code'] == 0)
@@ -296,10 +407,13 @@ class WalletService
             $money_field = ['normal_money' => 0, 'frozen_money '=> 1, 'give_money' => 2];
             if(!in_array($field, $money_field))
             {
+                //return DataReturn('钱包操作金额字段有误', -10);
+                sale_log('钱包',$user_id,'钱包操作金额字段有误');
                 return DataReturn('钱包操作金额字段有误', -10);
             }
 
             // 操作金额
+            //var_dump($money);exit;
             $money = PriceNumberFormat($money);
 
             // 开始处理
@@ -310,9 +424,11 @@ class WalletService
                 $field      => ($type == 1) ? PriceNumberFormat($wallet['data'][$field]+$money) : PriceNumberFormat($wallet['data'][$field]-$money),
                 'upd_time'  => time(),
             ];
-            if(!Db::name('PluginsWallet')->where(['id'=>$wallet['data']['id']])->update($data))
+
+            if(!Db::name('wallet')->where(['id'=>$wallet['data']['id']])->update($data))
             {
                 Db::rollback();
+                sale_log('钱包',$user_id,'钱包操作金额字段有误');
                 return DataReturn('钱包操作失败', -100);
             }
 
@@ -332,7 +448,26 @@ class WalletService
             if(!self::WalletLogInsert($log_data))
             {
                 Db::rollback();
+                sale_log('钱包日志',$user_id,'钱包日志添加失败');
                 return DataReturn('钱包日志添加失败', -101);
+            }
+            $data = array(
+                'user_id'           => $user_id,//分佣用户
+                'money'             => $res['id'],
+                'course_scale'      => intval($one_course_scale),
+                'order_id'          => $res['id'],
+                'advanced_id'       => $res['advanced_id'],
+                'course_id'         => $res['course_id'],
+                'order_uid'         => $res['uid'],//订单用户
+                'add_time'          => time(),
+                'type'              => $type_sale,
+                'money_sale'        => $money,
+            );
+            if(Db::name('sale_log')->insert($data)){
+                Db::rollback();
+                sale_log('分销',$user_id,'分销日志添加失败');
+                return DataReturn('分销日志添加失败', -101);
+
             }
 
             // 消息通知
@@ -342,6 +477,7 @@ class WalletService
             Db::commit();
             return DataReturn('操作成功', 0);
         }
+
         return $wallet;
     }
 }

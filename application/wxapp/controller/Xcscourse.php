@@ -48,6 +48,13 @@ class Xcscourse extends Base
         $where['id'] = $id;
         $data = $xcsCourse->getApiData($where,$id);
         $data['shareLink'] = $data['shareLink'].$this->uid;
+        $card_order = Db::name('cards_order')->where('uid',$this->uid)->where('endtime','>',time())->where('status',1)->find();
+        $ismember = 0;
+        if(!empty($card_order)){
+            $ismember = 1;
+            $data['courseData']['value'] = '0.00';
+        }
+        $data['is_member'] = $ismember;
         return returnjson(1000,$data,'获取成功');
     }
 

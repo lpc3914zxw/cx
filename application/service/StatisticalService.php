@@ -76,7 +76,7 @@ class StatisticalService
             {
                 // 钱包
                 case 'wallet' :
-                    $table = 'PluginsWallet';
+                    $table = 'Wallet';
 
                     // 扩展数据
                     $ext_count = Db::name('User')->count();
@@ -84,23 +84,23 @@ class StatisticalService
 
                 // 提现申请
                 case 'cash' :
-                    $table = 'PluginsWalletCash';
+                    $table = 'WalletCash';
 
                     // 扩展数据
                     $ext_count = Db::name($table)->where(['status'=>0])->count();
                     break;
 
                 // 充值
-                case 'recharge' :
-                    $table = 'PluginsWalletRecharge';
+               /* case 'recharge' :
+                    $table = 'WalletRecharge';
 
                     // 扩展数据
                     $ext_count = Db::name($table)->where(['status'=>0])->count();
-                    break;
+                    break;*/
 
                 // 账户明细
                 case 'walletlog' :
-                    $table = 'PluginsWalletLog';
+                    $table = 'WalletLog';
                     break;
             }
         }
@@ -112,17 +112,18 @@ class StatisticalService
         // 总数
         $total_count = Db::name($table)->count();
 
+
         // 昨天
-        $where = [
-            ['add_time', '>=', self::$yesterday_time_start],
-            ['add_time', '<=', self::$yesterday_time_end],
+       $where['add_time'] = [
+            [ '>=', self::$yesterday_time_start],
+            [ '<=', self::$yesterday_time_end],
         ];
         $yesterday_count = Db::name($table)->where($where)->count();
-
+        //echo Db::name('wallet')->getLastSql();exit;
         // 今天
-        $where = [
-            ['add_time', '>=', self::$today_time_start],
-            ['add_time', '<=', self::$today_time_end],
+        $where['add_time'] = [
+            [ '>=', self::$today_time_start],
+            [ '<=', self::$today_time_end],
         ];
         $today_count = Db::name($table)->where($where)->count();
 
@@ -158,7 +159,7 @@ class StatisticalService
                 'today_count'       => 0,
                 'right_count'       => 0,
                 'right_title'       => '用户',
-                'url'               => PluginsAdminUrl('wallet', 'wallet', 'index'),
+              //  'url'               => PluginsAdminUrl('wallet', 'wallet', 'index'),
             ],
             'cash' => [
                 'title'             => '提现总数',
@@ -167,23 +168,23 @@ class StatisticalService
                 'today_count'       => 0,
                 'right_count'       => 0,
                 'right_title'       => '待处理',
-                'url'               => PluginsAdminUrl('wallet', 'cash', 'index'),
+              //  'url'               => PluginsAdminUrl('wallet', 'cash', 'index'),
             ],
-            'recharge' => [
+          /*  'recharge' => [
                 'title'             => '充值总数',
                 'count'             => 0,
                 'yesterday_count'   => 0,
                 'today_count'       => 0,
                 'right_count'       => 0,
                 'right_title'       => '待支付',
-                'url'               => PluginsAdminUrl('wallet', 'recharge', 'index'),
-            ],
+              //  'url'               => PluginsAdminUrl('wallet', 'recharge', 'index'),
+            ],*/
             'walletlog' => [
                 'title'             => '账户明细总数',
                 'count'             => 0,
                 'yesterday_count'   => 0,
                 'today_count'       => 0,
-                'url'               => PluginsAdminUrl('wallet', 'walletlog', 'index'),
+              //  'url'               => PluginsAdminUrl('wallet', 'walletlog', 'index'),
             ],
         ];
         $type_all = ['wallet', 'cash', 'recharge', 'walletlog'];

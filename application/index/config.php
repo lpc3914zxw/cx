@@ -50,6 +50,7 @@ return [
         'port' => 6379,
 
         'password' => '',
+        'expire'         => 36000,
     ],
     /*'cache'                  => [
        // 驱动方式

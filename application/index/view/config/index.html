@@ -98,7 +98,16 @@
                         </div>
 
                         <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.course_scale_num.name}</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control link" name="{$data.course_scale_num.only_tag}" placeholder="{$data.course_scale_num.name}"  {if !empty($data)}value="{$data.course_scale_num.value}"{/if}>
+                            </div>
 
+                            <span class=" control-label" style="float:left">次  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {$data.course_scale_num.describe}</span>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">{$data.course_scale_time.name}</label>
                             <div class="col-sm-9">

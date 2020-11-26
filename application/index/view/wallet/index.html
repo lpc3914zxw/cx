@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/widgets.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>数据统计</title>
+
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="__STATIC__/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__STATIC__/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__STATIC__/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__STATIC__/css/animate.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="col-sm-3">
+        <div class="ibox">
+            <div class="ibox-content">
+                <h5 id="cash_title"></h5>
+                <table class="table table-stripped small m-t-md">
+                    <tbody>
+                    <tr>
+                        <td class="no-borders">
+                            <i class="fa fa-circle text-navy" id="cash_right_title"></i>
+                        </td>
+                        <td class="no-borders" id="cash_right_count"  >
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">总数</i>
+                        </td>
+                        <td id="cash_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">昨日</i>
+                        </td>
+                        <td id="cash_yesterday_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">今日</i>
+                        </td>
+                        <td id="cash_today_count">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="ibox">
+            <div class="ibox-content">
+                <h5 id="wallet_title"></h5>
+                <table class="table table-stripped small m-t-md">
+                    <tbody>
+                    <tr>
+                        <td class="no-borders">
+                            <i class="fa fa-circle text-navy" id="wallet_right_title"></i>
+                        </td>
+                        <td class="no-borders" id="wallet_right_count"  >
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">总数</i>
+                        </td>
+                        <td id="wallet_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">昨日</i>
+                        </td>
+                        <td id="wallet_yesterday_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">今日</i>
+                        </td>
+                        <td id="wallet_today_count">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="ibox">
+            <div class="ibox-content">
+                <h5 id="walletlog_title"></h5>
+                <table class="table table-stripped small m-t-md">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">总数</i>
+                        </td>
+                        <td id="walletlog_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">昨日</i>
+                        </td>
+                        <td id="walletlog_yesterday_count">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-circle text-navy">今日</i>
+                        </td>
+                        <td id="walletlog_today_count">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/jquery-ui-1.10.4.min.js"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/content.min.js?v=1.0.0"></script>
+<script src="__STATIC__/js/plugins/iCheck/icheck.min.js"></script>
+<script src="__STATIC__/js/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+<script src="__STATIC__/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+<script src="__STATIC__/js/plugins/flot/jquery.flot.js"></script>
+<script src="__STATIC__/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script src="__STATIC__/js/plugins/flot/jquery.flot.resize.js"></script>
+
+<script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/plugins/echarts/echarts-all.js"></script>
+<script src="__STATIC__/js/content.min.js?v=1.0.0"></script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+</body>
+
+<script>
+    $(function () {
+        $.ajax({
+            url: "{:\\think\\Url::build('Wallet/index')}",
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                if (data.code == 0) {
+                    $('#cash_count').text(data.data.cash.count)
+                    $('#cash_title').text(data.data.cash.title)
+                    $('#cash_right_title').text(data.data.cash.right_title)
+                    $('#cash_right_count').text(data.data.cash.right_count)
+                    $('#cash_today_count').text(data.data.cash.today_count)
+                    $('#cash_yesterday_count').text(data.data.cash.yesterday_count)
+
+                    $('#wallet_count').text(data.data.wallet.count)
+                    $('#wallet_title').text(data.data.wallet.title)
+                    $('#wallet_right_title').text(data.data.wallet.right_title)
+                    $('#wallet_right_count').text(data.data.wallet.right_count)
+                    $('#wallet_today_count').text(data.data.wallet.today_count)
+                    $('#wallet_yesterday_count').text(data.data.wallet.yesterday_count)
+
+                    $('#walletlog_count').text(data.data.walletlog.count)
+                    $('#walletlog_title').text(data.data.walletlog.title)
+                    $('#walletlog_right_title').text(data.data.walletlog.right_title)
+                    $('#walletlog_right_count').text(data.data.walletlog.right_count)
+                    $('#walletlog_today_count').text(data.data.walletlog.today_count)
+                    $('#walletlog_yesterday_count').text(data.data.walletlog.yesterday_count)
+                }
+            }
+        })
+    });
+
+</script>
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/widgets.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+</html>

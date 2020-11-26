@@ -36,13 +36,13 @@ return array(
         ),
         // 用户注册类型列表
     'common_weeks_list'          =>  array(
-        0 => array('value' => 'Sunday', 'name' => '周日','id'=>0),
-        1 => array('value' => 'Monday', 'name' => '周一','id'=>1),
-        2 => array('value' => 'Tuesday', 'name' => '周二','id'=>2),
-        3 => array('value' => 'Wednesday', 'name' => '周三','id'=>3),
-        4 => array('value' => 'Thursday', 'name' => '周四','id'=>4),
-        5 => array('value' => 'Friday', 'name' => '周五','id'=>5),
-        6 => array('value' => 'Saturday', 'name' => '周六','id'=>6),
+        0 => array('value' => 'Sun', 'name' => '周日','id'=>0),
+        1 => array('value' => 'Mon', 'name' => '周一','id'=>1),
+        2 => array('value' => 'Tue', 'name' => '周二','id'=>2),
+        3 => array('value' => 'Wed', 'name' => '周三','id'=>3),
+        4 => array('value' => 'Thu', 'name' => '周四','id'=>4),
+        5 => array('value' => 'Fri', 'name' => '周五','id'=>5),
+        6 => array('value' => 'Sat', 'name' => '周六','id'=>6),
     ),
 
     // 性别

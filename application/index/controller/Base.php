@@ -22,11 +22,21 @@ class Base extends Controller {
 
 	protected $partner = [ ];
 	protected $systeminfo = [];
+    protected $data_post;
+
+    // 输入参数 get
+    protected $data_get;
+
+    // 输入参数 request
+    protected $data_request;
 	public function __construct() {
 		parent::__construct ();
 		// 验证登录
 		$this->is_login && $this->check_login ();
 		// 加载菜单
+        $this->data_post = input('post.');
+        $this->data_get = input('get.');
+        $this->data_request = input();
 		$this->get_menu();
 		$this->getSystemInfo();
 		//var_dump($this->is_login);exit;

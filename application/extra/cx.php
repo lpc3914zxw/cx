@@ -17,4 +17,8 @@ return [
     'cache_common_my_config_key'            =>  'cache_common_my_config_data',
     // 配置信息一条缓存 拼接唯一标记 [ only_tag ]
     'cache_config_row_key'                  =>  'cache_config_row_data_',
+    // 应用数据缓存
+    'cache_plugins_data_key'                =>  'cache_plugins_data_key_data_',
+    // 用户缓存信息
+    'cache_user_info'                       =>  'cache_user_info_',
 ];

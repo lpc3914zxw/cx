@@ -232,4 +232,7 @@ return [
     ],
     'TOKEN'=>'xiaomage',
     'HTML_FILE_SUFFIX' => '.html',// 默认静态文件后缀
+
+    // 应用数据缓存
+    'cache_plugins_data_key'                =>  'cache_plugins_data_key_data_',
 ];

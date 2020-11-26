@@ -124,17 +124,20 @@ if (!function_exists('input')) {
             $key = substr($key, 1);
             $has = true;
         }
+
         if ($pos = strpos($key, '.')) {
             // 指定参数来源
-            list($method, $key) = explode('.', $key, 2);
-            if (!in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'])) {
-                $key    = $method . '.' . $key;
+            $method = substr($key, 0, $pos);
+            if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'])) {
+                $key = substr($key, $pos + 1);
+            } else {
                 $method = 'param';
             }
         } else {
             // 默认为自动判断
             $method = 'param';
         }
+
         if (isset($has)) {
             return request()->has($key, $method, $default);
         } else {
