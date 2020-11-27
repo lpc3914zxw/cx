@@ -71,6 +71,23 @@ class Wallet extends Base
             return returnjson(1000,'',$ret['data']);
         }
     }
+    /**
+     *提现申请
+     */
+    public function Toapplyamount(){
+            $user = UserService::LoginUserInfo();
+
+            $ret1=WalletService::UserWalletsale($user['id']);
+
+            //var_dump($ret1);exit;
+            $ret2=WalletService::UserWalletteam($user['id']);
+            $res=array( 'normal_money'=>$ret1['data']['normal_money'],
+                'normal_team_money'=>$ret2['data']['normal_team_money'])
+
+            ;
+
+            return returnjson(1000,$res,'获取成功');
+    }
 
     /**
      * 获取用户余额和冻结金额
@@ -189,7 +206,7 @@ class Wallet extends Base
             'm'             => $start,
             'n'             => $number,
             'where'         => $where,
-            'field'         =>['id,operation_money,add_time,status,business_type,money_type,operation_type']
+            'field'         =>['id,operation_money,add_time,status,business_type,operation_type']
         );
         $data = BaseService::WalletLogListApi($data_params);
 

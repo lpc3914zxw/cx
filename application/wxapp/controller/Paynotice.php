@@ -11,11 +11,7 @@ use app\wxapp\model\Orders;
 use think\Db;
 use aop\AopClient;
 use aop\request\AlipayTradeAppPayRequest;
-use app\service\BaseService;
 use app\service\WalletService;
-use app\service\CashService;
-use app\service\UserService;
-use think\helper\Time;
 class Paynotice extends Base {
     public function __construct(){
        $this->request = Request::instance();
@@ -29,7 +25,7 @@ class Paynotice extends Base {
         if($_POST['trade_status'] == 'TRADE_SUCCESS'){
 
             Db::name('face_order')->where(['out_trade_no'=>$_POST['out_trade_no']])->update(['status'=>1,'paytime'=>time(),'paytype'=>1]);
-
+                  
 
         	exit('success');//返回给支付宝success,页面不能有其它输出
         }
@@ -41,41 +37,8 @@ class Paynotice extends Base {
         $aop->alipayrsaPublicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgbPyffwy3iPQz0dodFKZZXRF5b6PMlAOhOrzuMixuSlN8qe3bLpE1CHMaVvgQZcYOzJzqd0d0mi69IPR8A1tZkCqF/jX/zbNpKDc4n3mPy7mA9gjfv2qJVpsysnaVSTcnKUkq8BD+MHGKq28LTF7GDts67glr7fni0LgV5NueLy3+BW6BFhG4cCNCD+Zq0hSQffrQnnk8wDha9kfrhsKZvyCN8wCCeOEGciQY3+9CR7u3jI4murUXdZtf2b1NV0qFCbivkDZoHEurRmDnkcMVrVTWVXMfxxfbxsruHRtHTAEb37tzp0DnJKfPRqaVuTN64is64/ywBWrUaanjmX89QIDAQAB';//支付宝公钥
         $flag = $aop->rsaCheckV1($_POST, $aop->alipayrsaPublicKey, "RSA2");
         if($_POST['trade_status'] == 'TRADE_SUCCESS'){
-           //Db::name('order')->where(['out_trade_no'=>$_POST['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
-            $res=Db::name('order')->where(['out_trade_no'=>$_POST['out_trade_no']])->find();
-            if($res['course_type']==1){
-                Db::name('order')->where(['out_trade_no'=>$_POST['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
-                exit('success');
-            }else {
-                $pid = Db::name('user')->where('id', '=', $res['uid'])->where('card_level','neq',0)->value('pid');
-                WalletService::AddUserWallet($res['uid']);//自动添加钱包
-                if (!empty($pid)) {
-                    //获取一级分销比例
-                    $one_course_scale = MyC('one_course_scale');
-                    $money_total = $res['total_amount'];
-                    $money_one_sale = $money_total * $one_course_scale / 100;
-                    //var_dump(PriceNumberFormat($money_one_sale));exit;
-                    if ($money_one_sale > 0.00) {
-                        WalletService::UserWalletMoneyUpdate($res, $one_course_scale, 1, $pid, $money_one_sale, 1, 'normal_money', 1);
-                    }
-                } else {
-                    $pid = 0;//没有上级
-                }
-                $ppid = Db::name('user')->where('id', $pid)->where('card_level','neq',0)->value('pid');
-                if (!empty($ppid)) {
-                    $two_course_scale = MyC('two_course_scale');
-                    $money_total = $res['total_amount'];
-                    $money_two_sale = $money_total * $two_course_scale / 100;
-                    if ($money_one_sale > 0.00) {
-                        WalletService::UserWalletMoneyUpdate($res, $two_course_scale, 2, $ppid, $money_two_sale, 1, 'normal_money', 1);
-                    }
-                } else {
-                    $ppid = 0;//没有上级
-                }
-                //is_scale是否分销
-                Db::name('order')->where(['out_trade_no' => $_POST['out_trade_no']])->update(['status' => 4, 'paytime' => time(), 'paytype' => 2, 'pid' => $pid, 'ppid' => $ppid, 'is_scale' => 1]);
-                exit('success');
-            }
+           Db::name('order')->where(['out_trade_no'=>$_POST['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
+            exit('success');//返回给支付宝success,页面不能有其它输出
         }
     }
     //人脸微信支付回调
@@ -98,41 +61,8 @@ class Paynotice extends Base {
         (($result['result_code'] !== 'SUCCESS') || ($result['mch_id'] !==$wx['mch_id']) || ($result['appid'] !== $wx['appid'])) && $this->wechatResult('FAIL', 'invalid param');
         $this->createSign($result, $wx['key']) !== $result['sign'] && $this->wechatResult('FAIL', 'invalid sign');
         if($result['return_code'] == 'SUCCESS'){
-           //Db::name('order')->where(['out_trade_no'=>$result['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
-            $res=Db::name('order')->where(['out_trade_no'=>$result['out_trade_no']])->find();
-            if($res['course_type']==1){
-                Db::name('order')->where(['out_trade_no'=>$result['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
-                exit('success');
-            }else {
-                $pid = Db::name('user')->where('id', '=', $res['uid'])->where('card_level','neq',0)->value('pid');
-                WalletService::AddUserWallet($res['uid']);//自动添加钱包
-                if (!empty($pid)) {
-                    //获取一级分销比例
-                    $one_course_scale = MyC('one_course_scale');
-                    $money_total = $res['total_amount'];
-                    $money_one_sale = $money_total * $one_course_scale / 100;
-                    //var_dump(PriceNumberFormat($money_one_sale));exit;
-                    if ($money_one_sale > 0.00) {
-                        WalletService::UserWalletMoneyUpdate($res, $one_course_scale, 1, $pid, $money_one_sale, 1, 'normal_money', 1);
-                    }
-                } else {
-                    $pid = 0;//没有上级
-                }
-                $ppid = Db::name('user')->where('id', $pid)->where('card_level','neq',0)->value('pid');
-                if (!empty($ppid)) {
-                    $two_course_scale = MyC('two_course_scale');
-                    $money_total = $res['total_amount'];
-                    $money_two_sale = $money_total * $two_course_scale / 100;
-                    if ($money_one_sale > 0.00) {
-                        WalletService::UserWalletMoneyUpdate($res, $two_course_scale, 2, $ppid, $money_two_sale, 1, 'normal_money', 1);
-                    }
-                } else {
-                    $ppid = 0;//没有上级
-                }
-                //is_scale是否分销
-                Db::name('order')->where(['out_trade_no' => $_POST['out_trade_no']])->update(['status' => 4, 'paytime' => time(), 'paytype' => 2, 'pid' => $pid, 'ppid' => $ppid, 'is_scale' => 1]);
-                exit('success');
-            }
+           Db::name('order')->where(['out_trade_no'=>$result['out_trade_no']])->update(['status'=>4,'paytime'=>time(),'paytype'=>2]);
+           exit('success');
         }
     }
     //会员卡宝支付回调
@@ -153,7 +83,7 @@ class Paynotice extends Base {
            }else{
                $dedi = $card['dedication_value'];
            }
-
+           
            $dedicData = [
                     'uid'=>$order['uid'],
                     'type'=>23,
@@ -163,11 +93,12 @@ class Paynotice extends Base {
                     'content'=>'购买'.$card['name'],
                     'addtime'=>time()
                 ];
-            Db::name('dedication_log')->insert($dedicData);
-
+            Db::name('dedication_log')->insert($dedicData);  
+           
            //$common_model->dedicationLog($order['uid'],23,$order['cardid'],'购买'.$card);
            Db::name('user')->where('id',$order['uid'])->update(['card_level'=>$order['cardid']]);
-           Db::name('user')->where('id',$order['uid'])->setInc('score',$dedi);
+           Db::name('user')->where('id',$order['uid'])->setInc('dedication_value',$dedi);
+           $this->card_fenxiao($_POST['out_trade_no']);
             exit('success');//返回给支付宝success,页面不能有其它输出
         }
     }
@@ -196,6 +127,46 @@ class Paynotice extends Base {
         }
         $str .= 'key=' . $key;
         return strtoupper(md5($str));
+    }
+     function card_fenxiao($params){
+        //$params = $this->data_post;
+        //获取订单信息
+        //$params = input();
+        $res=Db::name('cards_order')->where(['orderid'=>$params])->find();
+        //$res['id'] = 0;
+        //var_dump($res['total_amount']);exit;
+        if($res['is_fenxiao']==1){
+            return;
+        }
+        $pid=Db::name('user')->where('id','=',$res['uid'])->where('card_level','neq',0)->value('pid');
+        WalletService::AddUserWallet($res['uid']);//自动添加钱包
+        if(!empty($pid)){
+            //获取一级分销比例
+            $one_course_scale =MyC('one_course_scale');
+            $money_total=$res['price'];
+            $money_one_sale=$money_total*$one_course_scale/100;
+            //var_dump(PriceNumberFormat($money_one_sale));exit;
+            
+            if($money_one_sale>0){
+                $ress = WalletService::UserWalletMoneyUpdate($res,$one_course_scale,1,$pid,$money_one_sale,1,'normal_money',1,'下级购买会员卡分销',1);
+                //var_dump($ress);exit;
+            }
+        }else{
+            $pid=0;//没有上级
+        }
+        $ppid=Db::name('user')->where('id',$pid)->where('card_level','neq',0)->value('pid');
+        if(!empty($ppid)){
+            $two_course_scale =MyC('two_course_scale');
+            $money_total=$res['price'];
+            $money_two_sale=$money_total*$two_course_scale/100;
+            if($money_one_sale>0){
+                WalletService::UserWalletMoneyUpdate($res,$two_course_scale,2,$ppid,$money_two_sale,1,'normal_money',1,'二级购买会员卡分销',1);
+            }
+        }else{
+            $ppid=0;//没有上级
+        }
+        //is_scale是否分销
+        Db::name('cards_order')->where(['orderid'=>$params])->update(['is_fenxiao'=>1,'fenxiao_time'=>time()]);
     }
 
 }

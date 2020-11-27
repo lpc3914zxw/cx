@@ -392,13 +392,19 @@ class WalletService
      * @param   [int]          $business_type   [业务类型（0系统, 1分销, 2提现, 3消费）]
      * @param   [string]       $msg_title       [附加描述标题]
      */
-    public static function UserWalletMoneyUpdate($res,$one_course_scale,$type_sale,$user_id, $money, $type, $field = 'normal_money', $business_type = 0, $msg_title = '钱包变更')
-    {
-        $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id])->find();
+    public static function UserWalletMoneyUpdate($res,$one_course_scale,$type_sale,$user_id, $money, $type, $field = 'normal_money', $business_type = 0, $msg_title = '钱包变更',$order_type=0)
+    {   
+        if($order_type==0){
+            $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>0])->find();
+        }else if($order_type==1){
+            $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>1])->find();
+        }
+        
            if($sale){
                sale_log('分销',$user_id,'已添加');
                return DataReturn('已添加', -10);
            }
+           
         // 获取用户钱包
         $wallet = self::UserWallet($user_id);
         if($wallet['code'] == 0)
@@ -443,6 +449,7 @@ class WalletService
                 'original_money'    => $wallet['data'][$field],
                 'latest_money'      => $data[$field],
             ];
+            
             $msg = ($log_data['operation_type'] == 1) ? '增加' : '减少';
             $log_data['msg'] = $msg_title.' [ '.self::$money_type_list[$log_data['money_type']]['name'].'金额'.$msg.$log_data['operation_money'].'元 ]';
             if(!self::WalletLogInsert($log_data))
@@ -451,19 +458,37 @@ class WalletService
                 sale_log('钱包日志',$user_id,'钱包日志添加失败');
                 return DataReturn('钱包日志添加失败', -101);
             }
-            $data = array(
-                'user_id'           => $user_id,//分佣用户
-                'money'             => $res['id'],
-                'course_scale'      => intval($one_course_scale),
-                'order_id'          => $res['id'],
-                'advanced_id'       => $res['advanced_id'],
-                'course_id'         => $res['course_id'],
-                'order_uid'         => $res['uid'],//订单用户
-                'add_time'          => time(),
-                'type'              => $type_sale,
-                'money_sale'        => $money,
-            );
-            if(Db::name('sale_log')->insert($data)){
+            if($order_type==1){
+                $data = array(
+                    'user_id'           => $user_id,//分佣用户
+                    'money'             => $res['id'],
+                    'course_scale'      => intval($one_course_scale),
+                    'order_id'          => $res['id'],
+                    'advanced_id'       => 0,
+                    'course_id'         => 0,
+                    'order_uid'         => $res['uid'],//订单用户
+                    'add_time'          => time(),
+                    'type'              => $type_sale,
+                    'money_sale'        => $money,
+                    'order_type'       =>$order_type
+                );
+            }else{
+                $data = array(
+                    'user_id'           => $user_id,//分佣用户
+                    'money'             => $res['id'],
+                    'course_scale'      => intval($one_course_scale),
+                    'order_id'          => $res['id'],
+                    'advanced_id'       => $res['advanced_id'],
+                    'course_id'         => $res['course_id'],
+                    'order_uid'         => $res['uid'],//订单用户
+                    'add_time'          => time(),
+                    'type'              => $type_sale,
+                    'money_sale'        => $money,
+                    'order_type'       =>$order_type
+                );
+            }
+            
+            if(!Db::name('sale_log')->insert($data)){
                 Db::rollback();
                 sale_log('分销',$user_id,'分销日志添加失败');
                 return DataReturn('分销日志添加失败', -101);

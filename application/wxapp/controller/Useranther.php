@@ -505,7 +505,7 @@ class Useranther extends Base{
     }
   //自动执行未送基础包的用户
     public function compensation(){
-      //echo 111111111;exit;
+      echo 111111111;exit;
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);

@@ -319,11 +319,11 @@ class User extends Base{
      *
      */
     public function updateInfo($RequestId='') {
-        $request = Request::instance();
-        $ip = $request->ip();
-        if($RequestId!==cache($ip)){
-            return returnjson(1001,'','验证码错误');
-        }
+       // $request = Request::instance();
+       // $ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+         //   return returnjson(1001,'','验证码错误');
+       // }
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
