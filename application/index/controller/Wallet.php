@@ -10,6 +10,7 @@ namespace app\index\controller;
 
 
 use app\service\BaseService;
+use app\service\CashService;
 use app\service\SalelogService;
 use app\service\StatisticalService;
 use think\Db;
@@ -22,9 +23,7 @@ class Wallet extends Base
      */
         public function index($params = [])
         {
-
             $ret = BaseService::BaseConfig(false);
-
             if($this->request->isAjax()){
                 if($ret['code'] == 0){
                     $data=StatisticalService::StatisticalData();
@@ -32,9 +31,7 @@ class Wallet extends Base
                 }else{
                     return DataReturn($ret['msg'], -100);
                 }
-
             }
-
             return $this->fetch();
         }
 
@@ -77,6 +74,10 @@ class Wallet extends Base
     {
         if($this->request->isAjax()){
             $where = [];
+            if(!empty(input('business_type'))){
+                $business_type = input('business_type');
+                $where = ['business_type'=>$business_type];
+            }
             return BaseService::WalletlogList($where);
         }
         return $this->fetch();
@@ -89,9 +90,52 @@ class Wallet extends Base
     {
         if($this->request->isAjax()){
             $where = [];
+            if(!empty(input('status'))){
+                $status = input('status');
+                if($status==4){
+                    $where = ['type'=>array('in','3,4')];
+                }else{
+                    $where = ['type'=>$status];
+                }
+
+            }
+
             return SalelogService::SaleLogList($where);
         }
         return $this->fetch();
     }
+    /**钱包明细列表
+     * @param array $params
+     * @return array|mixed
+     */
+    public function cashcheck($id = 0)
+    {
+        if($this->request->post()){
+            $param=$this->data_post;
+            if($param['wallet_type']==0){
+                $ret=CashService::CashAudit($param);
+                if($ret['code'] == 0){
+                    return DataReturn('处理成功', 0);
+                }else{
+                    return DataReturn($ret['msg'], -100);
+                }
+            }elseif ($param['wallet_type']==1){
+                $ret=CashService::CashAuditTeam($param);
+                if($ret['code'] == 0){
+                    return DataReturn('处理成功', 0);
+                }else{
+                    return DataReturn($ret['msg'], -100);
+                }
+            }
 
+        }
+                $one=BaseService::CashOne($id);
+        $fee=MyC('course_scale_fee');
+        $money=$one['money']*intval(100-$fee)/100;
+        $money= PriceNumberFormat($money);
+        $this->assign('money',$money);
+        $this->assign('one',BaseService::CashOne($id));
+        $this->assign('id',$id);
+        return $this->fetch('cashcheck');
+    }
 }

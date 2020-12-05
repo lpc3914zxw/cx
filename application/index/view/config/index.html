@@ -119,6 +119,17 @@
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{$data.course_scale_team_time.name}</label>
+                            <div class="col-sm-9">
+                                {foreach $common_weeks_list as $v}
+                                <label class="checkbox-inline" >
+                                    <input type="checkbox" name="course_scale_team_time{$v.id}"    {if isset($data['course_scale_team_time']['value']) and in_array($v['value'], explode(',', $data['course_scale_team_time']['value']))}checked{/if} value="{$v.value}" >{$v.name}</label>
+                                {/foreach}
+
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
 
                         <div class="form-group">
                             <div class="form-group">

@@ -71,7 +71,7 @@ class WalletService
         }
 
         // 获取钱包, 不存在则创建
-        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money')->find();
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money,normal_team_money,frozen_team_money')->find();
         if(empty($wallet))
         {
             $data = [
@@ -108,7 +108,7 @@ class WalletService
         }
 
         // 获取钱包, 不存在则创建
-        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money,frozen_team_money,normal_team_money')->find();
+        $wallet = Db::name('wallet')->where(['user_id' => $user_id])->field('user_id,id,status,normal_money,frozen_money,frozen_team_money,normal_team_money,bank_name,bank_accounts,bank_username')->find();
         if(empty($wallet))
         {
             $data = [
@@ -248,9 +248,10 @@ class WalletService
             'latest_money'      => isset($params['latest_money']) ? PriceNumberFormat($params['latest_money']) : 0.00,
             'msg'               => empty($params['msg']) ? '系统' : $params['msg'],
             'add_time'          => time(),
+            'status'            =>isset($params['status']) ? intval($params['status']) : 1,
         ];
 
-        return Db::name('WalletLog')->insertGetId($data) > 0;
+        return Db::name('WalletLog')->insertGetId($data);
     }
 
     /**
@@ -393,18 +394,23 @@ class WalletService
      * @param   [string]       $msg_title       [附加描述标题]
      */
     public static function UserWalletMoneyUpdate($res,$one_course_scale,$type_sale,$user_id, $money, $type, $field = 'normal_money', $business_type = 0, $msg_title = '钱包变更',$order_type=0)
-    {   
-        if($order_type==0){
-            $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>0])->find();
-        }else if($order_type==1){
-            $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>1])->find();
+    {
+        if($type_sale==4 ||$type_sale==3){
+            $sale = array();
+        }else{
+            if($order_type==0){
+                $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>0])->find();
+            }else if($order_type==1){
+                $sale=Db::name('sale_log')->where(['order_id'=>$res['id'],'user_id'=>$user_id,'order_type'=>1])->find();
+            }
         }
-        
+
+
            if($sale){
                sale_log('分销',$user_id,'已添加');
                return DataReturn('已添加', -10);
            }
-           
+
         // 获取用户钱包
         $wallet = self::UserWallet($user_id);
         if($wallet['code'] == 0)
@@ -417,7 +423,9 @@ class WalletService
                 sale_log('钱包',$user_id,'钱包操作金额字段有误');
                 return DataReturn('钱包操作金额字段有误', -10);
             }
-
+            if($type_sale==4 ||$type_sale==3){
+                $field = 'normal_team_money';
+            }
             // 操作金额
             //var_dump($money);exit;
             $money = PriceNumberFormat($money);
@@ -439,17 +447,33 @@ class WalletService
             }
 
             // 日志
-            $log_data = [
-                'user_id'           => $wallet['data']['user_id'],
-                'wallet_id'         => $wallet['data']['id'],
-                'business_type'     => $business_type,
-                'operation_type'    => $type,
-                'money_type'        => $money_field[$field],
-                'operation_money'   => $money,
-                'original_money'    => $wallet['data'][$field],
-                'latest_money'      => $data[$field],
-            ];
-            
+
+            if($type_sale==4 ||$type_sale==3){
+               // $log_data['type'] = 1;
+                $log_data = [
+                    'user_id'           => $wallet['data']['user_id'],
+                    'wallet_id'         => $wallet['data']['id'],
+                    'business_type'     => $business_type,
+                    'operation_type'    => $type,
+                    'money_type'        => 2,
+                    'operation_money'   => $money,
+                    'original_money'    => $wallet['data'][$field],
+                    'latest_money'      => $data[$field],
+                    'type'              =>$order_type
+                ];
+            }else{
+                $log_data = [
+                    'user_id'           => $wallet['data']['user_id'],
+                    'wallet_id'         => $wallet['data']['id'],
+                    'business_type'     => $business_type,
+                    'operation_type'    => $type,
+                    'money_type'        => $money_field[$field],
+                    'operation_money'   => $money,
+                    'original_money'    => $wallet['data'][$field],
+                    'latest_money'      => $data[$field],
+                    'type'              =>$order_type
+                ];
+            }
             $msg = ($log_data['operation_type'] == 1) ? '增加' : '减少';
             $log_data['msg'] = $msg_title.' [ '.self::$money_type_list[$log_data['money_type']]['name'].'金额'.$msg.$log_data['operation_money'].'元 ]';
             if(!self::WalletLogInsert($log_data))
@@ -461,7 +485,7 @@ class WalletService
             if($order_type==1){
                 $data = array(
                     'user_id'           => $user_id,//分佣用户
-                    'money'             => $res['id'],
+                    'money'             => $res['price'],
                     'course_scale'      => intval($one_course_scale),
                     'order_id'          => $res['id'],
                     'advanced_id'       => 0,
@@ -487,7 +511,7 @@ class WalletService
                     'order_type'       =>$order_type
                 );
             }
-            
+
             if(!Db::name('sale_log')->insert($data)){
                 Db::rollback();
                 sale_log('分销',$user_id,'分销日志添加失败');

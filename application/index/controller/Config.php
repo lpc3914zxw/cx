@@ -20,6 +20,7 @@ class Config extends Base
     public function index() {
         if($this->request->isPost()) {
             $params = $this->request->param();
+            
            $data= ConfigService::ConfigSave($params);
             if($data['code']==0){
                 $this->success('保存成功');

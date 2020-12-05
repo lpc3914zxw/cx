@@ -91,6 +91,7 @@
                                             <th data-field="id" data-sortable="true" class="col-sm-1">ID</th>
                                             <th data-field="user" data-sortable="true"  >用户信息</th>
                                             <th data-field="headimg" data-formatter="formatImage" align="center"  >头像</th>
+                                            <th data-field="type_name" data-sortable="true" >类型</th>
                                             <th data-field="cash_msg" data-sortable="true"  >提现信息</th>
                                             <th data-field="cash_inner" data-sortable="true"  >收款信息</th>
                                             <th data-field="cash_out" data-sortable="true"  >打款信息</th>
@@ -191,19 +192,10 @@
         return text;
     }
     //格式化操作
-    function formatOperation1(value, row) {
-        var html = '';
-        html += '<div class="btn-group">';
-        html +=	'<button class="btn btn-success" type="button" onclick="edit(' + row.id + ')" data-target="#myModal">编&nbsp;&nbsp;&nbsp;辑</button>';
-        html +=	'<button class="btn btn-danger" type="button" onclick="del(' + row.id + ')" data-target="#myModal">删&nbsp;&nbsp;&nbsp;除</button>';
-        html +=	'</div>';
-        return html;
-    }
-    //格式化操作
     function formatOperation(value, row) {
         var html = '<div class="btn-group">';
 
-            html += '<button type="button" class="btn btn-w-m btn-white" onclick="check(' + row.id + ')">审核</button>';
+        html += '<button type="button" class="btn  btn-white" onclick="cashcheck(' + row.id + ',' + row.type + ')" >审核</button>';
 
         html +=	'</div>';
         return html;
@@ -220,10 +212,7 @@
             return value;
         }
     }
-
-
-    //
-    function add(){
+    function cashcheck(id,wallet_type) {
         parent.layer.open({
             type: 2,
             title: false,
@@ -233,7 +222,7 @@
             offset: 'rb', //右下角弹出
             time: 50, //2秒后自动关闭
             shift: 2,
-            content: ['/index/Honor/add', 'yes'], //iframe的url，no代表不显示滚动条
+            content: ['/index/wallet/cashcheck/id/' + id+'/wallet_type/'+wallet_type, 'yes'], //iframe的url，no代表不显示滚动条
             end: function(){ //此处用于演示
                 parent.layer.open({
                     type: 2,
@@ -242,35 +231,7 @@
                     shade: false,
                     maxmin: true, //开启最大化最小化按钮
                     area: ['1150px', '650px'],
-                    content: '/index/Honor/add',
-                    end:function() {
-                        location.reload();
-                    }
-                });
-            }
-        });
-    }
-
-    function  edit(id){
-        parent.layer.open({
-            type: 2,
-            title: false,
-            closeBtn: false,
-            shade: [0],
-            area: ['400px', '255px'],
-            offset: 'rb', //右下角弹出
-            time: 50, //2秒后自动关闭
-            shift: 2,
-            content: ["/index/Honor/edit/id/" + id, 'yes'], //iframe的url，no代表不显示滚动条
-            end: function(){ //此处用于演示
-                parent.layer.open({
-                    type: 2,
-                    title: '编辑',
-                    shadeClose: true,
-                    shade: false,
-                    maxmin: true, //开启最大化最小化按钮
-                    area: ['1150px', '650px'],
-                    content: "/index/Honor/edit/id/" + id,
+                    content: '/index/wallet/cashcheck/id/' + id+'/wallet_type/'+wallet_type,
                     end:function() {
                         location.reload();
                     }
@@ -280,132 +241,10 @@
     }
 
 
-
-
-    function del(id){
-        swal({
-            title:"您确定要删除这条信息吗",
-            text:"删除后将无法恢复，请谨慎操作！",
-            type:"warning",
-            showCancelButton:true,
-            confirmButtonColor:"#DD6B55",
-            confirmButtonText:"是的，我要删除！",
-            cancelButtonText:"让我再考虑一下…",
-            closeOnConfirm:false,closeOnCancel:false
-        },function(isConfirm){
-            if(isConfirm){
-                $.ajax({
-                    url: "{:\\think\\Url::build('Honor/del')}",
-                    data: {id: id},
-                    dataType: "json",
-                    type: "post",
-                    success: function(data) {
-                        if (data.code === 1) {
-                            swal(data.msg, "您已经永久删除了这条信息。", "success");
-                            $("#bootstrapTable").bootstrapTable('refresh');
-                        } else {
-                            swal("错误",data.msg,"error")
-                        }
-                    },
-                    error: function(e) {
-                        swal("操作错误","服务器错误，请重试！","error")
-                    }
-                });
-            }else{
-                swal("已取消","您取消了删除操作！","error")
-            }
-        })
+    function check(id,wallettype) {
+            window.location.href = "/index/wallet/cashcheck/id/" + id;
     }
-    function check(id) {
-        $('#id1').val(id)
-        $("#edit1").modal();
-    }
-    $("#editForm1").submit(function () {
-        var id = $('#id1').val();
-        var time1 = $('.time1').val()
 
-        $.ajax({
-            url: "{:\\think\\Url::build('peters/checkPeters')}",
-            type: "post",
-            data: {id: id,status:1,time1:time1},
-            dataType: "json",
-            success: function (data) {
-                if (data.code === 1) {
-                    swal(data.msg, "操作成功", "success");
-                    $("#edit").modal('hide');
-                    $('#time1').val('')
-                    $("#bootstrapTable").bootstrapTable('refresh');
-                } else {
-                    swal(data.msg,"操作失败","error")
-                }
-            },
-            error: function (e) {
-                swal(data.msg,"操作失败","error")
-
-            }
-        });
-        return false;
-    });
-    function check1(id) {
-        var msg = '通过';
-
-        swal({
-            title:"您确定要"+ msg +"吗",
-            text:msg +"请谨慎操作！",
-            type:"warning",
-            showCancelButton:true,
-            confirmButtonColor:"#DD6B55",
-            confirmButtonText:'是的，'+ msg +'！',
-            cancelButtonText:"让我再考虑一下…",
-            closeOnConfirm:false,closeOnCancel:false
-        },function(isConfirm){
-            if(isConfirm){
-                $.ajax({
-                    url: "{:\\think\\Url::build('peters/checkPeters')}",
-                    data: {id: id,status:1},
-                    dataType: "json",
-                    success: function(data) {
-                        if (data.code === 1) {
-                            swal(data.msg, "操作成功。", "success");
-                            $("#bootstrapTable").bootstrapTable('refresh');
-                        } else {
-                            swal("错误",data.msg,"error")
-                        }
-                    },
-                    error: function(e) {
-                        swal("操作错误","服务器错误，请重试！","error")
-                    }
-                });
-            }else{
-                swal("已取消","您取消了该操作！","error")
-            }
-        })
-    }
-    $("#editForm").submit(function () {
-        var id = $('#id').val();
-        var refuse = $('#refuse').val()
-        $.ajax({
-            url: "{:\\think\\Url::build('peters/checkPeters')}",
-            type: "post",
-            data: {id: id,status:2,refuse:refuse},
-            dataType: "json",
-            success: function (data) {
-                if (data.code === 1) {
-                    swal(data.msg, "操作成功", "success");
-                    $("#edit").modal('hide');
-                    $('#refuse').val('')
-                    $("#bootstrapTable").bootstrapTable('refresh');
-                } else {
-                    swal(data.msg,"操作失败","error")
-                }
-            },
-            error: function (e) {
-                swal(data.msg,"操作失败","error")
-
-            }
-        });
-        return false;
-    });
 </script>
 
 </body>

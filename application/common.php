@@ -1107,3 +1107,7 @@ function sale_log($basename=null,$num=null,$msg=null)
 
     file_put_contents($path, $msg.PHP_EOL,FILE_APPEND);
 }
+function CheckPrice($price)
+{
+    return (preg_match('/'.lang('common_regex_price').'/', $price) == 1) ? true : false;
+}

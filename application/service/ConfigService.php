@@ -52,7 +52,8 @@ class ConfigService
     public static $string_to_array_field_list = [
         'home_user_reg_state',
         'common_images_verify_rules',
-        'course_scale_time'
+        'course_scale_time',
+        'course_scale_team_time'
     ];
 
     /**
@@ -85,15 +86,20 @@ class ConfigService
         {
             return DataReturn('参数不能为空', -1);
         }
+        //var_dump($params);exit;
         $arr=array_keys($params);
         $str="";
+        $str1="";
         foreach ($arr as $v){
             if(substr($v,0,17)=='course_scale_time'){
                 $str.=$params[$v].',';
             }
+            if(substr($v,0,22)=='course_scale_team_time'){
+                $str1.=$params[$v].',';
+            }
         }
         $params['course_scale_time']=$str;
-
+        $params['course_scale_team_time']=$str1;
         // 当前参数中不存在则移除
         $data_fields = self::$attachment_field_list;
         foreach($data_fields as $key=>$field)
@@ -113,7 +119,7 @@ class ConfigService
 
         // 循环保存数据
         $success = 0;
-
+        
         // 开始更新数据
         foreach($params as $k=>$v)
         {

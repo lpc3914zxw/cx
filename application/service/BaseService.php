@@ -83,7 +83,7 @@ class BaseService
     public static function WalletlogList($map = [])
     {
         $total = Db::table('wallet_log')->where($map)->count(1);
-        $list = Db::table('wallet_log')->select(function($query) use($map) {
+        $list = Db::table('wallet_log')->order('id','desc')->select(function($query) use($map) {
             $query->where($map)->limit(page());
         });
         return self::WalletlogListWith($total,$list);
@@ -107,6 +107,13 @@ class BaseService
                     $business_type_list = WalletService::$business_type_list;
                     $operation_type_list = WalletService::$operation_type_list;
                     $money_type_list = WalletService::$money_type_list;
+                    if($v['type']==0){
+                        $v['type_name']='个人余额';
+                    }elseif ($v['type']==1){
+                        $v['type_name']='团队余额';
+                    }else{
+                        $v['type_name']='未知';
+                    }
                     // 状态
                     // 业务类型
                     $v['business_type_name'] = (isset($v['business_type']) && isset($business_type_list[$v['business_type']])) ? $business_type_list[$v['business_type']]['name'] : '未知';
@@ -125,6 +132,13 @@ class BaseService
         }
         return page_data($total, $data);
     }
+    public static function CashOne($id = 0)
+    {
+        return  Db::table('wallet_cash')->where('id','=',$id)->find();
+        //return self::CashListWith($total,$list);
+    }
+
+
     /**
      * 钱包明细列表
      * @author   Devil
@@ -136,7 +150,7 @@ class BaseService
     public static function CashList($map = [])
     {
         $total = Db::table('wallet_cash')->where($map)->count(1);
-        $list = Db::table('wallet_cash')->select(function($query) use($map) {
+        $list = Db::table('wallet_cash')->order('id','desc')->select(function($query) use($map) {
             $query->where($map)->limit(page());
         });
         return self::CashListWith($total,$list);
@@ -167,6 +181,14 @@ class BaseService
 
 
                     }
+                        if($v['type']==0){
+                            $v['type_name']='个人余额';
+                        }elseif ($v['type']==1){
+                            $v['type_name']='团队余额';
+                        }else{
+                            $v['type_name']='未知';
+                        }
+
                     // 备注
                     $v['msg'] = empty($v['msg']) ? '' : str_replace("\n", '<br />', $v['msg']);
 
@@ -230,6 +252,7 @@ class BaseService
 
         // 获取数据列表
         $data = Db::name('walletLog')->field($field)->where($where)->limit($m, $n)->order($order_by)->select();
+        //echo Db::name('walletLog')->getLastSql();exit;
             foreach($data as &$v)
             {
                 $v['add_time_time'] = empty($v['add_time']) ? '' : date('Y.m.d', $v['add_time']);
@@ -302,7 +325,7 @@ class BaseService
         return  Db::name('walletLog')->where($where)->where(['operation_type'=>1,'status'=>0])->sum('operation_money');
     }
     /**
-     * 累计提现
+     * 累计提现成功
      * @author   Devil
      * @blog    http://gong.gg/
      * @version 1.0.0
@@ -315,7 +338,7 @@ class BaseService
         return  Db::name('wallet_cash')->where('user_id','=',$user_id)->where(['status'=>1])->sum('money');
     }
     /**
-     * 累计提现
+     * 今日提现成功
      * @author   Devil
      * @blog    http://gong.gg/
      * @version 1.0.0
@@ -353,7 +376,7 @@ class BaseService
      */
     public static function WalletLogWhereApi($params = [],$user_id=0)
     {
-        $where ['money_type']= ['=',0];
+        $where ['money_type']= ['in','0,1,2'];
 
         // id
         if(!empty($params['id']))
@@ -385,10 +408,14 @@ class BaseService
             $where['type'] = [ '=', $params['type']];
         }
         // 业务类型
-        if(isset($params['business_type']) && $params['business_type'] > -1)
-        {
-            $where['business_type'] = [ '=', $params['business_type']];
-        }
+       /* if(isset($params['business_type']) && $params['business_type'] > -1)
+        {   if($params['type']==1){
+
+            }else{
+                $where['business_type'] = [ '=', $params['business_type']];
+            }
+
+        }*/
 
         // 操作类型
         if(isset($params['operation_type']) && $params['operation_type'] > -1)

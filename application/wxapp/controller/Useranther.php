@@ -486,6 +486,27 @@ class Useranther extends Base{
       	return returnjson(1000,0,'验证通过');
 
     }
+    //是否完善信息
+    public function is_set(){
+        $token = input('token');
+        $password = input('password');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if(empty($this->uid)) {
+            return returnjson(1100,0,'该用户已在其他设备登陆');
+        }
+        $userinfo = Db::name('user')->where('id',$this->uid)->field('provinceid,occupation,industry,education,year,gender')->find();
+        $is_set_address = 1;
+        $is_perfect = 1;
+        if(empty($userinfo['provinceid'])){
+            $is_set_address = 0;
+        }
+        if(empty($userinfo['occupation'])||empty($userinfo['industry'])||empty($userinfo['education'])||empty($userinfo['year'])||empty($userinfo['gender'])){
+            $is_perfect = 0;
+        }
+        return returnjson(1000,array('is_perfect'=>$is_perfect,'s_set_address'=>$is_set_address),'成功');
+    }
   public function updateVersion(){
         $token = input('token');
         $password = input('password');

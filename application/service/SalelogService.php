@@ -53,7 +53,7 @@ class SalelogService
     public static function SaleLogList($map = [])
     {
         $total = Db::table('sale_log')->where($map)->count(1);
-        $list = Db::table('sale_log')->select(function($query) use($map) {
+        $list = Db::table('sale_log')->order('id','desc')->select(function($query) use($map) {
             $query->where($map)->limit(page());
         });
         return self::SaleLogListWith($total,$list);
@@ -64,17 +64,28 @@ class SalelogService
         {
             foreach($data as &$v)
             {
-                $v['order_user_name'] = Db::name('user')->where('id','=',$v['order_uid'])->value('name');
-                $v['sale_user_name'] = Db::name('user')->where('id','=',$v['user_id'])->value('name');
-                $v['advanced_name'] = Db::name('advanced')->where('id','=',$v['advanced_id'])->value('name');
-                $v['course_name'] = Db::name('course')->where('id','=',$v['course_id'])->value('name');
-                $v['order_code'] = Db::name('order')->where('id','=',$v['order_id'])->value('order_id');
+                if($v['order_type']==0){
+                    
+                    $v['advanced_name'] = Db::name('advanced')->where('id','=',$v['advanced_id'])->value('name');
+                    $v['course_name'] = Db::name('course')->where('id','=',$v['course_id'])->value('name');
+                    $v['order_code'] = Db::name('order')->where('id','=',$v['order_id'])->value('order_id');
+                }else{
+                    $v['advanced_name'] = '会员卡';
+                    $v['course_name'] = '会员卡';
+                    $v['order_code'] = Db::name('cards_order')->where('id','=',$v['order_id'])->value('orderid');
+                }
+                 $v['order_user_name'] = Db::name('user')->where('id','=',$v['order_uid'])->value('name');
+                 $v['sale_user_name'] = Db::name('user')->where('id','=',$v['user_id'])->value('name');
                     if(isset($v['type']))
                     {
                         if($v['type']==1){
                             $v['type'] = '直接推荐';
                         }elseif($v['type']==2){
                             $v['type'] = '间接推荐';
+                        }elseif($v['type']==3){
+                            $v['type'] = '平级奖';
+                        }elseif($v['type']==4){
+                            $v['type'] = '极差奖';
                         }
                     }
             }

@@ -44,7 +44,7 @@
             </style>
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>钱包列表</h5>
+                    <h5>列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -70,9 +70,9 @@
                                                 <label>业务类型</label>
                                                 <select class="form-control" id="status" name="status">
                                                     <option value="" >-全部-</option>
-                                                    <option value="0">系统</option>
                                                     <option value="1">分销</option>
                                                     <option value="2">提现</option>
+                                                    <option value="4">极差</option>
 
                                                 </select>
                                             </div>
@@ -91,6 +91,7 @@
                                             <th data-field="name" data-sortable="true"  >昵称</th>
                                             <th data-field="headimg" data-formatter="formatImage" align="center">头像</th>
                                             <th data-field="tel" data-sortable="true"  >手机号</th>
+                                            <th data-field="type_name" data-sortable="true"  >手机号</th>
                                             <th data-field="business_type_name" data-sortable="true"  >业务</th>
                                             <th data-field="operation_type_name" data-sortable="true"  >类型</th>
                                             <th data-field="operation_money" data-sortable="true"  >操作金额(元)</th>
@@ -169,7 +170,7 @@
         var name = $('#name').val();
         $('#bootstrapTable').bootstrapTable("refreshOptions",{
             queryParams:function(params){
-                var data = {name: name, status:status};
+                var data = {name: name, business_type:status};
                 var query = $.extend( true, params, data);
                 return query;
             }

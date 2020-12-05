@@ -78,6 +78,7 @@ class Paynotice extends Base {
             $order = Db::name('cards_order')->where('orderid',$_POST['out_trade_no'])->find();
            Db::name('cards_order')->where('orderid',$_POST['out_trade_no'])->update(['status'=>1,'paytime'=>time(),'endtime'=>$yeartime,'paytype'=>1]);
            $card = Db::name('cards')->where('id',$order['cardid'])->field('name,discount,price,dedication_value')->find();
+           $pid = Db::name('user')->where('id',$order['uid'])->value('pid');
            if($card['discount']>0){
                $dedi = $card['dedication_value'] * $card['discount']/10;
            }else{
@@ -93,8 +94,20 @@ class Paynotice extends Base {
                     'content'=>'购买'.$card['name'],
                     'addtime'=>time()
                 ];
-            Db::name('dedication_log')->insert($dedicData);  
-           
+            Db::name('dedication_log')->insert($dedicData);
+           if(!empty($pid)){
+               $dedicData = [
+                        'uid'=>$pid,
+                        'type'=>23,
+                        'value'=>$dedi,
+                        'obj_id'=>$order['cardid'],
+                        'sq_type'=>0,
+                        'content'=>'购买'.$card['name'],
+                        'addtime'=>time()
+                    ];
+                Db::name('dedication_log')->insert($dedicData);
+                Db::name('user')->where('id',$pid)->setInc('dedication_value',$dedi);
+           }
            //$common_model->dedicationLog($order['uid'],23,$order['cardid'],'购买'.$card);
            Db::name('user')->where('id',$order['uid'])->update(['card_level'=>$order['cardid']]);
            Db::name('user')->where('id',$order['uid'])->setInc('dedication_value',$dedi);
@@ -138,19 +151,25 @@ class Paynotice extends Base {
         if($res['is_fenxiao']==1){
             return;
         }
+        $common = new common();
+        $uids=Db::name('user')->where('id','=',$res['uid'])->value('parentids');
         $pid=Db::name('user')->where('id','=',$res['uid'])->where('card_level','neq',0)->value('pid');
         WalletService::AddUserWallet($res['uid']);//自动添加钱包
+        
         if(!empty($pid)){
             //获取一级分销比例
             $one_course_scale =MyC('one_course_scale');
             $money_total=$res['price'];
             $money_one_sale=$money_total*$one_course_scale/100;
             //var_dump(PriceNumberFormat($money_one_sale));exit;
-            
+            $money1 = sprintf("%.2f",$money_one_sale*0.8);
+            $credit = $money_one_sale - $money1;
+            $common->save_credit($this->uid,$credit,3);
             if($money_one_sale>0){
                 $ress = WalletService::UserWalletMoneyUpdate($res,$one_course_scale,1,$pid,$money_one_sale,1,'normal_money',1,'下级购买会员卡分销',1);
                 //var_dump($ress);exit;
             }
+            
         }else{
             $pid=0;//没有上级
         }
@@ -160,6 +179,9 @@ class Paynotice extends Base {
             $money_total=$res['price'];
             $money_two_sale=$money_total*$two_course_scale/100;
             if($money_one_sale>0){
+                $money2 = sprintf("%.2f",$money_one_sale*0.8);
+                $credit = $money_one_sale - $money2;
+                $common->save_credit($this->uid,$credit,3);
                 WalletService::UserWalletMoneyUpdate($res,$two_course_scale,2,$ppid,$money_two_sale,1,'normal_money',1,'二级购买会员卡分销',1);
             }
         }else{
@@ -167,7 +189,69 @@ class Paynotice extends Base {
         }
         //is_scale是否分销
         Db::name('cards_order')->where(['orderid'=>$params])->update(['is_fenxiao'=>1,'fenxiao_time'=>time()]);
+        $array = $this->get_parents($uids);
+        $this->inc_parents_yeji($array,$res['price'],$uids);
     }
-
+    //获取全部族系成员
+    public function get_parents($uids){
+        $uids = ltrim($uids,'0,');
+        $uids = '202,'.$uids;
+        $uids = rtrim($uids,',');
+        if(empty($uids)){
+            return false;
+        }else{
+            $users = Db::name('user')->alias('u')->join('team_performance t','u.id = t.uid','LEFT')->where('u.id','in',$uids)->field('u.id,u.is_auth,u.status,u.card_level,t.total')->select();
+        }
+        
+        $array = array_reverse($users);
+        return $array;
+    }
+    //族系增加业绩
+    public function inc_parents_yeji($array,$price,$uids){
+        if(empty($array) || $price<=0){
+            return;
+        }
+        $uids = ltrim($uids,'0,');
+        $uids = '202,'.$uids;
+        $uids = rtrim($uids,',');
+        
+        $uidarray = Db::name('team_performance')->where('uid','in',$uids)->field('uid')->select();
+        $uidarray = array_column($uidarray,'uid');
+        $updateids = '';
+        $insertids = '';
+        foreach($array as $key=>$val){
+            
+            if(in_array($val['id'],$uidarray)){
+                
+                $updateids .= ','.$val['id'];
+            }else{
+               
+                $insertids .= ','.$val['id'];
+            }
+        }
+        if(!empty($updateids)){
+            $updateids = trim($updateids,',');
+            
+            Db::name('team_performance')->where('uid','in',$updateids)->setInc('total',$price);
+        }
+        if(!empty($insertids)){
+            $insertids = trim($insertids,',');
+            
+        }else{
+            return;
+        }
+        $insertids = explode(',',$insertids);
+        $all = array();
+        foreach($insertids as $ikey=>$ival){
+            $u['uid'] = $ival;
+            $u['total'] = $price;
+            $all[] = $u;
+        }
+        if(!empty($all)){
+            
+            Db::name('team_performance')->insertAll($all);
+        }
+        
+    }
 }
 

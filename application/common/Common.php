@@ -1307,4 +1307,31 @@ class Common
       return $total_pnum;
     }
     
+    //获取用户积分
+    public function get_user_credit($uid){
+        $credit = Db::name('user_credit')->where('uid',$uid)->value('credit');
+        if(empty($credit)){
+            $credit  = 0;
+        }
+        return $credit;
+    }
+    
+    //增加用户积分
+    public function save_credit($uid,$value,$type){
+        $credit = Db::name('user_credit')->where('uid',$uid)->value('credit');
+        if(empty($credit)&&$credit!=0){
+            Db::name('user_credit')->insert(array('uid'=>$uid,'credit'=>$value));
+        }else{
+            Db::name('user_credit')->where('uid',$uid)->setInc('credit',$value);
+        }
+        $data = array(
+                'uid' =>$uid,
+                'credit' =>$value,
+                'type' =>$type,
+                'type1' =>1,
+                'addtime' =>time(),
+            );
+        Db::name('user_credit_log')->insert($data);    
+    }
+    
 }

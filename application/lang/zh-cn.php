@@ -211,7 +211,6 @@ return array(
             0 => array('id' => 0, 'name' => '否', 'checked' => true),
             1 => array('id' => 1, 'name' => '是'),
         ),
-
     // 导航数据类型
     'common_nav_type_list'              =>  array(
             'custom'            =>  '自定义',
