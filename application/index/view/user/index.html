@@ -19,8 +19,8 @@
     <link href="__STATIC__/css/style.min862f.css?v=4.1.0" rel="stylesheet">
     <link href="__STATIC__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
     <link href="__STATIC__/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
-    
-    
+
+
     <style>
            .description  img{
                 width:100% !important;
@@ -60,15 +60,15 @@
                                             <input type="text" name="pname" id="pname" placeholder="上级id/手机号" class="form-control" value="">
                                         </div>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        
+
                                          <div class="form-group">
                                             <label>状态&nbsp;&nbsp;</label>
                                             <select class="form-control" id="is_auth" name="is_auth">
                                                 <option value="" >-是否实名-</option>
-                                                
+
                                                    <option value="1">是</option>
                                                    <option value="0">否</option>
-                                                  
+
                                             </select>
                                         </div>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -79,8 +79,8 @@
                                                     {volist name="levels" id="vo"}
                                                       <option value="{$vo.id}">{$vo.name}</option>
                                                     {/volist}
-                                                  
-                                                  
+
+
                                             </select>
                                         </div>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -91,8 +91,8 @@
                                                     {volist name="stleves" id="vo1"}
                                                       <option value="{$vo1.id}">{$vo1.name}</option>
                                                     {/volist}
-                                                   
-                                                  
+
+
                                             </select>
                                         </div>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -128,6 +128,7 @@
                                         <th data-field="pid" align="center">上级id</th>
                                         <th data-field="student_no" align="center">学号</th>
                                         <th data-field="tel" align="center">手机号</th>
+                                        <th data-field="email" align="center">邮箱</th>
                                         <th data-field="lname" align="center">等级</th>
                                         <th data-field="sname" align="center">星际等级</th>
                                         <th data-field="dedication_value" align="center">贡献值</th>
@@ -258,7 +259,7 @@
         </div>
     </div>
     <input type="hidden" name="uid" value=""  id="uid">
-    
+
 <script src="/static/web/js/laydate.js"></script>
 <script src="__STATIC__/js/jquery.min.js?v=2.1.4"></script>
 <script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
@@ -338,9 +339,9 @@
         window.location.href="/index/user/export/name/" + name + '/is_auth/' + is_auth + '/level/' + level + '/start_level/' + start_level + '/scoretime/' + scoretime;
     }
     // function importUser() {
-         
+
        //导入excel文件
-	$("#saveZipButton").on('click', function(){			
+	$("#saveZipButton").on('click', function(){
 		  var formData = new FormData();
 		    var name = $("#articleImageFile").val();
 		    var ptel = $("#ptel").val();
@@ -370,11 +371,11 @@
 	});
         //window.location.href="/index/user/importUser/name/" + name + '/is_auth/' + is_auth + '/level/' + level + '/start_level/' + start_level + '/scoretime/' + scoretime;
     //}
-     
+
 
      function editLevel(id) {
          $('#uid').val(id)
-         
+
          $("#editLevel").modal();
      }
 
@@ -439,7 +440,7 @@
      var uid = $('#uid').val();
      var courseid = $('#give option:selected').val()
      var pay_password = $('#pay_password').val()
-     
+
      $.ajax({
          url: "{:\\think\\Url::build('User/give')}",
          type: "post",
@@ -479,12 +480,12 @@
             }
         });
     }
-   
+
     laydate.render({
       elem: '#scoretime'
       ,type: 'datetime'
       ,range: true
-    }); 
+    });
      function formatAuth(value) {
          if(value == 0) {
              return '未认证';
@@ -687,10 +688,10 @@
            }
        })
    }
-   
+
     function uploade(obj) {
         //showWaiting();
-        
+
         $.ajaxfileupload({
             url : "/index/upload/uploade",
             secureuri : false,// 一般设置为false
@@ -700,7 +701,7 @@
             success : function(data){  // 服务器成功响应处理函数
                 console.log(data);
                 if(data.code == 0){
-                    
+
                     //closeWaiting()
                     //$('#yaudiourl').text(data.data)
                     //$('#audiourl').val(data.data)

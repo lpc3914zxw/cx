@@ -1064,6 +1064,26 @@ function MyC($key, $default = null, $mandatory = false)
     return isset($data[$key]) ? $data[$key] : $default;
 }
 /**
+ * [MyC 读取站点配置信息]
+ * @author   Devil
+ * @blog     http://gong.gg/
+ * @version  0.0.1
+ * @datetime 2016-12-29T17:17:25+0800
+ * @param    [string]    $key           [索引名称]
+ * @param    [mixed]     $default       [默认值]
+ * @param    [boolean]   $mandatory     [是否强制校验值,默认false]
+ * @return   [mixed]                    [配置信息值,没找到返回null]
+ */
+function MyCMail($key, $default = null, $mandatory = false)
+{
+    $data = cache(config('mail.cache_common_my_config_key'));
+    if($mandatory === true)
+    {
+        return empty($data[$key]) ? $default : $data[$key];
+    }
+    return isset($data[$key]) ? $data[$key] : $default;
+}
+/**
  * 金额格式化
  * @author   Devil
  * @blog    http://gong.gg/

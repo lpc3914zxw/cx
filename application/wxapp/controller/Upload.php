@@ -40,12 +40,14 @@ class Upload extends Base
      */
     public function uploadImg(){
         $file = request()->file('file');
+        //var_dump($file);exit;
         $documentRoot = $_SERVER['DOCUMENT_ROOT'];
         if($file){
             $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             $filename = $info->getSaveName();
             $file = 'uploads/'. $info->getSaveName();
             $url = uploadLocalToOss($file,"images", $filename);
+            //var_dump($url);exit;
             unlink($file);
             return json_encode(['code'=>0,'filepath'=>$url,'msg'=>'上传成功']);
         }
@@ -61,27 +63,27 @@ class Upload extends Base
         //$documentRoot = $_SERVER['DOCUMENT_ROOT'];
 
         if(!empty($_POST['file'])){
-            
+
             $a = 0;
             foreach($_POST['file'] as $fkey=> $fval){
               $name = time().$fkey;
-              
+
               file_put_contents(ROOT_PATH . 'public' . DS .'uploads/feedback/'.$name.'.png',print_r($_POST['file'][$fkey],true),FILE_APPEND);
                 //$url = uploadLocalToOss($file,"images", $filename);
-                
+
               $result = uploadLocalToOss(ROOT_PATH . 'public' . DS .'uploads/feedback/'.$name.'.png','images',$name.'.png');
-              
+
               $str .= $result.',';
-               
+
             }
         }
         $str = trim($str,',');
-        
+
         return json_encode(['code'=>0,'filepath'=>$str,'msg'=>'上传成功']);
-       
+
     }
-    
-   
+
+
 
     /**
      * 处理上传的图片

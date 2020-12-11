@@ -114,6 +114,7 @@ class UserService
             if(!empty($params['token']))
             {
                 $user = self::UserTokenData($params['token']);
+               // var_dump($user);exit;
             }
 
 

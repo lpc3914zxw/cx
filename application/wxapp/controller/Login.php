@@ -8,7 +8,7 @@ use app\wxapp\model\User;
 use think\Db;
 use app\common\Common;
 use think\Request;
-
+use app\service\SendmailService;
 
 class Login extends Controller
 {
@@ -251,8 +251,8 @@ class Login extends Controller
                 'regetime'=>time(),
               	'pid'=>$info1['id']
             ];
-          //$documentRoot = $_SERVER['DOCUMENT_ROOT'];
-//file_put_contents($documentRoot.'/log_0727.txt',print_r($uid.'--->'.$password.'--->'.$rpwd.'---'.$tel,true),FILE_APPEND);
+            //$documentRoot = $_SERVER['DOCUMENT_ROOT'];
+            //file_put_contents($documentRoot.'/log_0727.txt',print_r($uid.'--->'.$password.'--->'.$rpwd.'---'.$tel,true),FILE_APPEND);
           if($info1['pid'] == 0) {
                     $data['parentids'] = "0,";
            }else{
@@ -317,7 +317,80 @@ class Login extends Controller
             return returnjson(1000, $info, '登录成功!');
         }
     }
+    /*
+    * 验证码登陆--添加滑动验证
+    * @param string $tel
+    * @param string $code
+    */
+    public function emailcodeLogin($email = '',$code = '',$RequestId='') {
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+        //return returnjson(1001,'','验证码错误');
+        //}
+        $ycode = cache($email);
+        $ycode = 9999;
+        if($ycode != $code) {
+            return returnjson(1001,'','验证码错误');
+        }
+        if($code == '') {
+            return returnjson(1001,'','请输入验证码');
+        }
+        $user_model = new User();
+        if ($email == '') {
+            return returnjson(1001, '', '请输入手机号');
+        }
+        if (!preg_match("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/", $email)) {
+            return returnjson(1001, '', '手机号码有误!');
+        }
+        $where = ['email' => $email];
+        $info = $user_model->where($where)->find();
+        if (empty($info)) {
+            return returnjson(1001, '', '该账号未注册,请先注册!');
+        } else {
+            $token = md5(time() . rand(111111, 999999));
+            $user_model->where('id', $info['id'])->update(['token'=>$token]);
+            $info['token'] = $token;
+            return returnjson(1000, $info, '登录成功!');
+        }
+    }
+    /*
+       * 账号密码登陆--添加滑动验证
+       * @param string $tel
+       * @param string $password
+       * @return \type
+       */
+    public function emaildologin($email = '',$password = '',$RequestId='') {
+        $data = input();
+        // $request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+        //return returnjson(1001,'','验证码错误');
+        //}
+        if ($email == '' || $password == '') {
+            return returnjson(1001, '', '账号或密码不能为空!');
+        }
+        if (!preg_match("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/", $email)) {
+            return returnjson(1001, '', '手机号码有误!');
+        }
 
+        $user_model = new User();
+        $userInfo = $user_model->where('tel',$email)->find();
+        if(empty($userInfo)) {
+            return returnjson(1001, '', '该手机号未注册,请先注册!');
+        }
+        $password = splice_password($password, $userInfo['salt']);
+        $where = ['email' => $email, 'password' => $password];
+        $info = $user_model->where($where)->find();
+        if (empty($info)) {
+            return returnjson(1001, '', '账号或密码错误');
+        } else {
+            $token = md5(time() . rand(111111, 999999));
+            $user_model->where('id', $info['id'])->update(['token'=>$token]);
+            $info['token'] = $token;
+            return returnjson(1000, $info, '登录成功!');
+        }
+    }
     /*
      * 账号密码登陆--添加滑动验证
      * @param string $tel
@@ -391,7 +464,41 @@ class Login extends Controller
         }
         return returnjson(1001,'','设置失败,请重试');
     }
+    /*
+        * 设置密码--添加验证
+        * @param int $uid  用户id
+        * @param string $password  密码
+        * @param string $rpwd 重复密码
+        */
+    public function emailsetPassword($uid = 0,$password = '',$rpwd = '',$email='',$RequestId='') {
+        // $request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+        //return returnjson(1001,'','验证码错误');
+        //}
 
+        if($email == '' || $password == '' || $rpwd == '') {
+            return returnjson(1001,'','参数缺失');
+        }
+        if($password != $rpwd) {
+            return returnjson(1001,'','两次密码不一致');
+        }
+
+        $user_model = new User();
+        $userInfo = $user_model->where('id',$uid)->find();
+        if(empty($userInfo)){
+            $userInfo = $user_model->where('email',$email)->find();
+        }
+        if(empty($userInfo)){
+            return returnjson(1001,'','设置失败,请重试');
+        }
+        $password = splice_password($password, $userInfo['salt']);
+
+        if(false !== $user_model->where('id',$userInfo['id'])->update(['password'=>$password])){
+            return returnjson(1000,'','设置成功');
+        }
+        return returnjson(1001,'','设置失败,请重试');
+    }
     /*
      * h5注册页面--滑块验证
      */
@@ -423,8 +530,6 @@ class Login extends Controller
               if($ycode != $params['code']) {
                   $this->error('验证码错误');
               }
-
-
             $login_validate = new \app\wxapp\validate\Login();
             if(!$login_validate->check($checkData)) {
                 $this->error($login_validate->getError());
@@ -487,7 +592,9 @@ class Login extends Controller
         $this->assign('privacyprotocol',$privacyprotocol);
         $this->assign('url',$url);
         $params = $this->request->param();
+       // var_dump($params);exit;
         $myinfo = $user_model->where(['id'=>$params['p_id']])->field('student_no')->find();
+       // var_dump($myinfo);exit;
         $this->assign('myinfo',$myinfo);
         $this->assign('p_id',$params['p_id']);
         return $this->fetch();
@@ -522,9 +629,104 @@ class Login extends Controller
             }
 
     }
+    /* 验证码
+      * @author staitc7
+      */
+    public function sendemail() {
+        $email=input('email');
+        $verify_params = array(
+            'key_prefix' => md5('email_'.$email),
+            'expire_time' => MyCMail('common_verify_expire_time'),//到期时间
+            'interval_time'	=>	MyCMail('common_verify_time_interval'),//间隔时间
+        );
+        //var_dump($verify_params);exit;
+        $obj = new \base\Email($verify_params);
 
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
+
+        $email_params = array(
+            'email'     =>  $email,
+            'content'   =>  MyCMail('common_email_currency_template'),
+            'title'     => '财学堂 - 账户安全认证',
+            'code'      =>  $code,
+        );
+        $status = $obj->SendHtml($email_params);
+
+        if($status)
+        {
+            //$obj->Remove();
+            cache($email,$code,MyCMail('common_verify_expire_time'));
+            //return DataReturn('发送成功', 0);
+            return returnjson(1000,'','发送成功');
+        }
+       // return DataReturn('发送失败'.'['.$obj->error.']', -100);
+        return returnjson(1001,0,'发送失败'.'['.$obj->error.']');
+    }
+    /*
+    * 验证码注册--滑块验证
+    * @param string $tel
+     * @param string $code
+    */
+    public function emailRegister($email = '',$code = '',$RequestId='') {
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+        //return returnjson(1001,'','验证码错误');
+        //}
+        $ycode = cache($email);
+        $ycode = 9999;
+        if($code == '') {
+            return returnjson(1001,'','请输入验证码');
+        }
+        if($ycode != $code) {
+            return returnjson(1001,'','验证码错误');
+        }
+        $user_model = new User();
+        $student_no = input('student_no');
+        $info1 = $user_model->where(['student_no'=>$student_no])->find();
+        if(empty($info1)){
+            return returnjson(1001,'','邀请码无效');
+        }
+
+        $salt = get_rand_char(4);
+        $pay_salt = get_rand_char(4);
+        $student_no = $this->studentMake();
+        $where = ['email' => $email];
+        $info = $user_model->where($where)->find();
+        if(!preg_match("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/", $email)){
+            return returnjson(1001, '', '邮箱不合法');
+        }
+        $name = "用户".substr($email,0,8);
+        if (empty($info)) {
+            $data = [
+                'email'=>$email,
+                'name'=>$name,
+                'salt'=>$salt,
+                'pay_salt'=>$pay_salt,
+                'student_no'=>$student_no,
+                'regetime'=>time(),
+                'pid'=>$info1['id'],
+                'is_overseas'=>1
+            ];
+            //$documentRoot = $_SERVER['DOCUMENT_ROOT'];
+            //file_put_contents($documentRoot.'/log_0727.txt',print_r($uid.'--->'.$password.'--->'.$rpwd.'---'.$tel,true),FILE_APPEND);
+            if($info1['pid'] == 0) {
+                $data['parentids'] = "0,";
+            }else{
+                $data['parentids'] = $info1['parentids'].$info1['id'].',';
+            }
+            if($user_model->insert($data)){
+                $uid = $user_model->getLastInsID();
+            }
+            return returnjson(1000, $uid, '注册成功');
+        } else {
+            return returnjson(1001, '', '该邮箱已注册,前去登陆!');
+        }
+    }
     /**
-     * 测试
+     * 测试ip
      */
     public  function ca(){
         $request = Request::instance();

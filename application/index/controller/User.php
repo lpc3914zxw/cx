@@ -17,6 +17,7 @@ use app\index\model\Cardorder;
 
 use app\index\model\Course;
 use app\index\model\CreditSource;
+use app\service\BaseService;
 use app\service\CreditSoureService;
 use app\service\DedicationLogService;
 use app\service\HonorLogService;
@@ -24,6 +25,7 @@ use app\service\LearnPowerLogService;
 use app\service\LogMemberService;
 use app\service\MemberService;
 use app\service\RecommendService;
+use app\service\UserOverlogService;
 use app\service\UserService;
 use app\wxapp\model\LearnPowerLog;
 use think\Db;
@@ -1408,6 +1410,21 @@ class User extends AdminBase {
         }else{
             return $student_no;
         }
+    }
+    /**提现列表
+     * @param array $params
+     * @return array|mixed
+     */
+    public function overlog($params = [])
+    {
+        if($this->request->isAjax()){
+            $params= $this->data_get;
+
+            $where=UserOverlogService::OverlogWhere($params);
+            //var_dump($where);exit;
+            return UserOverlogService::OverlogList($where);
+        }
+        return $this->fetch();
     }
 
 }

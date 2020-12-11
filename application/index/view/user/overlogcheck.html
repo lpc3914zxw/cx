@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>才学APP - {$current_menu.name|default=''}</title>
+
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/hplus/img/favicon.png">
+    <link href="/static/hplus/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hplus/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hplus/css/animate.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/bootstrap-table/bootstrap-table.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/static/hplus/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+        #page-wrapper {
+            padding: 0 15px;
+            position: inherit;
+            margin: 0 0 0 60px;
+        }
+
+    </style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div >
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$current_menu.name|default="提现审核"}</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+
+                    <input type="hidden" name="id" value="{present name='id'}{$id}{/present}">
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="tabs-container">
+                                <div class="tab-content">
+                                    <div id="tab-1" class="tab-pane active">
+                                        <form method="post" class="form-horizontal newsForm">
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">提现编号</label>
+                                                    <div class="col-sm-9">
+                                                        <p class="form-control-static">{$one['cash_no']}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">提现类型</label>
+                                                    <div class="col-sm-9">
+                                                        <p class="form-control-static">{if condition="$one.type eq 0 "}个人
+                                                            {else /} 团队
+                                                            {/if}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 control-label">打款金额:</label>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" name="pay_money" class="form-control"  value="{$money}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 control-label">是否通过:</label>
+                                                        <div class="col-sm-9">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" checked="" value="agree"  name="type">通过</label>
+                                                            <label class="radio-inline">
+                                                                <input type="radio" value="refuse"  name="type">拒绝</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 control-label">备注:</label>
+                                                        <div class="col-sm-9">
+                                                            <textarea name="msg" class="form-control" rows="5" cols="10" placeholder="请输入说明"  ></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-4 col-sm-offset-2">
+                                                            <button class="btn btn-primary" type="submit" class="save">提交</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden"  value="{$id}"  id="id"/>
+<input type="hidden"  value="{$one['type']}"  id="wallet_type"/>
+<script src="/static/hplus/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/hplus/js/plugins/layer/layer.js"></script>
+<script src="__STATIC__/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__STATIC__/js/content.min.js?v=1.0.0"></script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+
+<script>
+    $(function () {
+        $(".newsForm").submit(function() {
+            var id = $('#id').val()
+            var wallet_type = $('#wallet_type').val()
+            $.ajax({
+                url: "{:\\think\\Url::build('user/overlogcheck')}",
+                data: $(this).serialize() + "&id=" + id+ "&wallet_type=" + wallet_type,
+                dataType: "json",
+                type: "post",
+                success: function(data){
+                    if (data.code === 0) {
+                        layer.msg(data.msg, {icon: 1, time: 3500});
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    } else {
+                        layer.msg(data.msg, {icon: 2, shift: 6});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+</script>
+</body>
+</html>

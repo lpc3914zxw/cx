@@ -3,6 +3,8 @@ namespace app\wxapp\controller;
 use app\common\Common;
 use app\index\model\HonorLog;
 use app\index\model\PosterTemp;
+use app\service\UserOverlogService;
+use app\service\UserService;
 use app\wxapp\model\Collection;
 use app\wxapp\model\Colliers;
 use app\wxapp\model\CourseBehavior;
@@ -203,7 +205,7 @@ class User extends Base{
                 break;
             case "write_off":
                 //$teltype =
-                break;     
+                break;
             default:
                 return returnjson(1001, '', '验证码类型错误!');
         }
@@ -2629,22 +2631,22 @@ class User extends Base{
     }
      /*
     注销账户
-    
-    
+
+
     */
     public function writeOff(){
         $token = input('token');
         if(!empty($token)) {
-            
+
             $this->getUserInfo($token);
         }
-        
+
         if(empty($this->uid)) {
             return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
         }
-        
+
         $user = new \app\wxapp\model\User();
-        
+
         $userInfo = $user->where('id',$this->uid)->field('id,tel,identityid')->find();
         if (!Cache::has('write_off'.$userInfo['tel'])){
             return returnjson(1001,'','验证码错误!');
@@ -2984,7 +2986,26 @@ class User extends Base{
     }
 
 
+    //保存实名信息（姓名，身份证号）
+    public function submitIdentity(){
+        $params=$this->data_post;
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $usr=UserService::LoginUserInfo();
+        //var_dump($usr);exit;
 
+        if($this->uid == 0) {
+            return returnjson('1100','','该设备在其他地方登录');
+        }
+        $ret=UserOverlogService::UserOverlogAdd($usr['id'],$params);
+        if($ret['code']!==0){
+            return returnjson(1001,'',$ret['msg']);
+        }else{
+            return returnjson(1000,$ret['data'],$ret['msg']);
+        }
+    }
 
 
 
