@@ -32,8 +32,9 @@ class UserOverlogService
     public static function UserOverlogAdd($user_id,$params,$status=0)
     {
         $user = Db::name('user_overlog')->where('user_id','=',$user_id)->order('id desc')->find();
-       // var_dump($user);exit;
-        if ($user['status']==0){
+        //var_dump($user);exit;
+
+        if ($user['status'] == 0 and isset($user)){
             return DataReturn('已提交等待审核', -100);
         }elseif ($user['status']==1){
             return DataReturn('已审核', -100);
@@ -159,18 +160,14 @@ class UserOverlogService
         {
             $where['id'] = [ '=', intval($params['id'])];
         }
-        // 订单号
-        if(!empty($params['orderno']))
-        {
-            $where['cash_no'] = [ '=', trim($params['orderno'])];
-        }
 
         // 关键字根据用户筛选
         if(!empty($params['keywords']))
         {
             if(empty($params['user']))
             {
-                $user_ids = Db::name('User')->where('name|tel', '=', $params['keywords'])->column('id');
+                $user_ids = Db::name('User')->where('name|email', '=', $params['keywords'])->column('id');
+                //var_dump($user_ids);exit;
                 if(!empty($user_ids))
                 {
                     $where['user_id'] = [ 'in', $user_ids];
@@ -182,7 +179,7 @@ class UserOverlogService
         }
 
         // 状态
-        if(isset($params['status']) && $params['status'] > -1)
+        if(isset($params['status']) && $params['status'] > -1 && $params['status']!=='')
         {
             $where['status'] = [ '=', $params['status']];
         }
@@ -269,5 +266,83 @@ class UserOverlogService
             }
         }
         return page_data($total, $data);
+    }
+    /**
+     * 提现申请审核
+     * @author   Devil
+     * @blog    http://gong.gg/
+     * @version 1.0.0
+     * @date    2019-05-10
+     * @desc    description
+     * @param    [array]          $params [输入参数]
+     */
+    public static function overlogAudit($params = [])
+    {
+        // 参数验证
+        $p = [
+            [
+                'checked_type'      => 'empty',
+                'key_name'          => 'id',
+                'error_msg'         => '申请id有误',
+            ],
+            [
+                'checked_type'      => 'length',
+                'key_name'          => 'note',
+                'checked_data'      => '180',
+                'error_msg'         => '备注最多 180 个字符',
+            ],
+            [
+                'checked_type'      => 'in',
+                'key_name'          => 'type',
+                'checked_data'      => ['agree', 'refuse'],
+                'error_msg'         => '操作类型有误，同意或拒绝操作出错',
+            ],
+        ];
+        $ret = ParamsChecked($params, $p);
+        if($ret !== true)
+        {
+            return DataReturn($ret, -1);
+        }
+        // 获取认证数据数据
+        $user_data=Db::name('user_overlog')->where('id','=',$params['id'])->find();
+        //校验
+        if($user_data['status']!==0){
+            return DataReturn('操作失败已审核或已拒绝', -101);
+        }
+        // 开始处理
+        Db::startTrans();
+
+        // 数据处理
+        if($params['type'] == 'agree')
+        {
+            $status=array('status'=>1,'note'=>$params['note'],'up_time'=>time());
+            $res=Db::name('user_overlog')->where('id','=',$params['id'])->update($status);
+            //var_dump($res);exit;
+            //echo Db::name('user_overlog')->getLastSql();exit;
+            if(!$res){
+                Db::rollback();
+                return DataReturn('操作失败', -101);
+            }
+            $updata_user=['realname'=>$user_data['real_name'],'identityid'=>$user_data['card_number'],'is_auth'=>1];
+            $ret=Db::name('user')->where('id','=',$user_data['user_id'])->update($updata_user);
+            if(!$ret){
+                Db::rollback();
+                return DataReturn('操作失败', -101);
+            }
+
+        } else {
+
+            $status=['status'=>2,'note'=>$params['note'],'up_time'=>time()];
+            $res=Db::name('user_overlog')->where('id','=',$params['id'])->update($status);
+            if($res){
+                Db::rollback();
+                return DataReturn('操作失败', -101);
+            }
+        }
+
+
+        // 处理成功
+        Db::commit();
+        return DataReturn('操作成功', 0);
     }
 }

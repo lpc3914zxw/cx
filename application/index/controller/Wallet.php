@@ -13,6 +13,7 @@ use app\service\BaseService;
 use app\service\CashService;
 use app\service\SalelogService;
 use app\service\StatisticalService;
+use app\service\UserOverlogService;
 use think\Db;
 
 class Wallet extends Base
@@ -137,5 +138,28 @@ class Wallet extends Base
         $this->assign('one',BaseService::CashOne($id));
         $this->assign('id',$id);
         return $this->fetch('cashcheck');
+    }
+    /**钱包明细列表
+     * @param array $params
+     * @return array|mixed
+     */
+    public function overlogcheck($id = 0)
+    {
+        if($this->request->post()){
+            $param=$this->data_post;
+            $ret=UserOverlogService::overlogAudit($param);
+            if($ret['code'] == 0){
+                return DataReturn('处理成功', 0);
+            }else{
+                return DataReturn($ret['msg'], -100);
+            }
+        }
+
+        $one=Db::name('user_overlog')->where('id','=',$id)->find();
+        $data_url=Db::name('user_overlog_img')->where('user_overlog_id','=',$id)->column('url');
+        $this->assign('one',$one);
+        $this->assign('data_url',$data_url);
+        $this->assign('id',$id);
+        return $this->fetch('overlogcheck');
     }
 }

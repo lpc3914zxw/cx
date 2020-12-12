@@ -18,6 +18,7 @@ use app\index\model\Cardorder;
 use app\index\model\Course;
 use app\index\model\CreditSource;
 use app\service\BaseService;
+use app\service\CashService;
 use app\service\CreditSoureService;
 use app\service\DedicationLogService;
 use app\service\HonorLogService;
@@ -1421,6 +1422,7 @@ class User extends AdminBase {
             $params= $this->data_get;
 
             $where=UserOverlogService::OverlogWhere($params);
+            //var_dump($where);exit;
             //var_dump($where);exit;
             return UserOverlogService::OverlogList($where);
         }

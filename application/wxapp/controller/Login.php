@@ -373,11 +373,10 @@ class Login extends Controller
         if (!preg_match("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/", $email)) {
             return returnjson(1001, '', '手机号码有误!');
         }
-
         $user_model = new User();
-        $userInfo = $user_model->where('tel',$email)->find();
+        $userInfo = $user_model->where('email',$email)->find();
         if(empty($userInfo)) {
-            return returnjson(1001, '', '该手机号未注册,请先注册!');
+            return returnjson(1001, '', '该邮箱未注册,请先注册!');
         }
         $password = splice_password($password, $userInfo['salt']);
         $where = ['email' => $email, 'password' => $password];

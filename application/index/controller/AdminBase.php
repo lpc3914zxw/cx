@@ -36,6 +36,7 @@ class AdminBase extends Base {
         $a = $request->action();
         $rule_name = $m.'/'.$c.'/'.$a;
         $result = $auth->check($rule_name,$this->partner['uid']);
+        //var_dump($request);exit;
         if(!$result){
             $this->error('您没有权限访问');
         }
