@@ -57,11 +57,11 @@ class Upload extends Base
      * APP 反馈问题图片上传 调用接口
      * @return false|mixed|string
      */
-    public function uploadImage(){
+  /*  public function uploadImage(){
         $str = '';
         $documentRoot = $_SERVER['DOCUMENT_ROOT'];
         //$documentRoot = $_SERVER['DOCUMENT_ROOT'];
-
+        //var_dump($_POST);exit;
         if(!empty($_POST['file'])){
 
             $a = 0;
@@ -73,6 +73,7 @@ class Upload extends Base
 
               $result = uploadLocalToOss(ROOT_PATH . 'public' . DS .'uploads/feedback/'.$name.'.png','images',$name.'.png');
 
+
               $str .= $result.',';
 
             }
@@ -81,8 +82,27 @@ class Upload extends Base
 
         return json_encode(['code'=>0,'filepath'=>$str,'msg'=>'上传成功']);
 
-    }
+    }*/
 
+    /*
+        * APP 反馈问题图片上传 调用接口
+        * @return false|mixed|string
+        */
+    public function uploadImage(){
+        $file = request()->file('file');
+        //var_dump($file);exit;
+        $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+        if($file){
+            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+            $filename = $info->getSaveName();
+            $file = 'uploads/'. $info->getSaveName();
+            $url = uploadLocalToOss($file,"images", $filename);
+            //var_dump($url);exit;
+            unlink($file);
+            return json_encode(['code'=>0,'filepath'=>$url,'msg'=>'上传成功']);
+        }
+
+    }
 
 
     /**

@@ -12,6 +12,83 @@ use app\service\SendmailService;
 
 class Login extends Controller
 {
+    /* 验证码
+  * @author staitc7
+  */
+    public function sendemail($email='',$type="login",$RequestId='') {
+        //$request = Request::instance();
+        //$ip = $request->ip();
+        //if($RequestId!==cache($ip)){
+        //return returnjson(1001,'','验证码错误');
+        //}
+
+        $user_model=new User();
+        $info = $user_model->where(['email'=>$email])->find();
+        if(!empty($info)){
+            $is_reg = 1;
+        }else{
+            $is_reg = 0;
+        }
+        $type = trim($type);
+        $data = input();
+        if(isset($data['pid'])&& empty($data['pid'])){
+
+        }else{
+            if($type =='login' || $type == 'findpwd'){
+                if(empty($info)){
+                    // return returnjson(1001, $is_reg, '此号码未注册');
+                }
+            }else{
+                if(!empty($info)){
+                    return returnjson(1001, $is_reg, '此邮箱已被注册');
+                }
+                $student_no = input('student_no');
+                $info1 = $user_model->where(['student_no'=>$student_no])->find();
+                if(empty($info1)){
+                   //    return returnjson(1001, $is_reg, '邀请码无效');
+                }
+
+            }
+        }
+        if($type=='login'){
+            $ty=0;
+        } elseif($type== 'register'){
+            $ty=1;
+        }elseif($type== 'findpwd'){
+            $ty=2;
+        }else{
+            return returnjson(1001, $is_reg, '无效参数');
+        }
+        $verify_params = array(
+            'key_prefix' => md5('email_'.$email),
+            'expire_time' => MyCMail('common_verify_expire_time'),//到期时间
+            'interval_time'	=>	MyCMail('common_verify_time_interval'),//间隔时间
+        );
+        //var_dump($verify_params);exit;
+        $obj = new \base\Email($verify_params);
+
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
+
+        $email_params = array(
+            'email'     =>  $email,
+            'content'   =>  MyCMail('common_email_currency_template'),
+            'title'     => '财学堂 - 账户安全认证',
+            'code'      =>  $code,
+        );
+        $status = $obj->SendHtml($email_params);
+
+        if($status)
+        {
+            //$obj->Remove();
+            cache($email,$code,MyCMail('common_verify_expire_time'));
+            //return DataReturn('发送成功', 0);
+            return returnjson(1000,$is_reg,'发送成功');
+        }
+        // return DataReturn('发送失败'.'['.$obj->error.']', -100);
+        return returnjson(1001,$is_reg,'发送失败'.'['.$obj->error.']');
+    }
     /*
     * 发送短信//
     */
@@ -206,6 +283,23 @@ class Login extends Controller
              return returnjson(1001, '', '验证不通过');
          }
      }
+
+    /*
+   * 忘记密码校验接口
+   * @param string $tel
+   * @param string $code
+   */
+    public function emailchenkForget($email,$code){
+        if(empty($email)||empty($code)){
+            return returnjson(1001, '', '参数缺失');
+        }
+        $ycode = 9999;
+        if($ycode == $code){
+            return returnjson(1000, '', '验证通过');
+        }else{
+            return returnjson(1001, '', '验证不通过');
+        }
+    }
     /*
      * 验证码注册--滑块验证
      * @param string $tel
@@ -628,41 +722,7 @@ class Login extends Controller
             }
 
     }
-    /* 验证码
-      * @author staitc7
-      */
-    public function sendemail() {
-        $email=input('email');
-        $verify_params = array(
-            'key_prefix' => md5('email_'.$email),
-            'expire_time' => MyCMail('common_verify_expire_time'),//到期时间
-            'interval_time'	=>	MyCMail('common_verify_time_interval'),//间隔时间
-        );
-        //var_dump($verify_params);exit;
-        $obj = new \base\Email($verify_params);
 
-        $str = '1234567890';
-        $randStr = str_shuffle($str); //打乱字符串
-        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
-
-        $email_params = array(
-            'email'     =>  $email,
-            'content'   =>  MyCMail('common_email_currency_template'),
-            'title'     => '财学堂 - 账户安全认证',
-            'code'      =>  $code,
-        );
-        $status = $obj->SendHtml($email_params);
-
-        if($status)
-        {
-            //$obj->Remove();
-            cache($email,$code,MyCMail('common_verify_expire_time'));
-            //return DataReturn('发送成功', 0);
-            return returnjson(1000,'','发送成功');
-        }
-       // return DataReturn('发送失败'.'['.$obj->error.']', -100);
-        return returnjson(1001,0,'发送失败'.'['.$obj->error.']');
-    }
     /*
     * 验证码注册--滑块验证
     * @param string $tel

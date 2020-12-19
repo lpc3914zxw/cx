@@ -10,7 +10,6 @@ namespace app\wxapp\controller;
 use app\service\BaseService;
 use app\service\WalletService;
 use think\Db;
-use think\Request;
 use app\service\CashService;
 use app\service\UserService;
 use think\helper\Time;

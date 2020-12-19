@@ -121,12 +121,13 @@ class UserOverlogService
         Db::name('user_overlog_img')->where(['user_overlog_id'=>$user_overlog_id])->delete();
         if(!empty($data))
         {
-            foreach($data as $photo)
+            foreach($data as $k=> $photo)
             {
                 $temp_photo = [
                     'user_overlog_id'      => $user_overlog_id,
                     'url'   => $photo,
                     'add_time'      => time(),
+                    'type'      => $k,
                 ];
                 if(Db::name('user_overlog_img')->insertGetId($temp_photo) <= 0)
                 {
@@ -332,9 +333,10 @@ class UserOverlogService
 
         } else {
 
-            $status=['status'=>2,'note'=>$params['note'],'up_time'=>time()];
+            $status=array('status'=>2,'note'=>$params['note'],'up_time'=>time());
             $res=Db::name('user_overlog')->where('id','=',$params['id'])->update($status);
-            if($res){
+            //echo Db::name('user_overlog')->getLastSql();exit;
+            if(!$res){
                 Db::rollback();
                 return DataReturn('操作失败', -101);
             }

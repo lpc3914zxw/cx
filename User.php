@@ -37,8 +37,8 @@ class User extends Base{
             return returnjson(1100,'该用户已在其他设备登陆');
         }
         $user = new \app\wxapp\model\User();
-        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,is_auth')->find();
-        if($userInfo){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,is_auth,is_overseas,email')->find();
+        if($userInfo){   //is_auth 0未认证  1已认证
             $level = new level();
             $mylevel = $level->where('value',$userInfo)->field('name')->find();
             if(empty($userInfo['signature'])){

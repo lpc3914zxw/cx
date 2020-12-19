@@ -24,7 +24,8 @@ class Wallet extends Base
      */
         public function index($params = [])
         {
-            $ret = BaseService::BaseConfig(false);
+
+                        $ret = BaseService::BaseConfig(false);
             if($this->request->isAjax()){
                 if($ret['code'] == 0){
                     $data=StatisticalService::StatisticalData();

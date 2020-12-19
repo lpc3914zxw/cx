@@ -68,7 +68,7 @@ class User extends Base{
     * 发送短信
     */
     public function sendcode() {
-       
+
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -94,18 +94,18 @@ class User extends Base{
         $content = ['code' => $code];
         switch ($type) {
            case "up_password":
-             //$teltype = 
+             //$teltype =
              break;
            case "set_pay_password":
-             
+
              break;
            case "up_tel":
-             
+
              break;
            case "new_tel":
               if($tel == $myuserinfo['tel']){
                   return returnjson(1001, '', '更改的手机号不能相同!');
-              } 
+              }
               $userinfo = $user_model->where(['tel' => $tel])->find();
              // $oldtelcode = cache('up_tel'.$userinfo['tel']);
               //if(empty($oldtelcode)){
@@ -202,9 +202,33 @@ class User extends Base{
              return returnjson(1001,'','验证码错误');
         }
         return returnjson(1000,'','验证通过');
-        
-    }
 
+    }
+//支付密码时验证验证码
+    public function checkEmailCodePayPass(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $post = Request::instance()->post();
+        if($this->uid == 0) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        if(empty($post['tel'])||empty($post['code'])){
+            return returnjson(1001,'','参数缺失');
+        }
+        //$code = $post['code'];
+        $user = new \app\wxapp\model\User;
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel')->find();
+        if (!Cache::has('set_pay_password'.$userInfo['tel'])){
+            return returnjson(1001,'','验证码错误');
+        }
+        if (Cache::get('set_pay_password'.$userInfo['tel']) != $post['code']) {
+            return returnjson(1001,'','验证码错误');
+        }
+        return returnjson(1000,'','验证通过');
+
+    }
     public function updateInfo() {
         $token = input('token');
         if(!empty($token)) {
@@ -263,7 +287,7 @@ class User extends Base{
         }
         return returnjson(1001,'','修改失败');
     }
-    
+
     /*
      * 上传头像
      */
@@ -300,7 +324,7 @@ class User extends Base{
         }
         return returnjson(1000,$userinfo,'');
     }
-    
+
     //保存实名信息（姓名，身份证号）
     public function saveIdentity(){
         $token = input('token');
@@ -323,12 +347,12 @@ class User extends Base{
         if(!empty($faceorder)){
             return returnjson(1002,'','您已付过款！');
         }
-        
+
         $user_model->where('id', $this->uid)->update(['realname'=>$post['realname'],'identityid'=>$post['identityid']]);
         $rdata['money'] = 0.01;
         $rdata['img'] = 'https://cx.hanshiqiang.com/static/wxapp/img/shiming-icon@3x.png';
         $rdata['title'] = '第三方实名认证服务';
-        
+
         //$advanced_model = new Advanced();
         //$advancedInfo = $advanced_model->field('reward,value,deadline,pay_type,learn_power')->where('id',$courseInfo['advanced_id'])->find();
          //$pay_types = explode(',',$advancedInfo['pay_type']);
@@ -347,7 +371,7 @@ class User extends Base{
           //  }
        // }
         //$pay_types = array('1','2');
-        
+
         return returnjson(1000,$rdata,'已提交');
     }
 
@@ -363,12 +387,12 @@ class User extends Base{
         $post_data['client_id']      = '2dfgWGhO6t8BGuoc68c5ccs5';
         $post_data['client_secret'] = '9dXylI1q4aqF3l5RiQTjWEHOj1Ds7siS';
         $o = "";
-        foreach ( $post_data as $k => $v ) 
+        foreach ( $post_data as $k => $v )
         {
             $o.= "$k=" . urlencode( $v ). "&" ;
         }
         $post_data = substr($o,0,-1);
-        
+
         $res = $this->request_post($url, $post_data);
         $data = json_decode($res,true);
         $data['updatetime'] = time();
@@ -376,7 +400,7 @@ class User extends Base{
         return $data['access_token'];
         //return returnjson(1000,json_decode($res),'已提交');
         //var_dump($res);
-            
+
     }
     //公安验证活体检测api
     function faceverify(){
@@ -392,7 +416,7 @@ class User extends Base{
         if(empty($image)) {
             return returnjson(1001,'','参数不能为空');
         }
-        
+
         $user_model= new \app\wxapp\model\User;
         $user = $user_model->where(['id'=>$this->uid])->field('identityid,realname,is_auth,level')->find();
         if($user['is_auth']==1){
@@ -401,7 +425,7 @@ class User extends Base{
         $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
         $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
         $count = Db::name('face_log')->where(['uid'=>$this->uid])->where(['addtime'=>['between',[$beginToday,$endToday]]])->count();
-        
+
         if($count>=3){
             return returnjson(1001,'','今日已超过验证次数!');
         }
@@ -436,13 +460,13 @@ class User extends Base{
             return returnjson(1001,'','未通过验证!');
         }
     }
-    
-    
+
+
     function request_post($url = '', $param = '') {
         if (empty($url) || empty($param)) {
             return false;
         }
-        
+
         $postUrl = $url;
         $curlPost = $param;
         $curl = curl_init();//初始化curl
@@ -450,16 +474,16 @@ class User extends Base{
         curl_setopt($curl, CURLOPT_HEADER, 0);//设置header
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//要求结果为字符串且输出到屏幕上
         curl_setopt($curl, CURLOPT_POST, 1);//post提交方式
-        
+
         curl_setopt($curl, CURLOPT_POSTFIELDS, $curlPost);
         $data = curl_exec($curl);//运行curl
         curl_close($curl);
-        
+
         return $data;
     }
 
-    
-    
+
+
 
     //退出登录
     public function outlogin(){
@@ -788,7 +812,7 @@ class User extends Base{
             $userInfo['content1'] = '你对学习的坚持，我们看得到!';
             $userInfo['content2'] = '听完50条音频，拓宽你的知识领域。';
         }
-        
+
         return returnjson(1000,$userInfo,'获取成功');
     }
 
@@ -1106,7 +1130,7 @@ class User extends Base{
         }
         return returnjson(1000,$creditInfo,'获取成功');
     }
-    
+
     /*
      * 学分详情
      */
@@ -1121,7 +1145,7 @@ class User extends Base{
         $creditSource = new CreditSource();
         $order_model = new Orders();
         $creditInfo = $creditSource->field('value,addtime,note,type,pay_type,score,status')->where('id',$id)->find();
-        
+
         $creditInfo['addtime'] = date('Y-m-d H:i:s',$creditInfo['addtime']);
         $creditInfo['status'] = '已完成';
         if($creditInfo['pay_type'] == 1) {
@@ -1520,7 +1544,7 @@ class User extends Base{
         }
     }
 
-    
+
     /*
      * 链上学籍
      * @return \type
@@ -1537,7 +1561,7 @@ class User extends Base{
         $page = empty($post['page'])?1:$post['page'];
         $status = empty(input('status')) ? 1 : input('status');
         $order_model = new Orders();
-        
+
         $start = ($page - 1) * 10;
         $limit = $start . ',' . 10;
         $orderInfo = $order_model->where(['uid'=>$this->uid])->where('status',$status)->field('course_id,paytime,status')->limit($limit)->order('status desc,paytime desc')->select();
@@ -1654,7 +1678,7 @@ class User extends Base{
         $message_model = new Message();
         $user_model = new \app\wxapp\model\User();
         $list = $message_model ->where(['invate_uid'=>$this->uid,'type'=>2])->select();
-       
+
         $listdata = array();
         if(!empty($list)){
             $listdata = array();
@@ -1927,7 +1951,7 @@ file_put_contents($documentRoot.'/log_0629-_.txt',print_r($file,true),FILE_APPEN
         }
         $common_model = new common();
         $res = $common_model ->isMaxOrMin($this->uid);
-           
+
         return returnjson(1000,$res,'成功');
     }
 }

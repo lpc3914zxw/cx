@@ -58,6 +58,29 @@ class User extends Base{
         }
         return returnjson(1000,$is_auth,'已认证');
     }
+    public function isAuthover() {
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if(empty($this->uid)) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        $user_model = new \app\wxapp\model\User();
+        $is_auth = $user_model->where('id',$this->uid)->value('is_auth');
+        if($is_auth == 0) {
+            return returnjson(1001,$is_auth,'请去认证');
+        }
+        $over=Db::name('user_overlog')->where('user_id','=',$this->uid)->order('id desc')->find();
+        if(empty($over)){
+            return returnjson(1001,$is_auth,'请去认证');
+        }elseif ($over['status']==0){
+            return returnjson(1001,$is_auth,'已提交等待审核');
+        }elseif ($over['status']==2){
+            return returnjson(1001,$is_auth,'审核已驳回,原因:  '.$over['note']);
+        }
+        return returnjson(1000,$is_auth,'已认证');
+    }
 
     /*
      * 我的页面
@@ -73,7 +96,7 @@ class User extends Base{
         }
         $user = new \app\wxapp\model\User();
         $startLevel = new StartLevel();
-        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,start_level,signature,score,wechat,tel,is_auth,wximg')->find();
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,start_level,signature,score,wechat,tel,is_auth,wximg,email,is_overseas')->find();
         $tel = Db::name('system')->where('id',1)->value('tel');
         $userInfo['serviceTel'] = $tel;
         if($userInfo){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
@@ -223,6 +246,95 @@ class User extends Base{
             return returnjson(1001, '',$res['SendStatusSet'][0]['Message']);
         }
     }
+
+    /** 修改密码发送邮箱验证码
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function sendemailcode() {
+
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $email = input('email');
+        $type = input('type');
+        if($this->uid == 0) {
+            return returnjson(1100,'','该用户已在其他设备登陆');
+        }
+        if(empty($type)){
+            return returnjson(1001,'','参数缺失');
+        }
+        $user_model = new \app\wxapp\model\User;
+        if (!preg_match("/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/", $email)) {
+            return returnjson(1001, '', '邮箱有误!');
+        }
+        $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+        $myuserinfo = $user_model->where(['id' => $this->uid])->find();
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4); //substr(string,start,length);返回字符串的一部分\
+        vendor('aliyun-dysms-php-sdk.api_demo.SmsDemo');
+        //$content = ['code' => $code];
+        switch ($type) {
+            case "up_password":
+                //$teltype =
+                break;
+            case "set_pay_password":
+
+                break;
+            case "up_email":
+
+                break;
+            case "new_email":
+                if($email == $myuserinfo['email']){
+                    return returnjson(1001, '', '更改的邮箱不能相同!');
+                }
+                $userinfo = $user_model->where(['email' => $email])->find();
+                if ($userinfo) {
+                    return returnjson(1001, '', '此邮箱已被注册!');
+                }
+                break;
+            case "write_off":
+                break;
+            default:
+                return returnjson(1001, '', '验证码类型错误!');
+        }
+        $verify_params = array(
+            'key_prefix' => md5('email_'.$email),
+            'expire_time' => MyCMail('common_verify_expire_time'),//到期时间
+            'interval_time'	=>	MyCMail('common_verify_time_interval'),//间隔时间
+        );
+        //var_dump($verify_params);exit;
+        $obj = new \base\Email($verify_params);
+
+        $str = '1234567890';
+        $randStr = str_shuffle($str); //打乱字符串
+        $code = substr($randStr, 0, 4);
+
+        $email_params = array(
+            'email'     =>  $email,
+            'content'   =>  MyCMail('common_email_currency_template'),
+            'title'     => '财学堂 - 账户安全认证',
+            'code'      =>  $code,
+        );
+        //var_dump(MyCMail('common_email_currency_template'));exit;
+        $status = $obj->SendHtml($email_params);
+
+        if($status)
+        {
+            //$obj->Remove();
+            cache($email,$code,MyCMail('common_verify_expire_time'));
+            Cache::set($type.$email,$code,MyCMail('common_verify_expire_time'));
+            //return DataReturn('发送成功', 0);
+            return returnjson(1000,'','发送成功');
+        }
+        // return DataReturn('发送失败'.'['.$obj->error.']', -100);
+        return returnjson(1001,'','发送失败'.'['.$obj->error.']');
+        //var_dump($res);exit;
+    }
     //修改手机时验证老号码验证码
     public function checkTelCode(){
         $post = Request::instance()->post();
@@ -243,14 +355,59 @@ class User extends Base{
             return returnjson(1001,'','验证码错误');
         }
         if (Cache::get('up_tel'.$userInfo['tel']) != $post['code']) {
-            return returnjson(1001,'','验证码错误');
+          //  return returnjson(1001,'','验证码错误');
         }
         return returnjson(1000,'','验证通过');
     }
+    public function checkEmailCode(){
+        $post = Request::instance()->post();
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        if($this->uid == 0) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        if(empty($post['tel'])||empty($post['code'])){
+            return returnjson(1001,'','参数缺失');
+        }
+        //$code = $post['code'];
+        $user = new \app\wxapp\model\User;
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,email')->find();
+        if (!Cache::has('up_email'.$userInfo['email'])){
+            return returnjson(1001,'','验证码错误');
+        }
+        if (Cache::get('up_email'.$userInfo['email']) != $post['code']) {
+           // return returnjson(1001,'','验证码错误');
+        }
+        return returnjson(1000,'','验证通过');
+    }
+    //修改登录密码时验证验证码--邮箱
+    public function checkEmailCodePass(){
 
-    //修改登录密码时验证验证码
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $post = Request::instance()->post();
+        if($this->uid == 0) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        if(empty($post['email'])||empty($post['code'])){
+            return returnjson(1001,'','参数缺失');
+        }
+        $user = new \app\wxapp\model\User;
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,email')->find();
+        if (!Cache::has('up_password'.$userInfo['email'])){
+            return returnjson(1001,'','验证码错误');
+        }
+        if (Cache::get('up_password'.$userInfo['email']) != $post['code']) {
+           // return returnjson(1001,'','验证码错误');
+        }
+        return returnjson(1000,'','验证通过');
+    }
+    //修改登录密码时验证验证码--手机
     public function checkTelCodePass(){
-
         $token = input('token');
         if(!empty($token)) {
             $this->getUserInfo($token);
@@ -269,12 +426,36 @@ class User extends Base{
             return returnjson(1001,'','验证码错误');
         }
         if (Cache::get('up_password'.$userInfo['tel']) != $post['code']) {
-            return returnjson(1001,'','验证码错误');
+            //return returnjson(1001,'','验证码错误');
         }
         return returnjson(1000,'','验证通过');
     }
+    //支付密码时验证验证码--邮箱
+    public function checkEmailCodePayPass(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+        }
+        $post = Request::instance()->post();
+        if($this->uid == 0) {
+            return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+        }
+        if(empty($post['email'])||empty($post['code'])){
+            return returnjson(1001,'','参数缺失');
+        }
+        //$code = $post['code'];
+        $user = new \app\wxapp\model\User;
+        $userInfo = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,email')->find();
+        if (!Cache::has('set_pay_password'.$userInfo['email'])){
+            return returnjson(1001,'','验证码错误');
+        }
+        if (Cache::get('set_pay_password'.$userInfo['email']) != $post['code']) {
+            //return returnjson(1001,'','验证码错误');
+        }
+        return returnjson(1000,'','验证通过');
 
-    //支付密码时验证验证码
+    }
+    //支付密码时验证验证码--手机
     public function checkTelCodePayPass(){
         $token = input('token');
         if(!empty($token)) {
@@ -364,14 +545,23 @@ class User extends Base{
             $param = splice_password($param,$userInfo['pay_salt']);
         }elseif($post['type'] == 7){  // 微信号
             $key = 'wechat';
-        }else if($param['type'] == 8) {  // 微信二维码
+        }else if($post['type'] == 8) {  // 微信二维码
             $key = 'wximg';
-        } else{
+        }elseif($post['type'] == 9){
+            if (!Cache::has('new_email'.$param)){
+                return returnjson(1001,'','验证码错误');
+            }
+            if (Cache::get('new_email'.$param) != $post['code']) {
+                return returnjson(1001,'','验证码错误');
+            }
+            $key = 'email';
+        }
+        else{
             return returnjson(1001,'','修改类型非法');
         }
         $res = $user->where('id',$this->uid)->update([$key=>$param]);
 
-        $userInfo1 = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,is_auth')->find();
+        $userInfo1 = $user->where('id',$this->uid)->field('id,name,headimg,student_no,level,signature,score,wechat,tel,is_auth,is_overseas,email')->find();
         if($userInfo1){   //is_auth 0未认证 1已提交审核 2已认证 3认证驳回
             $level = new level();
             $mylevel = $level->where('value',$userInfo1)->field('name')->find();
@@ -413,20 +603,105 @@ class User extends Base{
             }
         }
         $user_model = new \app\wxapp\model\User;
-        $userinfo = $user_model->where('id', $this->uid)->field('identityid,realname,is_auth')->find();
-        $userinfo['text1'] = '请认真填写资料，以保证资料正确，错误将无法通过用户真实性对比。';
-        $userinfo['text2'] = '为确保用户真实性，我们将调用第三方公司的认证系统进行实名认证，认证费用随机1.90～2.10元间（重阳节活动期间暂不收取，活动时间2020/10/23-2020/11/3）认证过程只做用户真实性比对，不做其他用途。';
-        $userinfo['text3'] = '活动期间每个人每天只有2次认证机会，超出则需要第二天认证，请仔细核对填写正确，必须人、证、脸一致方可通过。';
-        if($userinfo['is_auth'] ==1){
-            $userinfo['is_auth'] =1;
-            return returnjson(1000,$userinfo,'您已实名认证！');
+        $is_overseas = $user_model->where('id', $this->uid)->value('is_overseas');
+       // $type = input('type');
+        if($is_overseas==0){
+            $type=0;
         }else{
-            $userinfo['is_auth'] = 0;
+            $type=1;
+        }
+        if($type==0){
+
+            $userinfo = $user_model->where('id', $this->uid)->field('identityid,realname,is_auth')->find();
+            $userinfo['is_overseas']=0;
+            $userinfo['text1'] = '请认真填写资料，以保证资料正确，错误将无法通过用户真实性对比。';
+            $userinfo['text2'] = '为确保用户真实性，我们将调用第三方公司的认证系统进行实名认证，认证费用随机1.90～2.10元间（重阳节活动期间暂不收取，活动时间2020/10/23-2020/11/3）认证过程只做用户真实性比对，不做其他用途。';
+            $userinfo['text3'] = '活动期间每个人每天只有2次认证机会，超出则需要第二天认证，请仔细核对填写正确，必须人、证、脸一致方可通过。';
+            $userinfo['img_card']=null;
+            $userinfo['img_handcard']=null;
+            $userinfo['status']=null;
+            $userinfo['note']=null;
+            if($userinfo['is_auth'] ==1){
+                $userinfo['is_auth'] =1;
+                return returnjson(1001,$userinfo,'您已实名认证！');
+            }else{
+                $userinfo['is_auth'] = 0;
+            }
+
+            return returnjson(1000,$userinfo,'请去认证');
+        }elseif($type == 1){
+            $over=Db::name('user_overlog')->where('user_id','=',$this->uid)->order('id desc')->field('id,real_name,card_number,note,status')->find();
+            if(!isset($over['card_number'])){
+                $over['card_number']='';
+            }
+            if(!isset($over['real_name'])){
+                $over['real_name']='';
+            }
+            if(!isset($over['note'])){
+                $over['note']='';
+            }
+            if(!isset($over['status'])){
+                $over['status']=null;
+            }
+            if(!isset($over['id'])){
+                $over['id']=null;
+            }
+            $data=array('identityid'=>$over['card_number'],'realname'=>$over['real_name'],'note'=>$over['note'],
+                'status'=>$over['status']);
+            $data['text1'] = '请认真填写资料，以保证资料正确，错误将无法通过用户真实性对比。';
+            $data['text2'] = '为确保用户真实性，我们将调用第三方公司的认证系统进行实名认证，认证费用随机1.90～2.10元间（重阳节活动期间暂不收取，活动时间2020/10/23-2020/11/3）认证过程只做用户真实性比对，不做其他用途。';
+            $data['text3'] = '活动期间每个人每天只有2次认证机会，超出则需要第二天认证，请仔细核对填写正确，必须人、证、脸一致方可通过。';
+            $data['is_overseas']=1;
+            if(empty($over['id'])){
+                $data['is_auth'] =0;
+                $data['img_card']=null;
+                $data['img_handcard']=null;
+                return returnjson(1000,$data,'请去认证');
+            }elseif ($over['status']==0){
+                $data['is_auth'] =0;
+                $photo=Db::name('user_overlog_img')->where('user_overlog_id','=',$over['id'])->order('type asc')->column('url');
+                $data['img_card']=$photo[0];
+                $data['img_handcard']=$photo[1];
+                return returnjson(1000,$data,'已提交等待审核');
+            }elseif ($over['status']==2){
+                $data['is_auth'] =0;
+                $photo=Db::name('user_overlog_img')->where('user_overlog_id','=',$over['id'])->order('type asc')->column('url');
+                $data['img_card']=$photo[0];
+                $data['img_handcard']=$photo[1];
+                return returnjson(1001,$data,'审核已驳回');
+            }
+            $data['is_auth'] =1;
+            $photo=Db::name('user_overlog_img')->where('user_overlog_id','=',$over['id'])->order('type asc')->column('url');
+            $data['img_card']=$photo[0];
+            $data['img_handcard']=$photo[1];
+            return returnjson(1001,$data,'已认证');
+        }else{
+            return returnjson(1001,'','参数错误');
         }
 
-        return returnjson(1000,$userinfo,'');
     }
-
+    //获取身份验证信息
+    public function getIdentityover(){
+        $token = input('token');
+        if(!empty($token)) {
+            $this->getUserInfo($token);
+            if($this->uid == 0) {
+                return returnjson(1100,'该用户已在其他设备登陆','该用户已在其他设备登陆');
+            }
+        }
+        $over=Db::name('user_overlog')->where('user_id','=',$this->uid)->order('id desc')->field('real_name,card_number,note,status')->find();
+        $over['text1'] = '请认真填写资料，以保证资料正确，错误将无法通过用户真实性对比。';
+        $over['text2'] = '为确保用户真实性，我们将调用第三方公司的认证系统进行实名认证，认证费用随机1.90～2.10元间（重阳节活动期间暂不收取，活动时间2020/10/23-2020/11/3）认证过程只做用户真实性比对，不做其他用途。';
+        $over['text3'] = '活动期间每个人每天只有2次认证机会，超出则需要第二天认证，请仔细核对填写正确，必须人、证、脸一致方可通过。';
+        if(empty($over)){
+            return returnjson(1000,'','请去认证');
+        }elseif ($over['status']==0){
+            return returnjson(1001,$over,'已提交等待审核');
+        }elseif ($over['status']==2){
+            return returnjson(1001,$over,'审核已驳回');
+        }
+        return returnjson(1001,$over,'已认证');
+    }
     //保存实名信息（姓名，身份证号）
     public function saveIdentity(){
         $token = input('token');
@@ -454,7 +729,6 @@ class User extends Base{
             if($authnum<=$count){
                 return returnjson(1001,'','今日已超过验证次数，请明日再来');
             }
-
         }
         $user_model = new \app\wxapp\model\User();
       	//判断此身份证是佛存在
@@ -466,8 +740,6 @@ class User extends Base{
         if($userinfo['is_auth']==1){
             return returnjson(1001,'','您已实名认证过！');
         }
-
-
         $user_model->where('id', $this->uid)->update(['realname'=>$post['realname'],'identityid'=>$post['identityid']]);
       	$faceorder = Db::name('face_order')->where(['uid'=>$this->uid,'status'=>1])->find();
         if(!empty($faceorder)){
@@ -2993,13 +3265,11 @@ class User extends Base{
         if(!empty($token)) {
             $this->getUserInfo($token);
         }
-        $usr=UserService::LoginUserInfo();
-        //var_dump($usr);exit;
 
         if($this->uid == 0) {
             return returnjson('1100','','该设备在其他地方登录');
         }
-        $ret=UserOverlogService::UserOverlogAdd($usr['id'],$params);
+        $ret=UserOverlogService::UserOverlogAdd($this->uid,$params);
         if($ret['code']!==0){
             return returnjson(1001,'',$ret['msg']);
         }else{
